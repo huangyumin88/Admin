@@ -1,0 +1,38 @@
+export default {
+    name:{
+		movie_id: '电影id',
+		movie_name: '电影名称',
+		movie_real_name: '真实姓名',
+		movie_picture: '主图',
+		plot_photo: '剧情图片',
+		translated_name: '译名',
+		sub_intros: '内容标签',
+		url: '详情页地址',
+		years: '年代',
+		place: '产地',
+		category_name: '类别',
+		category_ids: '类别数组',
+		language_name: '语言',
+		subtitle: '字幕',
+		release_date: '上映日期',
+		imdb: 'IMDb评分',
+		doubandb: '豆瓣评分',
+		score: '评分',
+		awards: '奖项',
+		times: '',
+		time: '片长',
+		director: '导演',
+		scriptwriter: '编剧',
+		actors: '演员',
+		intros: '简介',
+		down_urls: '下载地址',
+		video_size: '视频大小',
+		video_resolution: '视频分辨率',
+		isUpdate: '更新',
+		isStop: '停用',
+    },
+    status: {
+    },
+    tip: {
+    }
+}

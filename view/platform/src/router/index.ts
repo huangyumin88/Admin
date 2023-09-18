@@ -104,6 +104,15 @@ const initRouteList = [
                 },
                 meta: { isAuth: true, keepAlive: true, componentName: '/platform/config' }
             },
+            {
+                path: '/movie/movie',
+                component: async () => {
+                    const component = await import('@/views/movie/movie/Index.vue')
+                    component.default.name = '/movie/movie'
+                    return component
+                },
+                meta: { isAuth: true, keepAlive: true, componentName: '/movie/movie' }
+            },
             /*--------前端路由自动代码生成锚点（不允许修改和删除，否则将不能自动生成路由）--------*/
             {
                 path: '/profile',

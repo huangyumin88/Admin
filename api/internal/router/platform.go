@@ -8,6 +8,7 @@ import (
 	controllerLogin "api/internal/controller/platform/login"
 	controllerMy "api/internal/controller/platform/my"
 	controllerPlatform "api/internal/controller/platform/platform"
+	controllerMovie "api/internal/controller/platform/movie"
 	"api/internal/middleware"
 )
 
@@ -48,6 +49,10 @@ func InitRouterPlatform(s *ghttp.Server) {
 			group.Group(`/platform`, func(group *ghttp.RouterGroup) {
 				group.Bind(controllerPlatform.NewAdmin())
 				group.Bind(controllerPlatform.NewConfig())
+			})
+
+			group.Group(`/movie`, func(group *ghttp.RouterGroup) {
+				group.Bind(controllerMovie.NewMovie())
 			})
 
 			/*--------后端路由自动代码生成锚点（不允许修改和删除，否则将不能自动生成路由）--------*/
