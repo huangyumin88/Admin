@@ -2,6 +2,7 @@ package cmd
 
 import (
 	daoAuth "api/internal/dao/auth"
+	"api/internal/service"
 	"api/internal/utils"
 	"context"
 	"fmt"
@@ -18,41 +19,41 @@ import (
 )
 
 /*
-后台常用生成示例：./main myGen -sceneCode=platform -dbGroup=default -dbTable=auth_test -removePrefix=auth_ -moduleDir=auth -commonName=测试 -isList=1 -isCount=1 -isInfo=1 -isCreate=1 -isUpdate=1 -isDelete=1 -isApi=1 -isAuthAction=1 -isView=1 -isCover=0
+后台常用生成示例：./main myGen -sceneCode=platform -dbGroup=default -dbTable=auth_test -removePrefix=auth_ -moduleDir=auth -commonName=权限管理/测试 -isList=1 -isCount=1 -isInfo=1 -isCreate=1 -isUpdate=1 -isDelete=1 -isApi=1 -isAuthAction=1 -isView=1 -isCover=0
 APP常用生成示例：./main myGen -sceneCode=app -dbGroup=xxxx -dbTable=user -removePrefix= -moduleDir=xxxx/user -commonName=用户 -isList=1 -isCount=0 -isInfo=1 -isCreate=0 -isUpdate=0 -isDelete=0 -isApi=1 -isAuthAction=0 -isView=0 -isCover=0
 
 强烈建议搭配Git使用
 表字段命名需要遵守以下规则，否则只会根据字段类型做默认处理
 主键必须在第一个字段。否则需要在dao层重写PrimaryKey方法返回主键字段
-表内尽量根据表名设置xxxxId和xxxxName两个字段(这两字段，常用于前端部分组件，服务端请求获取id和label两个字段用于列表展示)
+表内尽量根据表名设置xxxxId主键和xxxxName名称两个字段（作用1：常用于前端部分组件，如MySelect.vue组件；作用2：当其它表存在与该表主键同名的关联字段时，会自动生成联表查询代码）
 每个字段都必须有注释。以下符号[\n\r.。:：(（]之前的部分或整个注释，将作为字段名称使用
 
 	部分常用字段：
-		密码 		命名：password|passwd；类型：char(32)；注意：salt同时存在时，有特殊处理
-		加密盐 		命名：salt；类型：char(8)；
-		父级		命名：pid；类型：int等类型；注意：level,idPath|id_path同时存在时，有特殊处理
-		层级		命名：level；类型：int等类型
-		层级路径	命名：idPath|id_path；类型：varchar
-		排序		命名：sort；类型：int等类型
-		权重		命名：weight；类型：int等类型
+		密码 		命名：password|passwd；类型：char(32)；注意：password|passwd,salt同时存在时，有特殊处理
+		加密盐 		命名：salt；类型：char(8)；注意：password|passwd,salt同时存在时，(才)有特殊处理
+		父级		命名：pid；类型：int等类型；注意：pid,level,idPath|id_path同时存在时，有特殊处理
+		层级		命名：level；类型：int等类型；注意：pid,level,idPath|id_path同时存在时，(才)有特殊处理
+		层级路径	命名：idPath|id_path；类型：varchar；注意：pid,level,idPath|id_path同时存在时，(才)有特殊处理
+		排序		命名：sort；类型：int等类型；
+		权重		命名：weight；类型：int等类型；
 		性别		命名：gender；类型：int等类型；注释：多状态之间用[\s,，;；]等字符分隔。示例（性别：0未设置 1男 2女）
-		头像		命名：avatar；类型：varchar
+		头像		命名：avatar；类型：varchar；
 	其他类型字段：
-		名称		命名：name后缀；类型：varchar
-		标识		命名：code后缀；类型：varchar
-		手机		命名：mobile,phone后缀；类型：varchar
-		链接		命名：url,link后缀；类型：varchar
-		关联ID		命名：id后缀；类型：int等类型
+		名称		命名：name后缀；类型：varchar；
+		标识		命名：code后缀；类型：varchar；
+		手机		命名：mobile,phone后缀；类型：varchar；
+		链接		命名：url,link后缀；类型：varchar；
+		关联ID		命名：id后缀；类型：int等类型；
 		图片		命名：icon,cover,img,img_list,imgList,img_arr,imgArr,image,image_list,imageList,image_arr,imageArr等后缀；类型：单图片varchar，多图片json或text
 		视频		命名：video,video_list,videoList,video_arr,videoArr等后缀；类型：单视频varchar，多视频json或text
-		数组		命名：list,arr等后缀；类型：json或text
-		IP			命名：IP后缀；类型：varchar
+		数组		命名：list,arr等后缀；类型：json或text；
+		IP			命名：IP后缀；类型：varchar；
 		(富)文本	命名：remark,desc,msg,message,intro,content后缀；类型：varchar或text；前端生成表单组件：textarea文本输入框或tinymce富文本编辑器
 		状态		命名：status后缀；类型：int等类型；注释：多状态之间用[\s,，;；]等字符分隔。示例（状态：0待处理 1已处理 2驳回）
 		类型		命名：type后缀；类型：int等类型；注释：多状态之间用[\s,，;；]等字符分隔。示例（类型：0安卓 1苹果）
 		是否		命名：is_前缀；类型：int等类型；注释：示例（停用：0否 1是）
-		开始时间	命名：start_前缀；类型：timestamp或datetime或date
-		结束时间	命名：end_前缀；类型：timestamp或datetime或date
+		开始时间	命名：start_前缀；类型：timestamp或datetime或date；
+		结束时间	命名：end_前缀；类型：timestamp或datetime或date；
 */
 type MyGenOption struct {
 	SceneCode    string `json:"sceneCode"`    //场景标识，必须在数据库表auth_scene已存在。示例：platform
@@ -60,7 +61,7 @@ type MyGenOption struct {
 	DbTable      string `json:"dbTable"`      //db表。示例：auth_test
 	RemovePrefix string `json:"removePrefix"` //要删除的db表前缀。必须和hack/config.yaml内removePrefix保持一致，示例：auth_
 	ModuleDir    string `json:"moduleDir"`    //模块目录，支持多目录。必须和hack/config.yaml内daoPath的后面部分保持一致，示例：auth，xxxx/user
-	CommonName   string `json:"commonName"`   //公共名称，将同时在swagger文档Tag标签名称，菜单名称和操作名称中使用。示例：场景，权限/测试
+	CommonName   string `json:"commonName"`   //公共名称，将同时在swagger文档Tag标签，权限菜单和权限操作中使用。示例：用户，权限管理/测试
 	IsList       bool   `json:"isList" `      //是否生成列表接口(0和no为false，1和yes为true)
 	IsCount      bool   `json:"isCount" `     //列表接口是否返回总数
 	IsInfo       bool   `json:"isInfo" `      //是否生成详情接口
@@ -77,13 +78,12 @@ type MyGenTpl struct {
 	TableColumnList                gdb.Result //表字段详情
 	SceneName                      string     //场景名称
 	SceneId                        int        //场景ID
-	TableNameCaseCamelLower        string     //去除前缀表名（小驼峰）
 	TableNameCaseCamel             string     //去除前缀表名（大驼峰）
+	TableNameCaseCamelLower        string     //去除前缀表名（小驼峰）
 	TableNameCaseSnake             string     //去除前缀表名（蛇形）
+	ModuleDirCaseCamel             string     //模块目录（大驼峰，/会被去除）
 	ModuleDirCaseCamelLower        string     //模块目录（小驼峰，/会被保留）
 	ModuleDirCaseCamelLowerReplace string     //模块目录（小驼峰，/会被替换成.）
-	ModuleDirCaseCamel             string     //模块目录（大驼峰，/会被去除）
-	ModuleDirCaseSnake             string     //模块目录（蛇形，/会被去除）
 	LogicStructName                string     //logic层结构体名称，也是权限操作前缀（大驼峰，由ModuleDirCaseCamel+TableNameCaseCamel组成。命名原因：gf gen service只支持logic单层目录，可能导致service层重名）
 	PrimaryKey                     string     //表主键
 	DeletedField                   string     //表删除时间字段
@@ -91,7 +91,8 @@ type MyGenTpl struct {
 	CreatedField                   string     //表创建时间字段
 	LabelField                     string     //dao层label对应的字段(常用于前端组件)
 	// 以下字段用于对某些表字段做特殊处理
-	PasswordHandle struct { //password|passwd,salt同时存在时，需特殊处理
+	RelTableMap    map[string]RelTableItem //当id后缀字段，且关联表能确定时，会自动生成联表查询代码
+	PasswordHandle struct {                //password|passwd,salt同时存在时，需特殊处理
 		IsCoexist     bool   //是否同时存在
 		PasswordField string //密码字段
 		SaltField     string //加密盐字段
@@ -103,6 +104,19 @@ type MyGenTpl struct {
 		IdPathField string //层级路径字段
 		SortField   string //排序字段
 	}
+}
+
+type RelTableItem struct {
+	IsExistRelTableDao         bool   //是否存在关联表dao层
+	RelDaoDir                  string //关联表dao层目录
+	RelDaoDirCaseCamel         string //关联表dao层目录（大驼峰，/会被去除）
+	RelDaoDirCaseCamelLower    string //关联表dao层目录（小驼峰，/会被保留）
+	IsSameDir                  bool   //关联表dao层是否与当前生成dao层在相同目录下
+	RelTableNameCaseCamel      string //关联表名（大驼峰）
+	RelTableNameCaseCamelLower string //关联表名（小驼峰）
+	RelTableNameCaseSnake      string //关联表名（蛇形）
+	RelNameFieldCaseCamelLower string //关联表名称字段（小驼峰）
+	RelNameFieldName           string //关联表名称字段名称
 }
 
 func MyGenFunc(ctx context.Context, parser *gcmd.Parser) (err error) {
@@ -204,16 +218,16 @@ func MyGenOptionHandle(ctx context.Context, parser *gcmd.Parser) (option *MyGenO
 		}
 		option.ModuleDir = gcmd.Scan("> 请输入模块目录:\n")
 	}
-	// 公共名称，将同时在swagger文档Tag标签名称，菜单名称和操作名称中使用。示例：场景
+	// 公共名称，将同时在swagger文档Tag标签，权限菜单和权限操作中使用。示例：场景
 	_, ok = optionMap[`commonName`]
 	if !ok {
-		option.CommonName = gcmd.Scan("> 请输入公共名称，将同时在swagger文档Tag标签名称，菜单名称和操作名称中使用:\n")
+		option.CommonName = gcmd.Scan("> 请输入公共名称，将同时在swagger文档Tag标签，权限菜单和权限操作中使用:\n")
 	}
 	for {
 		if option.CommonName != `` {
 			break
 		}
-		option.CommonName = gcmd.Scan("> 请输入公共名称，将同时在swagger文档Tag标签名称，菜单名称和操作名称中使用:\n")
+		option.CommonName = gcmd.Scan("> 请输入公共名称，将同时在swagger文档Tag标签，权限菜单和权限操作中使用:\n")
 	}
 noAllRestart:
 	// 是否生成列表接口
@@ -414,24 +428,22 @@ func MyGenTplHandle(ctx context.Context, option *MyGenOption) (tpl *MyGenTpl) {
 		TableColumnList:         tableColumnList,
 		SceneName:               sceneInfo[daoAuth.Scene.Columns().SceneName].String(),
 		SceneId:                 sceneInfo[daoAuth.Scene.Columns().SceneId].Int(),
-		TableNameCaseCamelLower: gstr.CaseCamelLower(tableName),
 		TableNameCaseCamel:      gstr.CaseCamel(tableName),
+		TableNameCaseCamelLower: gstr.CaseCamelLower(tableName),
 		TableNameCaseSnake:      gstr.CaseSnakeFirstUpper(tableName),
+		RelTableMap:             map[string]RelTableItem{},
 	}
 	moduleDirArr := gstr.Split(option.ModuleDir, `/`)
-	ModuleDirCaseCamelLowerArr := []string{}
-	ModuleDirCaseCamelArr := []string{}
-	ModuleDirCaseSnakeArr := []string{}
+	moduleDirCaseCamelArr := []string{}
+	moduleDirCaseCamelLowerArr := []string{}
 	for _, v := range moduleDirArr {
-		ModuleDirCaseCamelLowerArr = append(ModuleDirCaseCamelLowerArr, gstr.CaseCamelLower(v))
-		ModuleDirCaseCamelArr = append(ModuleDirCaseCamelArr, gstr.CaseCamel(v))
-		ModuleDirCaseSnakeArr = append(ModuleDirCaseSnakeArr, gstr.CaseSnake(v))
+		moduleDirCaseCamelArr = append(moduleDirCaseCamelArr, gstr.CaseCamel(v))
+		moduleDirCaseCamelLowerArr = append(moduleDirCaseCamelLowerArr, gstr.CaseCamelLower(v))
 	}
-	tpl.ModuleDirCaseCamelLower = gstr.Join(ModuleDirCaseCamelLowerArr, `/`)
+	tpl.ModuleDirCaseCamel = gstr.Join(moduleDirCaseCamelArr, ``)
+	tpl.ModuleDirCaseCamelLower = gstr.Join(moduleDirCaseCamelLowerArr, `/`)
 	tpl.ModuleDirCaseCamelLowerReplace = gstr.Replace(tpl.ModuleDirCaseCamelLower, `/`, `.`)
-	tpl.ModuleDirCaseCamel = gstr.Join(ModuleDirCaseCamelArr, ``)
-	tpl.ModuleDirCaseSnake = gstr.Join(ModuleDirCaseSnakeArr, `_`)
-	if ModuleDirCaseSnakeArr[len(ModuleDirCaseSnakeArr)-1] == tpl.TableNameCaseSnake {
+	if gstr.CaseSnakeFirstUpper(moduleDirCaseCamelArr[len(moduleDirCaseCamelArr)-1]) == tpl.TableNameCaseSnake {
 		tpl.LogicStructName = tpl.ModuleDirCaseCamel
 	} else {
 		tpl.LogicStructName = tpl.ModuleDirCaseCamel + tpl.TableNameCaseCamel
@@ -442,6 +454,8 @@ func MyGenTplHandle(ctx context.Context, option *MyGenOption) (tpl *MyGenTpl) {
 	for index, column := range tpl.TableColumnList {
 		field := column[`Field`].String()
 		fieldCaseCamel := gstr.CaseCamel(field)
+		tmp, _ := gregex.MatchString(`[^\n\r\.。:：\(（]*`, column[`Comment`].String())
+		fieldName := gstr.Trim(tmp[0])
 		fieldArr[index] = field
 		fieldCaseCamelArr[index] = fieldCaseCamel
 
@@ -492,6 +506,68 @@ func MyGenTplHandle(ctx context.Context, option *MyGenOption) (tpl *MyGenTpl) {
 			tpl.PidHandle.SortField = field
 			continue
 		}
+		//id后缀
+		if gstr.SubStr(fieldCaseCamel, -2) == `Id` && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+			relTableNameRaw := gstr.SubStr(field, 0, -2)
+			relTableItem := RelTableItem{
+				IsExistRelTableDao:         false,
+				RelDaoDir:                  ``,
+				IsSameDir:                  false,
+				RelTableNameCaseCamel:      gstr.CaseCamel(relTableNameRaw),
+				RelTableNameCaseCamelLower: gstr.CaseCamelLower(relTableNameRaw),
+				RelTableNameCaseSnake:      gstr.CaseSnakeFirstUpper(relTableNameRaw),
+				RelNameFieldCaseCamelLower: gstr.CaseCamelLower(relTableNameRaw) + `Name`,
+				RelNameFieldName:           fieldName,
+			}
+			if gstr.ToUpper(gstr.SubStr(relTableItem.RelNameFieldName, -2)) == `ID` {
+				relTableItem.RelNameFieldName = gstr.SubStr(relTableItem.RelNameFieldName, 0, -2)
+			}
+
+			fileArr, _ := gfile.ScanDirFile(gfile.SelfDir()+`/internal/dao/`, relTableItem.RelTableNameCaseSnake+`\.go`, true)
+			relDaoDirList := []string{}
+			for _, v := range fileArr {
+				if gstr.Count(v, `/internal/`) == 1 {
+					relDaoDirTmp := gstr.Replace(v, gfile.SelfDir()+`/internal/dao/`, ``)
+					relDaoDirTmp = gstr.Replace(relDaoDirTmp, `/`+relTableItem.RelTableNameCaseSnake+`.go`, ``)
+					if relDaoDirTmp == tpl.ModuleDirCaseCamelLower { //关联dao层在相同目录下时，直接返回
+						relTableItem.IsExistRelTableDao = true
+						relTableItem.RelDaoDir = relDaoDirTmp
+						relTableItem.IsSameDir = true
+						break
+					}
+					relDaoDirList = append(relDaoDirList, relDaoDirTmp)
+				}
+			}
+			if !relTableItem.IsExistRelTableDao {
+				if len(relDaoDirList) == 1 {
+					relTableItem.IsExistRelTableDao = true
+					relTableItem.RelDaoDir = relDaoDirList[0]
+				} else {
+					// gstr.SubStr(tpl.ModuleDirCaseCamelLower, 0, gstr.PosR(tpl.ModuleDirCaseCamelLower, `/`))
+					relDaoCount := 0 //计算dao层同层目录的数量
+					for _, v := range relDaoDirList {
+						if gstr.Count(v, `/`) == gstr.Count(tpl.ModuleDirCaseCamelLower, `/`) {
+							relDaoCount++
+							relTableItem.RelDaoDir = v
+						}
+					}
+					if relDaoCount == 1 { //当同层目录只存在一个关联dao时，以这个为准
+						relTableItem.IsExistRelTableDao = true
+					}
+				}
+			}
+			relDaoDirArr := gstr.Split(relTableItem.RelDaoDir, `/`)
+			relDaoDirCaseCamelArr := []string{}
+			relDaoDirCaseCamelLowerArr := []string{}
+			for _, v := range relDaoDirArr {
+				relDaoDirCaseCamelArr = append(relDaoDirCaseCamelArr, gstr.CaseCamel(v))
+				relDaoDirCaseCamelLowerArr = append(relDaoDirCaseCamelLowerArr, gstr.CaseCamelLower(v))
+			}
+			relTableItem.RelDaoDirCaseCamel = gstr.Join(relDaoDirCaseCamelArr, ``)
+			relTableItem.RelDaoDirCaseCamelLower = gstr.Join(relDaoDirCaseCamelLowerArr, `/`)
+			tpl.RelTableMap[field] = relTableItem
+			continue
+		}
 	}
 
 	fieldCaseCamelArrG := garray.NewStrArrayFrom(fieldCaseCamelArr)
@@ -526,15 +602,18 @@ func MyGenTplHandle(ctx context.Context, option *MyGenOption) (tpl *MyGenTpl) {
 // 自动生成操作
 func MyGenAction(ctx context.Context, sceneId int, actionCode string, actionName string) {
 	daoThis := daoAuth.Action
-	idVar, _ := daoThis.ParseDbCtx(ctx).Where(daoThis.Columns().ActionCode, actionCode).Value(daoThis.PrimaryKey())
+	columnsThis := daoAuth.Action.Columns()
+	actionName = gstr.Replace(actionName, `/`, `-`)
+
+	idVar, _ := daoThis.ParseDbCtx(ctx).Where(columnsThis.ActionCode, actionCode).Value(daoThis.PrimaryKey())
 	id := idVar.Int64()
 	if id == 0 {
 		id, _ = daoThis.ParseDbCtx(ctx).Data(map[string]interface{}{
-			daoThis.Columns().ActionCode: actionCode,
-			daoThis.Columns().ActionName: actionName,
+			columnsThis.ActionCode: actionCode,
+			columnsThis.ActionName: actionName,
 		}).InsertAndGetId()
 	} else {
-		daoThis.ParseDbCtx(ctx).Where(daoThis.PrimaryKey(), id).Data(daoThis.Columns().ActionName, actionName).Update()
+		daoThis.ParseDbCtx(ctx).Where(daoThis.PrimaryKey(), id).Data(columnsThis.ActionName, actionName).Update()
 	}
 	daoAuth.ActionRelToScene.ParseDbCtx(ctx).Data(map[string]interface{}{
 		daoAuth.ActionRelToScene.Columns().ActionId: id,
@@ -545,22 +624,44 @@ func MyGenAction(ctx context.Context, sceneId int, actionCode string, actionName
 // 自动生成菜单
 func MyGenMenu(ctx context.Context, sceneId int, menuUrl string, menuName string, menuNameOfEn string) {
 	daoThis := daoAuth.Menu
-	idVar, _ := daoThis.ParseDbCtx(ctx).Where(daoThis.Columns().SceneId, sceneId).Where(daoThis.Columns().MenuUrl, menuUrl).Value(daoThis.PrimaryKey())
+	columnsThis := daoAuth.Menu.Columns()
+	menuNameArr := gstr.Split(menuName, `/`)
+
+	var pid int64 = 0
+	for _, v := range menuNameArr[:len(menuNameArr)-1] {
+		pidVar, _ := daoThis.ParseDbCtx(ctx).Where(columnsThis.SceneId, sceneId).Where(columnsThis.MenuName, v).Value(daoThis.PrimaryKey())
+		if pidVar.Int() == 0 {
+			pid, _ = service.AuthMenu().Create(ctx, g.Map{
+				columnsThis.SceneId:   sceneId,
+				columnsThis.Pid:       pid,
+				columnsThis.MenuName:  v,
+				columnsThis.MenuIcon:  `AutoiconEpLink`,
+				columnsThis.MenuUrl:   ``,
+				columnsThis.ExtraData: `{"i18n": {"title": {"en": "", "zh-cn": "` + v + `"}}}`,
+			})
+		} else {
+			pid = pidVar.Int64()
+		}
+	}
+
+	menuName = menuNameArr[len(menuNameArr)-1]
+	idVar, _ := daoThis.ParseDbCtx(ctx).Where(columnsThis.SceneId, sceneId).Where(columnsThis.MenuUrl, menuUrl).Value(daoThis.PrimaryKey())
 	id := idVar.Int()
 	if id == 0 {
-		daoThis.ParseDbCtx(ctx).Handler(daoThis.ParseInsert(map[string]interface{}{
-			daoThis.Columns().SceneId:   sceneId,
-			daoThis.Columns().Pid:       0,
-			daoThis.Columns().MenuName:  menuName,
-			daoThis.Columns().MenuIcon:  `AutoiconEpLink`,
-			daoThis.Columns().MenuUrl:   menuUrl,
-			daoThis.Columns().ExtraData: `{"i18n": {"title": {"en": "` + menuNameOfEn + `", "zh-cn": "` + menuName + `"}}}`,
-		})).InsertAndGetId()
+		service.AuthMenu().Create(ctx, g.Map{
+			columnsThis.SceneId:   sceneId,
+			columnsThis.Pid:       pid,
+			columnsThis.MenuName:  menuName,
+			columnsThis.MenuIcon:  `AutoiconEpLink`,
+			columnsThis.MenuUrl:   menuUrl,
+			columnsThis.ExtraData: `{"i18n": {"title": {"en": "` + menuNameOfEn + `", "zh-cn": "` + menuName + `"}}}`,
+		})
 	} else {
-		daoThis.ParseDbCtx(ctx).Where(daoThis.PrimaryKey(), id).Data(map[string]interface{}{
-			daoThis.Columns().MenuName:  menuName,
-			daoThis.Columns().ExtraData: `{"i18n": {"title": {"en": "` + menuNameOfEn + `", "zh-cn": "` + menuName + `"}}}`,
-		}).Update()
+		service.AuthMenu().Update(ctx, g.Map{daoThis.PrimaryKey(): id}, g.Map{
+			columnsThis.MenuName:  menuName,
+			columnsThis.Pid:       pid,
+			columnsThis.ExtraData: `{"i18n": {"title": {"en": "` + menuNameOfEn + `", "zh-cn": "` + menuName + `"}}}`,
+		})
 	}
 }
 
@@ -593,6 +694,7 @@ func MyGenTplDao(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 	daoParseOrder := ``
 	daoParseJoin := ``
 	daoFunc := ``
+	daoImportOtherDao := ``
 
 	if tpl.LabelField != `` {
 		daoParseFieldTmp := `
@@ -631,24 +733,74 @@ func MyGenTplDao(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 			}
 			continue
 		}
+		//主键
+		if column[`Key`].String() == `PRI` && column[`Extra`].String() == `auto_increment` {
+			continue
+		}
 		//password|passwd
 		if garray.NewStrArrayFrom([]string{`password`, `passwd`}).Contains(field) && column[`Type`].String() == `char(32)` {
 			continue
 		}
 		//salt
-		if garray.NewStrArrayFrom([]string{`salt`}).Contains(field) && column[`Type`].String() == `char(8)` {
+		if garray.NewStrArrayFrom([]string{`salt`}).Contains(field) && column[`Type`].String() == `char(8)` && tpl.PasswordHandle.IsCoexist {
 			continue
 		}
 		//pid
 		if garray.NewStrArrayFrom([]string{`pid`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+			if tpl.LabelField != `` {
+				daoParseFieldTmp := `
+			case ` + "`p" + gstr.CaseCamel(tpl.LabelField) + "`" + `:
+				m = m.Fields(` + "`p_`" + ` + daoThis.Table() + ` + "`.`" + ` + daoThis.Columns().` + gstr.CaseCamel(tpl.LabelField) + ` + ` + "` AS `" + ` + v)
+				m = daoThis.ParseJoin(` + "`p_`" + `+daoThis.Table(), joinTableArr)(m)`
+				if gstr.Pos(tplDao, daoParseFieldTmp) == -1 {
+					daoParseField += daoParseFieldTmp
+				}
+			}
+			daoParseFieldTmp := `
+			case ` + "`tree`" + `:
+				m = m.Fields(daoThis.Table() + ` + "`.`" + ` + daoThis.PrimaryKey())
+				m = m.Fields(daoThis.Table() + ` + "`.`" + ` + daoThis.Columns().` + fieldCaseCamel + `)
+				m = daoThis.ParseOrder([]string{` + "`tree`" + `}, joinTableArr)(m)`
+			if gstr.Pos(tplDao, daoParseFieldTmp) == -1 {
+				daoParseField += daoParseFieldTmp
+			}
+			daoParseOrderTmp := `
+			case ` + "`tree`" + `:
+				m = m.OrderAsc(daoThis.Table() + ` + "`.`" + ` + daoThis.Columns().` + fieldCaseCamel + `)`
+			if tpl.PidHandle.SortField != `` {
+				daoParseOrderTmp += `
+				m = m.OrderAsc(daoThis.Table() + ` + "`.`" + ` + daoThis.Columns().` + gstr.CaseCamel(tpl.PidHandle.SortField) + `)`
+			}
+			daoParseOrderTmp += `
+				m = m.OrderAsc(daoThis.Table() + ` + "`.`" + ` + daoThis.PrimaryKey())`
+			if gstr.Pos(tplDao, daoParseOrderTmp) == -1 {
+				daoParseOrder += daoParseOrderTmp
+			}
+			daoParseJoinTmp := `
+		case ` + "`p_`" + ` + daoThis.Table():
+			relTable := ` + "`p_`" + ` + daoThis.Table()
+			if !garray.NewStrArrayFrom(*joinTableArr).Contains(relTable) {
+				*joinTableArr = append(*joinTableArr, relTable)
+				m = m.LeftJoin(daoThis.Table()+` + "` AS `" + `+relTable, relTable+` + "`.`" + `+daoThis.PrimaryKey()+` + "` = `" + `+daoThis.Table()+` + "`.`" + `+daoThis.Columns().` + fieldCaseCamel + `)
+			}`
+			if gstr.Pos(tplDao, daoParseJoinTmp) == -1 {
+				daoParseJoin += daoParseJoinTmp
+			}
 			continue
 		}
 		//level
-		if garray.NewStrArrayFrom([]string{`level`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+		if garray.NewStrArrayFrom([]string{`level`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 && tpl.PidHandle.IsCoexist {
+			daoParseOrderTmp := `
+			case daoThis.Columns().` + fieldCaseCamel + `:
+				m = m.Order(daoThis.Table()+` + "`.`" + `+kArr[0], kArr[1])
+				m = m.OrderDesc(daoThis.Table() + ` + "`.`" + ` + daoThis.PrimaryKey())` //追加主键倒序。mysql排序字段有重复值时，分页会导致同一条数据可能在不同页都出现
+			if gstr.Pos(tplDao, daoParseOrderTmp) == -1 {
+				daoParseOrder += daoParseOrderTmp
+			}
 			continue
 		}
 		//idPath|id_path
-		if fieldCaseCamel == `IdPath` && gstr.Pos(column[`Type`].String(), `varchar`) != -1 {
+		if fieldCaseCamel == `IdPath` && gstr.Pos(column[`Type`].String(), `varchar`) != -1 && tpl.PidHandle.IsCoexist {
 			continue
 		}
 		//sort
@@ -660,6 +812,39 @@ func MyGenTplDao(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 				m = m.OrderDesc(daoThis.Table() + ` + "`.`" + ` + daoThis.PrimaryKey())` //追加主键倒序。mysql排序字段有重复值时，分页会导致同一条数据可能在不同页都出现
 			if gstr.Pos(tplDao, daoParseOrderTmp) == -1 {
 				daoParseOrder += daoParseOrderTmp
+			}
+			continue
+		}
+		//id后缀
+		if gstr.SubStr(fieldCaseCamel, -2) == `Id` && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+			if tpl.RelTableMap[field].IsExistRelTableDao {
+				relTable := tpl.RelTableMap[field]
+				daoPath := relTable.RelTableNameCaseCamel
+				if !relTable.IsSameDir {
+					daoPath = `dao` + relTable.RelDaoDirCaseCamel + `.` + relTable.RelTableNameCaseCamel
+					daoImportOtherDaoTmp := `
+	dao` + relTable.RelDaoDirCaseCamel + ` "api/internal/dao/` + relTable.RelDaoDir + `"`
+					if gstr.Pos(tplDao, daoImportOtherDaoTmp) == -1 {
+						daoImportOtherDao += daoImportOtherDaoTmp
+					}
+				}
+				daoParseFieldTmp := `
+			case ` + "`" + relTable.RelNameFieldCaseCamelLower + "`" + `:
+				m = m.Fields(` + daoPath + `.Table() + ` + "`.`" + ` + v)
+				m = daoThis.ParseJoin(` + daoPath + `.Table(), joinTableArr)(m)`
+				if gstr.Pos(tplDao, daoParseFieldTmp) == -1 {
+					daoParseField += daoParseFieldTmp
+				}
+				daoParseJoinTmp := `
+		case ` + daoPath + `.Table():
+			relTable := ` + daoPath + `.Table()
+			if !garray.NewStrArrayFrom(*joinTableArr).Contains(relTable) {
+				*joinTableArr = append(*joinTableArr, relTable)
+				m = m.LeftJoin(relTable, relTable+` + "`.`" + `+` + daoPath + `.PrimaryKey()+` + "` = `" + `+daoThis.Table()+` + "`.`" + `+daoThis.Columns().` + fieldCaseCamel + `)
+			}`
+				if gstr.Pos(tplDao, daoParseJoinTmp) == -1 {
+					daoParseJoin += daoParseJoinTmp
+				}
 			}
 			continue
 		}
@@ -729,48 +914,6 @@ func MyGenTplDao(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 		}
 	}
 
-	if tpl.PidHandle.PidField != `` {
-		if tpl.LabelField != `` {
-			daoParseFieldTmp := `
-			case ` + "`p" + gstr.CaseCamel(tpl.LabelField) + "`" + `:
-				m = m.Fields(` + "`p_`" + ` + daoThis.Table() + ` + "`.`" + ` + daoThis.Columns().` + gstr.CaseCamel(tpl.LabelField) + ` + ` + "` AS `" + ` + v)
-				m = daoThis.ParseJoin(` + "`p_`" + `+daoThis.Table(), joinTableArr)(m)`
-			if gstr.Pos(tplDao, daoParseFieldTmp) == -1 {
-				daoParseField += daoParseFieldTmp
-			}
-		}
-		daoParseFieldTmp := `
-			case ` + "`tree`" + `:
-				m = m.Fields(daoThis.Table() + ` + "`.`" + ` + daoThis.PrimaryKey())
-				m = m.Fields(daoThis.Table() + ` + "`.`" + ` + daoThis.Columns().` + gstr.CaseCamel(tpl.PidHandle.PidField) + `)
-				m = daoThis.ParseOrder([]string{` + "`tree`" + `}, joinTableArr)(m)`
-		if gstr.Pos(tplDao, daoParseFieldTmp) == -1 {
-			daoParseField += daoParseFieldTmp
-		}
-		daoParseOrderTmp := `
-			case ` + "`tree`" + `:
-				m = m.OrderAsc(daoThis.Table() + ` + "`.`" + ` + daoThis.Columns().` + gstr.CaseCamel(tpl.PidHandle.PidField) + `)`
-		if tpl.PidHandle.SortField != `` {
-			daoParseOrderTmp += `
-				m = m.OrderAsc(daoThis.Table() + ` + "`.`" + ` + daoThis.Columns().` + gstr.CaseCamel(tpl.PidHandle.SortField) + `)`
-		}
-		daoParseOrderTmp += `
-				m = m.OrderAsc(daoThis.Table() + ` + "`.`" + ` + daoThis.PrimaryKey())`
-		if gstr.Pos(tplDao, daoParseOrderTmp) == -1 {
-			daoParseOrder += daoParseOrderTmp
-		}
-		daoParseJoinTmp := `
-		case ` + "`p_`" + ` + daoThis.Table():
-			relTable := ` + "`p_`" + ` + daoThis.Table()
-			if !garray.NewStrArrayFrom(*joinTableArr).Contains(relTable) {
-				*joinTableArr = append(*joinTableArr, relTable)
-				m = m.LeftJoin(daoThis.Table()+` + "` AS `" + `+relTable, relTable+` + "`.`" + `+daoThis.PrimaryKey()+` + "` = `" + `+daoThis.Table()+` + "`.`" + `+daoThis.Columns().` + gstr.CaseCamel(tpl.PidHandle.PidField) + `)
-			}`
-		if gstr.Pos(tplDao, daoParseJoinTmp) == -1 {
-			daoParseJoin += daoParseJoinTmp
-		}
-	}
-
 	if tpl.PidHandle.IsCoexist {
 		daoParseInsertTmp := `
 			case daoThis.Columns().` + gstr.CaseCamel(tpl.PidHandle.PidField) + `:
@@ -833,7 +976,6 @@ func MyGenTplDao(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 			daoHookUpdateAfter += daoHookUpdateAfterTmp
 		}
 		daoFuncTmp := `
-
 // 修改pid时，更新所有子孙级的idPath和level
 func (daoThis *` + tpl.TableNameCaseCamelLower + `Dao) UpdateChildIdPathAndLevel(ctx context.Context, newIdPath string, oldIdPath string, newLevel int, oldLevel int) {
 	daoThis.ParseDbCtx(ctx).WhereLike(daoThis.Columns().` + gstr.CaseCamel(tpl.PidHandle.IdPathField) + `, oldIdPath+` + "`-%`" + `).Data(g.Map{
@@ -891,8 +1033,8 @@ func (daoThis *` + tpl.TableNameCaseCamelLower + `Dao) UpdateChildIdPathAndLevel
 	}
 	if daoHookSelect != `` {
 		daoHookSelectPoint := `
-					/* case ` + "`xxxx`" + `:
-					record[v] = gvar.New(` + "``" + `) */`
+						/* case ` + "`xxxx`" + `:
+						record[v] = gvar.New(` + "``" + `) */`
 		tplDao = gstr.Replace(tplDao, daoHookSelectPoint, daoHookSelect)
 	}
 	if daoParseFilter != `` {
@@ -916,8 +1058,11 @@ func (daoThis *` + tpl.TableNameCaseCamelLower + `Dao) UpdateChildIdPathAndLevel
 		tplDao = gstr.Replace(tplDao, daoParseJoinPoint, daoParseJoin)
 	}
 	if daoFunc != `` {
-		daoFuncPoint := `// Fill with you ideas below.`
-		tplDao = gstr.Replace(tplDao, daoFuncPoint, daoFuncPoint+daoFunc)
+		tplDao = tplDao + daoFunc
+	}
+	if daoImportOtherDao != `` {
+		daoImportOtherDaoPoint := `"api/internal/dao/auth/internal"`
+		tplDao = gstr.Replace(tplDao, daoImportOtherDaoPoint, daoImportOtherDaoPoint+daoImportOtherDao)
 	}
 
 	tplDao = gstr.Replace(tplDao, `"github.com/gogf/gf/v2/util/gconv"`, `"github.com/gogf/gf/v2/util/gconv"
@@ -932,7 +1077,7 @@ func (daoThis *` + tpl.TableNameCaseCamelLower + `Dao) UpdateChildIdPathAndLevel
 
 // logic模板生成（文件不存在时增删改查全部生成，已存在不处理不覆盖）
 func MyGenTplLogic(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
-	saveFile := gfile.SelfDir() + `/internal/logic/` + tpl.ModuleDirCaseSnake + `/` + tpl.TableNameCaseSnake + `.go`
+	saveFile := gfile.SelfDir() + `/internal/logic/` + gstr.LcFirst(tpl.ModuleDirCaseCamel) + `/` + tpl.TableNameCaseSnake + `.go`
 	if gfile.IsFile(saveFile) {
 		return
 	}
@@ -1072,6 +1217,7 @@ func MyGenTplApi(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 	apiReqCreateColumn := ``
 	apiReqUpdateColumn := ``
 	apiResColumn := ``
+	apiResColumnAlloweFieldList := ``
 	if tpl.LabelField != `` {
 		apiReqFilterColumn += `Label          string      ` + "`" + `json:"label,omitempty" v:"length:1,30|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"标签。常用于前端组件"` + "`\n"
 		apiResColumn += `Label       *string     ` + "`" + `json:"label,omitempty" dc:"标签。常用于前端组件"` + "`\n"
@@ -1115,7 +1261,7 @@ func MyGenTplApi(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 			continue
 		}
 		//salt
-		if garray.NewStrArrayFrom([]string{`salt`}).Contains(field) && column[`Type`].String() == `char(8)` {
+		if garray.NewStrArrayFrom([]string{`salt`}).Contains(field) && column[`Type`].String() == `char(8)` && tpl.PasswordHandle.IsCoexist {
 			continue
 		}
 		//pid
@@ -1124,26 +1270,25 @@ func MyGenTplApi(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 			apiReqCreateColumn += fieldCaseCamel + ` *uint ` + "`" + `json:"` + field + `,omitempty" v:"integer|min:0" dc:"` + comment + `"` + "`\n"
 			apiReqUpdateColumn += fieldCaseCamel + ` *uint ` + "`" + `json:"` + field + `,omitempty" v:"integer|min:0" dc:"` + comment + `"` + "`\n"
 			apiResColumn += fieldCaseCamel + ` *uint ` + "`" + `json:"` + field + `,omitempty" dc:"` + comment + `"` + "`\n"
-			if tpl.PidHandle.PidField != `` && tpl.LabelField != `` {
-				apiResColumn += `P` + gstr.CaseCamel(tpl.LabelField) + ` *string ` + "`" + `json:"p` + gstr.CaseCamel(tpl.LabelField) + `,omitempty" dc:"` + comment + `"` + "`\n"
+			if tpl.LabelField != `` {
+				apiResColumnAlloweFieldList += `P` + gstr.CaseCamel(tpl.LabelField) + ` *string ` + "`" + `json:"p` + gstr.CaseCamel(tpl.LabelField) + `,omitempty" dc:"父级"` + "`\n"
 			}
 			continue
 		}
 		//level
-		if garray.NewStrArrayFrom([]string{`level`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+		if garray.NewStrArrayFrom([]string{`level`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 && tpl.PidHandle.IsCoexist {
 			apiReqFilterColumn += fieldCaseCamel + ` *uint ` + "`" + `json:"` + field + `,omitempty" v:"integer|min:0" dc:"` + comment + `"` + "`\n"
 			apiResColumn += fieldCaseCamel + ` *uint ` + "`" + `json:"` + field + `,omitempty" dc:"` + comment + `"` + "`\n"
 			continue
 		}
 		//idPath|id_path
-		if fieldCaseCamel == `IdPath` && gstr.Pos(column[`Type`].String(), `varchar`) != -1 {
+		if fieldCaseCamel == `IdPath` && gstr.Pos(column[`Type`].String(), `varchar`) != -1 && tpl.PidHandle.IsCoexist {
 			apiResColumn += fieldCaseCamel + ` *string ` + "`" + `json:"` + field + `,omitempty" dc:"` + comment + `"` + "`\n"
 			continue
 		}
 		//sort
 		//weight
 		if garray.NewStrArrayFrom([]string{`sort`, `weight`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 {
-			apiReqFilterColumn += fieldCaseCamel + ` *uint ` + "`" + `json:"` + field + `,omitempty" v:"integer|between:0,100" dc:"` + comment + `"` + "`\n"
 			apiReqCreateColumn += fieldCaseCamel + ` *uint ` + "`" + `json:"` + field + `,omitempty" v:"integer|between:0,100" dc:"` + comment + `"` + "`\n"
 			apiReqUpdateColumn += fieldCaseCamel + ` *uint ` + "`" + `json:"` + field + `,omitempty" v:"integer|between:0,100" dc:"` + comment + `"` + "`\n"
 			apiResColumn += fieldCaseCamel + ` *uint ` + "`" + `json:"` + field + `,omitempty" dc:"` + comment + `"` + "`\n"
@@ -1155,6 +1300,10 @@ func MyGenTplApi(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 			apiReqCreateColumn += fieldCaseCamel + ` *uint ` + "`" + `json:"` + field + `,omitempty" v:"integer|min:1" dc:"` + comment + `"` + "`\n"
 			apiReqUpdateColumn += fieldCaseCamel + ` *uint ` + "`" + `json:"` + field + `,omitempty" v:"integer|min:1" dc:"` + comment + `"` + "`\n"
 			apiResColumn += fieldCaseCamel + ` *uint ` + "`" + `json:"` + field + `,omitempty" dc:"` + comment + `"` + "`\n"
+			if tpl.RelTableMap[field].IsExistRelTableDao {
+				relTable := tpl.RelTableMap[field]
+				apiResColumnAlloweFieldList += gstr.CaseCamel(relTable.RelNameFieldCaseCamelLower) + ` *string ` + "`" + `json:"` + relTable.RelNameFieldCaseCamelLower + `,omitempty" dc:"` + relTable.RelNameFieldName + `"` + "`\n"
+			}
 			continue
 		}
 		//name或code后缀
@@ -1400,6 +1549,7 @@ type ` + tpl.TableNameCaseCamel + `ListRes struct {`
 type ` + tpl.TableNameCaseCamel + `Item struct {
 	Id          *uint       ` + "`" + `json:"id,omitempty" dc:"ID"` + "`" + `
 	` + apiResColumn + `
+	` + apiResColumnAlloweFieldList + `
 }
 
 /*--------列表 结束--------*/
@@ -1501,9 +1651,6 @@ func MyGenTplController(ctx context.Context, option *MyGenOption, tpl *MyGenTpl)
 	controllerAlloweFieldInfo := "`id`, "
 	controllerAlloweFieldTree := "`id`, "
 	controllerAlloweFieldNoAuth := "`id`, "
-	if tpl.PrimaryKey != `` && tpl.PrimaryKey != `id` {
-		controllerAlloweFieldNoAuth += `columnsThis.` + gstr.CaseCamel(tpl.PrimaryKey) + `, `
-	}
 	if tpl.LabelField != `` {
 		controllerAlloweFieldList += "`label`, "
 		controllerAlloweFieldInfo += "`label`, "
@@ -1519,14 +1666,29 @@ func MyGenTplController(ctx context.Context, option *MyGenOption, tpl *MyGenTpl)
 	for _, column := range tpl.TableColumnList {
 		field := column[`Field`].String()
 		fieldCaseCamel := gstr.CaseCamel(field)
+		//主键
+		if column[`Key`].String() == `PRI` && column[`Extra`].String() == `auto_increment` {
+			if field != `id` {
+				controllerAlloweFieldNoAuth += `columnsThis.` + fieldCaseCamel + `, `
+			}
+			continue
+		}
 		//password|passwd
 		if garray.NewStrArrayFrom([]string{`password`, `passwd`}).Contains(field) && column[`Type`].String() == `char(32)` {
 			controllerAlloweFieldDiff += `columnsThis.` + fieldCaseCamel + `, `
 			continue
 		}
 		//salt
-		if garray.NewStrArrayFrom([]string{`salt`}).Contains(field) && column[`Type`].String() == `char(8)` {
+		if garray.NewStrArrayFrom([]string{`salt`}).Contains(field) && column[`Type`].String() == `char(8)` && tpl.PasswordHandle.IsCoexist {
 			controllerAlloweFieldDiff += `columnsThis.` + fieldCaseCamel + `, `
+			continue
+		}
+		//id后缀
+		if gstr.SubStr(fieldCaseCamel, -2) == `Id` && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+			if tpl.RelTableMap[field].IsExistRelTableDao {
+				relTable := tpl.RelTableMap[field]
+				controllerAlloweFieldList += "`" + relTable.RelNameFieldCaseCamelLower + "`, "
+			}
 			continue
 		}
 	}
@@ -1602,10 +1764,11 @@ func (controllerThis *` + tpl.TableNameCaseCamel + `) List(ctx context.Context, 
 		field = []string{` + controllerAlloweFieldNoAuth + `}
 	}
 	/**--------权限验证 结束--------**/
-
+`
+		}
+		tplController += `
 	daoHandlerThis := dao.NewDaoHandler(ctx, &dao` + tpl.ModuleDirCaseCamel + `.` + tpl.TableNameCaseCamel + `)
 	daoHandlerThis.Filter(filter)`
-		}
 		if option.IsCount {
 			tplController += `
 	count, err := daoHandlerThis.Count()
@@ -1985,7 +2148,7 @@ func MyGenTplViewList(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 			continue
 		}
 		//salt
-		if garray.NewStrArrayFrom([]string{`salt`}).Contains(field) && column[`Type`].String() == `char(8)` {
+		if garray.NewStrArrayFrom([]string{`salt`}).Contains(field) && column[`Type`].String() == `char(8)` && tpl.PasswordHandle.IsCoexist {
 			continue
 		}
 		//pid
@@ -2001,13 +2164,32 @@ func MyGenTplViewList(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 			continue
 		}
 		//level
-		/* if garray.NewStrArrayFrom([]string{`level`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+		if garray.NewStrArrayFrom([]string{`level`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 && tpl.PidHandle.IsCoexist {
+			viewListColumn += `
+	{
+		dataKey: '` + field + `',
+		title: t('` + tpl.ModuleDirCaseCamelLowerReplace + `.` + tpl.TableNameCaseCamelLower + `.name.` + field + `'),
+		key: '` + field + `',
+		align: 'center',
+        width: 100,
+        sortable: true,
+	},`
 			continue
-		} */
+		}
 		//idPath|id_path
-		/* if fieldCaseCamel == `IdPath` && gstr.Pos(column[`Type`].String(), `varchar`) != -1 {
+		if fieldCaseCamel == `IdPath` && gstr.Pos(column[`Type`].String(), `varchar`) != -1 && tpl.PidHandle.IsCoexist {
+			viewListColumn += `
+	{
+		dataKey: '` + field + `',
+		title: t('` + tpl.ModuleDirCaseCamelLowerReplace + `.` + tpl.TableNameCaseCamelLower + `.name.` + field + `'),
+		key: '` + field + `',
+		align: 'center',
+        width: 150,
+        hidden: true,
+	},`
 			continue
-		} */
+
+		}
 		//sort
 		//weight
 		if garray.NewStrArrayFrom([]string{`sort`, `weight`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 {
@@ -2083,9 +2265,14 @@ func MyGenTplViewList(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 		}
 		//id后缀
 		if gstr.SubStr(fieldCaseCamel, -2) == `Id` && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+			relNameField := field
+			if tpl.RelTableMap[field].IsExistRelTableDao {
+				relTable := tpl.RelTableMap[field]
+				relNameField = relTable.RelNameFieldCaseCamelLower
+			}
 			viewListColumn += `
 	{
-		dataKey: '` + field + `',
+		dataKey: '` + relNameField + `',
 		title: t('` + tpl.ModuleDirCaseCamelLowerReplace + `.` + tpl.TableNameCaseCamelLower + `.name.` + field + `'),
 		key: '` + field + `',
 		align: 'center',
@@ -2849,7 +3036,7 @@ func MyGenTplViewQuery(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) 
 			continue
 		}
 		//salt
-		if garray.NewStrArrayFrom([]string{`salt`}).Contains(field) && column[`Type`].String() == `char(8)` {
+		if garray.NewStrArrayFrom([]string{`salt`}).Contains(field) && column[`Type`].String() == `char(8)` && tpl.PasswordHandle.IsCoexist {
 			continue
 		}
 		//pid
@@ -2860,12 +3047,12 @@ func MyGenTplViewQuery(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) 
 		</ElFormItem>`
 			continue
 		}
-		//level
-		/* if garray.NewStrArrayFrom([]string{`level`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+		/* //level
+		if garray.NewStrArrayFrom([]string{`level`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 && tpl.PidHandle.IsCoexist {
 			continue
 		} */
 		//idPath|id_path
-		if fieldCaseCamel == `IdPath` && gstr.Pos(column[`Type`].String(), `varchar`) != -1 {
+		if fieldCaseCamel == `IdPath` && gstr.Pos(column[`Type`].String(), `varchar`) != -1 && tpl.PidHandle.IsCoexist {
 			continue
 		}
 		//sort
@@ -2875,9 +3062,14 @@ func MyGenTplViewQuery(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) 
 		}
 		//id后缀
 		if gstr.SubStr(fieldCaseCamel, -2) == `Id` && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+			apiUrl := tpl.ModuleDirCaseCamelLower + `/` + gstr.CaseCamelLower(gstr.SubStr(field, 0, -2))
+			if tpl.RelTableMap[field].IsExistRelTableDao {
+				relTable := tpl.RelTableMap[field]
+				apiUrl = relTable.RelDaoDirCaseCamelLower + `/` + relTable.RelTableNameCaseCamelLower
+			}
 			viewQueryField += `
 		<ElFormItem prop="` + field + `">
-			<MySelect v-model="queryCommon.data.` + field + `" :placeholder="t('` + tpl.ModuleDirCaseCamelLowerReplace + `.` + tpl.TableNameCaseCamelLower + `.name.` + field + `')" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/` + tpl.ModuleDirCaseCamelLower + `/` + gstr.CaseCamelLower(gstr.SubStr(field, 0, -2)) + `/list' }" />
+			<MySelect v-model="queryCommon.data.` + field + `" :placeholder="t('` + tpl.ModuleDirCaseCamelLowerReplace + `.` + tpl.TableNameCaseCamelLower + `.name.` + field + `')" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/` + apiUrl + `/list' }" />
 		</ElFormItem>`
 			continue
 		}
@@ -3144,11 +3336,13 @@ func MyGenTplViewSave(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 			continue
 		}
 		//salt
-		if garray.NewStrArrayFrom([]string{`salt`}).Contains(field) && column[`Type`].String() == `char(8)` {
+		if garray.NewStrArrayFrom([]string{`salt`}).Contains(field) && column[`Type`].String() == `char(8)` && tpl.PasswordHandle.IsCoexist {
 			continue
 		}
 		//pid
 		if garray.NewStrArrayFrom([]string{`pid`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+			viewSaveDataInit += `
+		` + field + `: 0,`
 			viewSaveRule += `
 		` + field + `: [
 			{ type: 'integer', min: 0, trigger: 'change', message: t('validation.select') }
@@ -3160,11 +3354,11 @@ func MyGenTplViewSave(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 			continue
 		}
 		//level
-		if garray.NewStrArrayFrom([]string{`level`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+		if garray.NewStrArrayFrom([]string{`level`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 && tpl.PidHandle.IsCoexist {
 			continue
 		}
 		//idPath|id_path
-		if fieldCaseCamel == `IdPath` && gstr.Pos(column[`Type`].String(), `varchar`) != -1 {
+		if fieldCaseCamel == `IdPath` && gstr.Pos(column[`Type`].String(), `varchar`) != -1 && tpl.PidHandle.IsCoexist {
 			continue
 		}
 		//sort
@@ -3178,7 +3372,7 @@ func MyGenTplViewSave(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 		],`
 			viewSaveField += `
 				<ElFormItem :label="t('` + tpl.ModuleDirCaseCamelLowerReplace + `.` + tpl.TableNameCaseCamelLower + `.name.` + field + `')" prop="` + field + `">
-                    <ElInputNumber v-model="saveForm.data.` + field + `" :precision="0" :min="0" :max="100" :step="1" :step-strictly="true" controls-position="right" :value-on-clear="50" />
+                    <ElInputNumber v-model="saveForm.data.` + field + `" :precision="0" :min="0" :max="100" :step="1" :step-strictly="true" controls-position="right" :value-on-clear="` + column[`Default`].String() + `" />
                     <label>
                         <ElAlert :title="t('` + tpl.ModuleDirCaseCamelLowerReplace + `.` + tpl.TableNameCaseCamelLower + `.tip.` + field + `')" type="info" :show-icon="true" :closable="false" />
                     </label>
@@ -3187,13 +3381,18 @@ func MyGenTplViewSave(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 		}
 		//id后缀
 		if gstr.SubStr(fieldCaseCamel, -2) == `Id` && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+			apiUrl := tpl.ModuleDirCaseCamelLower + `/` + gstr.CaseCamelLower(gstr.SubStr(field, 0, -2))
+			if tpl.RelTableMap[field].IsExistRelTableDao {
+				relTable := tpl.RelTableMap[field]
+				apiUrl = relTable.RelDaoDirCaseCamelLower + `/` + relTable.RelTableNameCaseCamelLower
+			}
 			viewSaveRule += `
 		` + field + `: [
 			{ type: 'integer', min: 1, trigger: 'change', message: t('validation.select') }
 		],`
 			viewSaveField += `
 				<ElFormItem :label="t('` + tpl.ModuleDirCaseCamelLowerReplace + `.` + tpl.TableNameCaseCamelLower + `.name.` + field + `')" prop="` + field + `">
-                    <MySelect v-model="saveForm.data.` + field + `" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/` + tpl.ModuleDirCaseCamelLower + `/` + gstr.CaseCamelLower(gstr.SubStr(field, 0, -2)) + `/list' }" />
+                    <MySelect v-model="saveForm.data.` + field + `" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/` + apiUrl + `/list' }" />
                 </ElFormItem>`
 			continue
 		}
@@ -3792,19 +3991,21 @@ func MyGenTplViewI18n(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 			continue
 		} */
 		//salt
-		if garray.NewStrArrayFrom([]string{`salt`}).Contains(field) && column[`Type`].String() == `char(8)` {
+		if garray.NewStrArrayFrom([]string{`salt`}).Contains(field) && column[`Type`].String() == `char(8)` && tpl.PasswordHandle.IsCoexist {
 			continue
 		}
 		//pid
-		/* if garray.NewStrArrayFrom([]string{`pid`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+		if garray.NewStrArrayFrom([]string{`pid`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+			viewI18nName += `
+		` + field + `: '父级',`
 			continue
-		} */
-		//level
-		/* if garray.NewStrArrayFrom([]string{`level`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+		}
+		/* //level
+		if garray.NewStrArrayFrom([]string{`level`}).Contains(field) && gstr.Pos(column[`Type`].String(), `int`) != -1 && tpl.PidHandle.IsCoexist {
 			continue
-		} */
+		}
 		//idPath|id_path
-		/* if fieldCaseCamel == `IdPath` && gstr.Pos(column[`Type`].String(), `varchar`) != -1 {
+		if fieldCaseCamel == `IdPath` && gstr.Pos(column[`Type`].String(), `varchar`) != -1 && tpl.PidHandle.IsCoexist {
 			continue
 		} */
 		//sort
@@ -3814,6 +4015,16 @@ func MyGenTplViewI18n(ctx context.Context, option *MyGenOption, tpl *MyGenTpl) {
 		` + field + `: '` + fieldName + `',`
 			viewI18nTip += `
 		` + field + `: '` + tip + `',`
+			continue
+		}
+		//id后缀
+		if gstr.SubStr(fieldCaseCamel, -2) == `Id` && gstr.Pos(column[`Type`].String(), `int`) != -1 {
+			if tpl.RelTableMap[field].IsExistRelTableDao {
+				relTable := tpl.RelTableMap[field]
+				fieldName = relTable.RelNameFieldName
+			}
+			viewI18nName += `
+		` + field + `: '` + fieldName + `',`
 			continue
 		}
 		//icon,cover,img,img_list,imgList,img_arr,imgArr,image,image_list,imageList,image_arr,imageArr等后缀

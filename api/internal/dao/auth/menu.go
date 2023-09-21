@@ -9,6 +9,7 @@ import (
 	"context"
 	"database/sql"
 	"strings"
+	"sync"
 
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/container/gvar"
@@ -278,21 +279,26 @@ func (daoThis *menuDao) HookSelect(afterField []string) gdb.HookHandler {
 			if err != nil {
 				return
 			}
-			for index, record := range result {
-				for _, v := range afterField {
-					switch v {
-					/* case `xxxx`:
-					record[v] = gvar.New(``) */
-					case `showMenu`:
-						extraDataJson := gjson.New(record[daoThis.Columns().ExtraData])
-						record[`i18n`] = extraDataJson.Get(`i18n`)
-						if record[`i18n`] == nil {
-							record[`i18n`] = gvar.New(map[string]interface{}{`title`: map[string]interface{}{`zh-cn`: record[`menuName`]}})
+			var wg sync.WaitGroup
+			for _, record := range result {
+				wg.Add(1)
+				go func(record gdb.Record) {
+					defer wg.Done()
+					for _, v := range afterField {
+						switch v {
+						/* case `xxxx`:
+						record[v] = gvar.New(``) */
+						case `showMenu`:
+							extraDataJson := gjson.New(record[daoThis.Columns().ExtraData])
+							record[`i18n`] = extraDataJson.Get(`i18n`)
+							if record[`i18n`] == nil {
+								record[`i18n`] = gvar.New(map[string]interface{}{`title`: map[string]interface{}{`zh-cn`: record[`menuName`]}})
+							}
 						}
 					}
-				}
-				result[index] = record
+				}(record)
 			}
+			wg.Wait()
 			return
 		},
 	}
@@ -391,9 +397,9 @@ func (daoThis *menuDao) ParseOrder(order []string, joinTableArr *[]string) gdb.M
 				m = m.OrderAsc(daoThis.Table() + `.` + daoThis.Columns().Pid)
 				m = m.OrderAsc(daoThis.Table() + `.` + daoThis.Columns().Sort)
 				m = m.OrderAsc(daoThis.Table() + `.` + daoThis.PrimaryKey())
-			case daoThis.Columns().Sort:
+			case daoThis.Columns().Sort, daoThis.Columns().Level:
 				m = m.Order(daoThis.Table()+`.`+kArr[0], kArr[1])
-				m = m.OrderDesc(daoThis.Table() + `.` + daoThis.PrimaryKey()) //防止分页错乱
+				m = m.OrderDesc(daoThis.Table() + `.` + daoThis.PrimaryKey())
 			default:
 				if daoThis.ColumnArrG().Contains(kArr[0]) {
 					m = m.Order(daoThis.Table()+`.`+kArr[0], kArr[1])
