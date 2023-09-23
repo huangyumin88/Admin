@@ -32,6 +32,7 @@ type Movie struct {
 	Awards          string      `json:"awards"          ` // 奖项
 	Times           string      `json:"times"           ` //
 	Time            string      `json:"time"            ` // 片长
+	SortTime        string      `json:"sortTime"        ` // 排序时间
 	Director        string      `json:"director"        ` // 导演
 	Scriptwriter    string      `json:"scriptwriter"    ` // 编剧
 	Actors          string      `json:"actors"          ` // 演员

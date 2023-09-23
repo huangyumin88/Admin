@@ -47,6 +47,7 @@ type MovieColumns struct {
 	Awards          string // 奖项
 	Times           string //
 	Time            string // 片长
+	SortTime        string // 排序时间
 	Director        string // 导演
 	Scriptwriter    string // 编剧
 	Actors          string // 演员
@@ -84,6 +85,7 @@ var movieColumns = MovieColumns{
 	Awards:          "awards",
 	Times:           "times",
 	Time:            "time",
+	SortTime:        "sort_time",
 	Director:        "director",
 	Scriptwriter:    "scriptwriter",
 	Actors:          "actors",

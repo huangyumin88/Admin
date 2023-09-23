@@ -34,6 +34,7 @@ type Movie struct {
 	Awards          interface{} // 奖项
 	Times           interface{} //
 	Time            interface{} // 片长
+	SortTime        interface{} // 排序时间
 	Director        interface{} // 导演
 	Scriptwriter    interface{} // 编剧
 	Actors          interface{} // 演员
