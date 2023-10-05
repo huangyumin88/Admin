@@ -6,9 +6,11 @@ import (
 	daoMovie "api/internal/dao/movie"
 	"api/internal/utils"
 	"context"
-
+	"fmt"
 	"github.com/gogf/gf/v2/container/gset"
 	"github.com/gogf/gf/v2/util/gconv"
+	"reflect"
+	"strings"
 )
 
 type Movie struct{}
@@ -56,10 +58,36 @@ func (controllerThis *Movie) List(ctx context.Context, req *apiMovie.MovieListRe
 		return
 	}
 
+	Movie := daoMovie.Movie
+	MovieCol := Movie.Columns()
+	for _, item := range list {
+		stringsx := item[MovieCol.Actors]
+		interfaceValue := stringsx.Interface()
+		str, ok := interfaceValue.(string)
+		if ok {
+			// 变量 str 成功转换为字符串类型
+			// 现在可以在 str 中使用它
+			fmt.Println("Converted String:", str)
+			parts := strings.Split(str, ",")
+			partsValue := reflect.ValueOf(parts)
+			item["ActorsArray"] = partsValue
+		} else {
+			// 转换失败，stringsx 不是一个字符串类型
+			fmt.Println("Conversion to string failed")
+		}
+
+		//parts := strings.Split(stringsx, ",")
+		//item.ActorsArray = parts
+		//fmt.Println(item.ActorsArray)
+		//print(stringsx)
+		break
+	}
+
 	res = &apiMovie.MovieListRes{
 		Count: count,
 	}
 	list.Structs(&res.List)
+
 	return
 }
 

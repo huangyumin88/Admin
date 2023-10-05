@@ -79,11 +79,12 @@ type MovieItem struct {
 	Score       *string `json:"score,omitempty" dc:"评分"`
 	Awards      *string `json:"awards,omitempty" dc:"奖项"`
 	//Times           *string     `json:"times,omitempty" dc:""`
-	Time         *string `json:"time,omitempty" dc:"片长"`
-	Director     *string `json:"director,omitempty" dc:"导演"`
-	Scriptwriter *string `json:"scriptwriter,omitempty" dc:"编剧"`
-	Actors       *string `json:"actors,omitempty" dc:"演员"`
-	Intros       *string `json:"intros,omitempty" dc:"简介"`
+	Time         *string  `json:"time,omitempty" dc:"片长"`
+	Director     *string  `json:"director,omitempty" dc:"导演"`
+	Scriptwriter *string  `json:"scriptwriter,omitempty" dc:"编剧"`
+	Actors       *string  `json:"actors,omitempty" dc:"演员"`
+	ActorsArray  []string `json:"actors_array,omitempty" dc:"演员分解"`
+	Intros       *string  `json:"intros,omitempty" dc:"简介"`
 	//DownUrls        *string     `json:"down_urls,omitempty" dc:"下载地址"`
 	//VideoSize       *string     `json:"video_size,omitempty" dc:"视频大小"`
 	VideoResolution *string `json:"video_resolution,omitempty" dc:"视频分辨率"`
@@ -123,17 +124,18 @@ type MovieInfo struct {
 	CategoryIds  *string `json:"category_ids,omitempty" dc:"类别数组"`
 	LanguageName *string `json:"language_name,omitempty" dc:"语言"`
 	//Subtitle        *string     `json:"subtitle,omitempty" dc:"字幕"`
-	ReleaseDate  *string `json:"release_date,omitempty" dc:"上映日期"`
-	Imdb         *string `json:"imdb,omitempty" dc:"IMDb评分"`
-	Doubandb     *string `json:"doubandb,omitempty" dc:"豆瓣评分"`
-	Score        *string `json:"score,omitempty" dc:"评分"`
-	Awards       *string `json:"awards,omitempty" dc:"奖项"`
-	Times        *string `json:"times,omitempty" dc:""`
-	Time         *string `json:"time,omitempty" dc:"片长"`
-	Director     *string `json:"director,omitempty" dc:"导演"`
-	Scriptwriter *string `json:"scriptwriter,omitempty" dc:"编剧"`
-	Actors       *string `json:"actors,omitempty" dc:"演员"`
-	Intros       *string `json:"intros,omitempty" dc:"简介"`
+	ReleaseDate  *string  `json:"release_date,omitempty" dc:"上映日期"`
+	Imdb         *string  `json:"imdb,omitempty" dc:"IMDb评分"`
+	Doubandb     *string  `json:"doubandb,omitempty" dc:"豆瓣评分"`
+	Score        *string  `json:"score,omitempty" dc:"评分"`
+	Awards       *string  `json:"awards,omitempty" dc:"奖项"`
+	Times        *string  `json:"times,omitempty" dc:""`
+	Time         *string  `json:"time,omitempty" dc:"片长"`
+	Director     *string  `json:"director,omitempty" dc:"导演"`
+	Scriptwriter *string  `json:"scriptwriter,omitempty" dc:"编剧"`
+	Actors       *string  `json:"actors,omitempty" dc:"演员"`
+	ActorsArray  []string `json:"actors_array,omitempty" dc:"演员分解"`
+	Intros       *string  `json:"intros,omitempty" dc:"简介"`
 	//DownUrls        *string     `json:"down_urls,omitempty" dc:"下载地址"`
 	//VideoSize       *string     `json:"video_size,omitempty" dc:"视频大小"`
 	VideoResolution *string `json:"video_resolution,omitempty" dc:"视频分辨率"`
