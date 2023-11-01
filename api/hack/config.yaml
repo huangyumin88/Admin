@@ -3,19 +3,23 @@
 gfcli:
   build:
     packSrc: "resource/i18n,manifest" # 需要打包资源目录。打包前manifest目录下的配置文件需改成正式环境
+    arch: "amd64"
+    system: "linux"
+    version:  "v1.0.0"
+    output:   "./bin"
     # output: "../main"
   gen:
     dao:
-      - link: "mysql:root:123456@tcp(0.0.0.0:3306)/dev_admin"
+      - link: "mysql:root:Hym123456@tcp(0.0.0.0:3306)/web_apple_db"
         group: "default"
-        removePrefix: "auth_"
-        daoPath: "dao/auth"
-        doPath: "model/do/auth"
-        entityPath: "model/entity/auth"
-        tables: "auth_test"
+        removePrefix: "apple_"
+        daoPath: "dao/apple"
+        doPath: "model/do/apple"
+        entityPath: "model/entity/apple"
+        tables: "apple_account"
         tplDaoIndexPath: "resource/gen/gen_dao_template_dao.txt"
         tplDaoInternalPath: "resource/gen/gen_dao_template_dao_internal.txt"
         overwriteDao: true
     pbentity:
-      - link: "mysql:root:123456@tcp(0.0.0.0:3306)/dev_admin"
-        tables: "auth_test"
+#      - link: "mysql:root:Hym123456@tcp(0.0.0.0:3306)/web_apple_db"
+#        tables: "auth_test"
