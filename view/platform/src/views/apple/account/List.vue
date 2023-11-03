@@ -1,5 +1,10 @@
 <script setup lang="ts">
+import account from "@/i18n/language/zh-cn/apple/account";
+
 const { t, tm } = useI18n()
+import { ElLoading } from 'element-plus'
+
+const isLoading = ref(false)
 
 const table = reactive({
 	columns: [{
@@ -182,27 +187,34 @@ const table = reactive({
 		fixed: 'right',
 		cellRenderer: (props: any): any => {
 			return [
+        h(ElButton, {
+          type: 'primary',
+          size: 'small',
+          onClick: () => handleLogin(props.rowData.account,props.rowData.pwd)
+        }, {
+          default: () => [h(AutoiconEpOpportunity), t('common.login')]
+        }),
 				h(ElButton, {
-					type: 'primary',
+          type: 'danger',
 					size: 'small',
 					onClick: () => handleEditCopy(props.rowData.id)
 				}, {
 					default: () => [h(AutoiconEpEdit), t('common.edit')]
 				}),
 				h(ElButton, {
-					type: 'danger',
+					type: 'warning',
 					size: 'small',
 					onClick: () => handleDelete([props.rowData.id])
 				}, {
 					default: () => [h(AutoiconEpDelete), t('common.delete')]
 				}),
-				h(ElButton, {
-					type: 'warning',
-					size: 'small',
-					onClick: () => handleEditCopy(props.rowData.id, 'copy')
-				}, {
-					default: () => [h(AutoiconEpDocumentCopy), t('common.copy')]
-				}),
+				// h(ElButton, {
+				// 	type: 'warning',
+				// 	size: 'small',
+				// 	onClick: () => handleEditCopy(props.rowData.id, 'copy')
+				// }, {
+				// 	default: () => [h(AutoiconEpDocumentCopy), t('common.copy')]
+				// }),
 			]
 		},
 	}] as any,
@@ -247,14 +259,31 @@ const handleEditCopy = (id: number, type: string = 'edit') => {
 				delete saveCommon.data.id
 				saveCommon.title = t('common.edit')
 				break;
-			case 'copy':
-				delete saveCommon.data.id
-				saveCommon.title = t('common.copy')
-				break;
 		}
 		saveCommon.visible = true
 	}).catch(() => { })
 }
+
+// 登录
+
+const handleLogin = (account: string,pwd: string) => {
+  ElMessageBox.confirm('', {
+    type: 'warning',
+    title: t('common.tip.configLogin'),
+    center: true,
+    showClose: false,
+  }).then(() => {
+
+    isLoading.value = true
+    request(t('config.VITE_HTTP_API_PREFIX') + '/apple/account/login', { account: account,pwd:pwd }, true).then((res) => {
+      isLoading.value = false
+      getList()
+    }).catch(() => {
+      isLoading.value = false
+    })
+  }).catch(() => { })
+}
+
 //删除
 const handleDelete = (idArr: number[]) => {
 	ElMessageBox.confirm('', {
@@ -354,7 +383,7 @@ defineExpose({
 	<ElMain>
 		<ElAutoResizer>
 			<template #default="{ height, width }">
-				<ElTableV2 class="main-table" :columns="table.columns" :data="table.data" :sort-by="table.sort" @column-sort="table.handleSort" :width="width" :height="height" :fixed="true" :row-height="50">
+				<ElTableV2 class="main-table" :columns="table.columns" :data="table.data" :sort-by="table.sort" @column-sort="table.handleSort" :width="width" :height="height" :fixed="true" :row-height="50" v-loading="isLoading">
 					<template v-if="table.loading" #overlay>
 						<ElIcon class="is-loading" color="var(--el-color-primary)" :size="25">
 							<AutoiconEpLoading />

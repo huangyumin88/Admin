@@ -123,4 +123,10 @@ type AccountDeleteReq struct {
 	IdArr  []uint `json:"idArr,omitempty" v:"required|distinct|foreach|integer|foreach|min:1" dc:"ID数组"`
 }
 
+type AccountLoginReq struct {
+	g.Meta  `path:"/account/login" method:"post" tags:"平台后台/苹果" sm:"登录"`
+	Account *string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
+	Pwd     *string `json:"pwd,omitempty" v:"length:1,255" dc:"密码"`
+}
+
 /*--------删除 结束--------*/
