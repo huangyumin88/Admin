@@ -47,6 +47,7 @@ export default {
         pleaseSelect: '请选择',
         selectDelete: '请选择要删除的记录',
         configDelete: '确定删除？',
+        configLogin: '确定登录？',
         configExit: '确定退出当前操作？',
         configExport: '确认导出？',
         uploadOrDrop: '<em>点击上传</em>或将文件拖到此处',

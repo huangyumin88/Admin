@@ -8,6 +8,15 @@ import (
 	"api/internal/service"
 	"api/internal/utils"
 	"context"
+	"encoding/base64"
+	"fmt"
+	"log"
+	"os"
+	"time"
+
+	"github.com/chromedp/cdproto/network"
+	"github.com/chromedp/chromedp"
+	"github.com/chromedp/chromedp/kb"
 
 	"github.com/gogf/gf/v2/container/gset"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -162,4 +171,199 @@ func (controllerThis *Account) Delete(ctx context.Context, req *apiApple.Account
 
 	_, err = service.AppleAccount().Delete(ctx, filter)
 	return
+}
+
+func (controllerThis *Account) Login(ctx context.Context, req *apiApple.AccountLoginReq) (res *api.CommonTokenRes, err error) {
+	filter := map[string]interface{}{`account`: req.Account, `pwd`: req.Pwd}
+	//_, err = service.AppleAccount().Login(ctx, filter)
+
+	daoHandlerThis := dao.NewDaoHandler(ctx, &daoApple.Account)
+
+	filter1 := map[string]interface{}{`account`: req.Account}
+	daoHandlerThis.Filter(filter1)
+	count, err := daoHandlerThis.Count()
+
+	if count == 0 {
+		// 新增
+		_, err = service.AppleAccount().Create(ctx, filter)
+	}
+
+	ctx, cancel := chromedp.NewContext(context.Background())
+	defer cancel()
+
+	opts := append(chromedp.DefaultExecAllocatorOptions[:],
+		chromedp.Flag("headless", false),
+		chromedp.Flag("incognito", true),        // 启用无痕模式
+		chromedp.Flag("incognito", true),        //# 不加载图片, 提升速度
+		chromedp.Flag("some-flag", true),        // 添加特定的标志
+		chromedp.Flag("no-sandbox", true),       // 禁用沙盒模式
+		chromedp.Flag("disable-infobars", true), // 禁用信息栏
+	)
+	allocCtx, allocCancel := chromedp.NewExecAllocator(ctx, opts...)
+	defer allocCancel()
+
+	ctx, cancel = chromedp.NewContext(allocCtx)
+	defer cancel()
+
+	// 监听网络请求
+	status := 200
+	chromedp.ListenTarget(ctx, func(ev interface{}) {
+		// 检查事件是否为网络响应事件
+		if responseReceived, ok := ev.(*network.EventResponseReceived); ok {
+			// 获取响应信息
+			resp := responseReceived.Response
+
+			// 打印请求 URL 和响应状态码
+			//fmt.Printf("URL: %s, Status Code: %d\n", resp.URL, resp.Status)
+			if resp.URL == "https://idmsa.apple.com/appleauth/auth/signin/complete?isRememberMeEnabled=true" {
+				fmt.Printf("URL: %s, Status Code: %d\n", resp.URL, resp.Status)
+				if resp.Status == 401 {
+					status = 401
+				} else if resp.Status == 200 {
+					//
+				}
+			} else if resp.URL == "https://secure6.store.apple.com/shop/accounthomex?_a=fetchDevices&_m=home.devices" {
+				if resp.Status == 200 {
+					// 保存cookies
+
+					//var cookies []*network.Cookie
+					//if err := chromedp.Run(ctx, network.GetCookies().With(&cookies)); err != nil {
+					//	log.Fatal(err)
+					//} else {
+					//	var cookieString string
+					//
+					//	for _, cookie := range cookies {
+					//		cookieString += fmt.Sprintf("%s=%s\n", cookie.Name, cookie.Value)
+					//	}
+					//
+					//	// 删除最后一个分号和空格
+					//	if len(cookieString) > 1 {
+					//		cookieString = cookieString[:len(cookieString)-1]
+					//	}
+					//
+					//	data := map[string]interface{}{`account`: *req.Account, `pwd`: *req.Pwd, `cookies`: cookieString, `login_status`: 1}
+					//	filter := map[string]interface{}{`account`: *req.Account}
+					//	_, err = service.AppleAccount().Update(ctx, filter, data)
+					//}
+				}
+			}
+		}
+	})
+
+	url := "https://secure6.store.apple.com/shop/account/home"
+
+	err = chromedp.Run(ctx,
+		chromedp.Navigate(url),
+		chromedp.Sleep(1*time.Second),
+	)
+	if err != nil {
+		panic(err)
+	}
+
+	tryFindAndType(ctx, "account_name_text_field", *req.Account)
+	tryFindAndType(ctx, "password_text_field", *req.Pwd)
+	time.Sleep(1 * time.Second)
+
+	if status == 200 {
+		//GetAllCookies(ctx)
+
+		upDataWithCookies(ctx, *req.Account, *req.Pwd)
+
+		time.Sleep(10 * time.Second)
+		// 关闭浏览器
+		if err := chromedp.Cancel(ctx); err != nil {
+			log.Fatal(err)
+		}
+
+		data := []byte(*req.Account)
+		token := base64.StdEncoding.EncodeToString(data)
+		res = &api.CommonTokenRes{Token: token}
+		return
+	} else if status == 401 {
+		if err := chromedp.Cancel(ctx); err != nil {
+			log.Fatal(err)
+		}
+		err = utils.NewErrorCode(ctx, 39990010, ``)
+		return
+	}
+
+	err = utils.NewErrorCode(ctx, 39990010, ``)
+	return
+}
+
+func tryFindAndType(ctx context.Context, selector, text string) {
+	err := chromedp.Run(ctx,
+		chromedp.WaitVisible(`#`+selector),
+		chromedp.SendKeys(`#`+selector, text),
+	)
+	if err != nil {
+		panic(err)
+	}
+	// 等待1秒钟
+	time.Sleep(1 * time.Second)
+
+	// 模拟按下回车键
+	err = chromedp.Run(ctx,
+		chromedp.KeyEvent(kb.Enter), // 模拟回车键
+	)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func upDataWithCookies(ctx context.Context, account string, pwd string) {
+
+	err := chromedp.Run(ctx, chromedp.ActionFunc(func(ctx context.Context) error {
+		cookies, err := network.GetCookies().Do(ctx)
+		if err != nil {
+			return err
+		}
+
+		var cookieString string
+
+		for _, cookie := range cookies {
+			cookieString += fmt.Sprintf("%s=%s\n", cookie.Name, cookie.Value)
+		}
+
+		// 删除最后一个分号和空格
+		if len(cookieString) > 1 {
+			cookieString = cookieString[:len(cookieString)-1]
+		}
+
+		data := map[string]interface{}{`account`: account, `pwd`: pwd, `cookies`: cookieString, `login_status`: 1}
+		filter := map[string]interface{}{`account`: account}
+		_, err = service.AppleAccount().Update(ctx, filter, data)
+		return nil
+	}),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func GetAllCookies(ctx context.Context) {
+	file, err := os.OpenFile("./cookies", os.O_RDWR|os.O_CREATE|os.O_APPEND, os.ModePerm)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+	err = chromedp.Run(ctx, chromedp.ActionFunc(func(ctx context.Context) error {
+		cookies, err := network.GetCookies().Do(ctx)
+		if err != nil {
+			return err
+		}
+
+		for _, cookie := range cookies {
+			_, err := file.WriteString(fmt.Sprintf("%s=%s\n", cookie.Name, cookie.Value))
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
 }

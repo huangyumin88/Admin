@@ -56,3 +56,15 @@ func (logicThis *sAppleAccount) Delete(ctx context.Context, filter map[string]in
 	row, _ = result.RowsAffected()
 	return
 }
+
+//func (logicThis *sAppleAccount) Login(ctx context.Context, filter map[string]interface{}) (id int64, err error) {
+//
+//	daoThis := daoApple.Account
+//	daoHandlerThis := dao.NewDaoHandler(ctx, &daoThis).Filter(filter)
+//	idArr, _ := daoHandlerThis.GetModel(true).Array(daoThis.PrimaryKey())
+//	if len(idArr) == 0 {
+//		err = utils.NewErrorCode(ctx, 29999998, ``)
+//		return
+//	}
+//	return
+//}

@@ -16,7 +16,7 @@ logger:
     stdout: false # 日志是否同时输出到终端。默认true
 
 server:
-  address: ":20082"
+  address: ":20085"
   openapiPath: "/api.json"
   swaggerPath: "/swagger"
   # maxHeaderBytes: "10240" # 请求Header大小限制（Byte）。默认为10KB
