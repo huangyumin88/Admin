@@ -20,3 +20,9 @@ type LoginLoginReq struct {
 }
 
 /*--------登录 结束--------*/
+
+type LoginAppleReq struct {
+	g.Meta  `path:"/apple/login" method:"post" tags:"苹果/账号登录" sm:"账号登录"`
+	Account *string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
+	Pwd     *string `json:"pwd,omitempty" v:"length:1,255" dc:"密码"`
+}

@@ -275,7 +275,7 @@ const handleLogin = (account: string,pwd: string) => {
   }).then(() => {
 
     isLoading.value = true
-    request(t('config.VITE_HTTP_API_PREFIX') + '/apple/account/login', { account: account,pwd:pwd }, true).then((res) => {
+    request(t('config.VITE_HTTP_API_PREFIX') + '/login/apple/login', { account: account,pwd:pwd }, true).then((res) => {
       isLoading.value = false
       getList()
     }).catch(() => {
