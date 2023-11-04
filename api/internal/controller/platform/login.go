@@ -16,6 +16,7 @@ import (
 	"github.com/chromedp/chromedp"
 	"github.com/chromedp/chromedp/kb"
 	"log"
+	"regexp"
 	"strings"
 	"time"
 
@@ -89,7 +90,7 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 	defer cancel()
 
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.Flag("headless", true),
+		chromedp.Flag("headless", false),
 		chromedp.Flag("incognito", true),        // 启用无痕模式
 		chromedp.Flag("incognito", true),        //# 不加载图片, 提升速度
 		chromedp.Flag("some-flag", true),        // 添加特定的标志
@@ -104,6 +105,7 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 
 	// 监听网络请求
 	status := 999
+
 	chromedp.ListenTarget(ctx, func(ev interface{}) {
 		// 检查事件是否为网络响应事件
 		if responseReceived, ok := ev.(*network.EventResponseReceived); ok {
@@ -124,6 +126,8 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 
 			} else if resp.URL == "https://secure6.store.apple.com/shop/accounthomex?_a=fetchDevices&_m=home.devices" {
 
+			} else if resp.URL == "https://secure6.store.apple.com/shop/account/home" {
+
 			}
 		}
 	})
@@ -140,10 +144,10 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 
 	tryFindAndType(ctx, "account_name_text_field", *req.Account)
 	tryFindAndType(ctx, "password_text_field", *req.Pwd)
-
+	time.Sleep(3 * time.Second)
 	if status == 200 {
 		//GetAllCookies(ctx)
-		time.Sleep(3 * time.Second)
+
 		upDataWithCookies(ctx, *req.Account, *req.Pwd)
 
 		time.Sleep(1 * time.Second)
@@ -171,6 +175,7 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 		return
 	}
 
+	chromedp.Cancel(ctx)
 	err = utils.NewErrorCode(ctx, 39990010, ``)
 	return
 }
@@ -197,13 +202,17 @@ func tryFindAndType(ctx context.Context, selector, text string) {
 
 func upDataWithCookies(ctx context.Context, account string, pwd string) {
 
+	//var aosStk AosStk
+	var html string
+	var currentURL string
+	var cookieString string
+	var stk string
+	var countryCode string
 	err := chromedp.Run(ctx, chromedp.ActionFunc(func(ctx context.Context) error {
 		cookies, err := network.GetCookies().Do(ctx)
 		if err != nil {
 			return err
 		}
-
-		var cookieString string
 
 		for _, cookie := range cookies {
 			cookieString += fmt.Sprintf("%s=%s\n", cookie.Name, cookie.Value)
@@ -214,20 +223,52 @@ func upDataWithCookies(ctx context.Context, account string, pwd string) {
 			cookieString = cookieString[:len(cookieString)-1]
 		}
 
-		data := map[string]interface{}{`account`: account, `pwd`: pwd, `cookies`: cookieString, `login_status`: 1}
-		filter := map[string]interface{}{`account`: account}
-
-		info, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(g.Map{`account`: account}).GetModel().One()
-		if info.IsEmpty() {
-			_, err = service.AppleAccount().Create(ctx, data)
-
-		} else {
-			_, err = service.AppleAccount().Update(ctx, filter, data)
-		}
 		return nil
 	}),
+		//chromedp.Evaluate(`document.documentElement.outerHTML`, &html),
+		chromedp.Tasks{
+			chromedp.OuterHTML("html", &html),
+			chromedp.Location(&currentURL),
+		},
 	)
 	if err != nil {
 		log.Fatal(err)
+	}
+	// 查找x-aos-stk字段
+	re := regexp.MustCompile(`"x-aos-stk":"(.*?)"`)
+	match := re.FindStringSubmatch(html)
+	if len(match) > 1 {
+		stk = match[1]
+		ix := strings.Index(stk, `"`)
+		if ix > -1 {
+			stk = stk[:ix]
+		}
+		fmt.Printf("子字符串之后的 42 个字符: %s\n", stk)
+	} else {
+		fmt.Println("未查找到")
+	}
+
+	re1 := regexp.MustCompile(`"countryCode":"(.*?)"`)
+	match1 := re1.FindStringSubmatch(html)
+	if len(match1) > 1 {
+		countryCode = match1[1]
+		ix := strings.Index(countryCode, `"`)
+		if ix > -1 {
+			countryCode = countryCode[:ix]
+		}
+		fmt.Printf("子字符串之后的 countryCode 个字符: %s\n", countryCode)
+	} else {
+		fmt.Println("未查找到")
+	}
+
+	data := map[string]interface{}{`account`: account, `pwd`: pwd, `cookies`: cookieString, `login_status`: 1, `stk`: stk, `country_code`: countryCode}
+	filter := map[string]interface{}{`account`: account}
+
+	info, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(g.Map{`account`: account}).GetModel().One()
+	if info.IsEmpty() {
+		_, err = service.AppleAccount().Create(ctx, data)
+
+	} else {
+		_, err = service.AppleAccount().Update(ctx, filter, data)
 	}
 }

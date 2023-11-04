@@ -37,6 +37,7 @@ type AccountColumns struct {
 	IsStop      string // 停用：0否 1是
 	UpdatedAt   string // 更新时间
 	CreatedAt   string // 创建时间
+	Stk         string // x-aos-stk
 }
 
 // accountColumns holds the columns for table apple_account.
@@ -53,6 +54,7 @@ var accountColumns = AccountColumns{
 	IsStop:      "isStop",
 	UpdatedAt:   "updatedAt",
 	CreatedAt:   "createdAt",
+	Stk:         "stk",
 }
 
 // NewAccountDao creates and returns a new DAO object for table data access.

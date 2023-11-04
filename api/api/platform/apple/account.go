@@ -47,6 +47,7 @@ type AccountListItem struct {
 	Status      *int        `json:"status,omitempty" dc:"禁用：0否 1是"`
 	Info        *string     `json:"info,omitempty" dc:"信息"`
 	Cookies     *string     `json:"cookies,omitempty" dc:"cookies"`
+	Stk         *string     `json:"stk,omitempty" dc:"stk"`
 	LoginStatus *int        `json:"login_status,omitempty" dc:"登录：0否 1是"`
 	IsStop      *uint       `json:"isStop,omitempty" dc:"停用：0否 1是"`
 	UpdatedAt   *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
@@ -76,6 +77,7 @@ type AccountInfo struct {
 	Status      *int        `json:"status,omitempty" dc:"禁用：0否 1是"`
 	Info        *string     `json:"info,omitempty" dc:"信息"`
 	Cookies     *string     `json:"cookies,omitempty" dc:"cookies"`
+	Stk         *string     `json:"stk,omitempty" dc:"stk"`
 	LoginStatus *int        `json:"login_status,omitempty" dc:"登录：0否 1是"`
 	IsStop      *uint       `json:"isStop,omitempty" dc:"停用：0否 1是"`
 	UpdatedAt   *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
@@ -94,6 +96,7 @@ type AccountCreateReq struct {
 	Status      *int    `json:"status,omitempty" v:"integer|in:0,1" dc:"禁用：0否 1是"`
 	Info        *string `json:"info,omitempty" v:"" dc:"信息"`
 	Cookies     *string `json:"cookies,omitempty" v:"" dc:"cookies"`
+	Stk         *string `json:"stk,omitempty" dc:"stk"`
 	LoginStatus *int    `json:"login_status,omitempty" v:"integer|in:0,1" dc:"登录：0否 1是"`
 	IsStop      *uint   `json:"isStop,omitempty" v:"integer|in:0,1" dc:"停用：0否 1是"`
 }
@@ -111,6 +114,7 @@ type AccountUpdateReq struct {
 	Status      *int    `json:"status,omitempty" v:"integer|in:0,1" dc:"禁用：0否 1是"`
 	Info        *string `json:"info,omitempty" v:"" dc:"信息"`
 	Cookies     *string `json:"cookies,omitempty" v:"" dc:"cookies"`
+	Stk         *string `json:"stk,omitempty" dc:"stk"`
 	LoginStatus *int    `json:"login_status,omitempty" v:"integer|in:0,1" dc:"登录：0否 1是"`
 	IsStop      *uint   `json:"isStop,omitempty" v:"integer|in:0,1" dc:"停用：0否 1是"`
 }

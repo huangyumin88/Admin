@@ -22,4 +22,5 @@ type Account struct {
 	IsStop      uint        `json:"isStop"      ` // 停用：0否 1是
 	UpdatedAt   *gtime.Time `json:"updatedAt"   ` // 更新时间
 	CreatedAt   *gtime.Time `json:"createdAt"   ` // 创建时间
+	Stk         string      `json:"stk"         ` // x-aos-stk
 }

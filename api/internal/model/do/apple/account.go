@@ -24,4 +24,5 @@ type Account struct {
 	IsStop      interface{} // 停用：0否 1是
 	UpdatedAt   *gtime.Time // 更新时间
 	CreatedAt   *gtime.Time // 创建时间
+	Stk         interface{} // x-aos-stk
 }

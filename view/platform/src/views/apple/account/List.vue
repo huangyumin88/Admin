@@ -85,6 +85,13 @@ const table = reactive({
 		align: 'center',
 		width: 150,
 	},
+  {
+    dataKey: 'stk',
+    title: t('stk'),
+    key: 'stk',
+    align: 'center',
+    width: 200,
+  },
 	{
 		dataKey: 'status',
 		title: t('apple.account.name.status'),

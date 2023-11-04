@@ -25,6 +25,9 @@ const saveForm = reactive({
 		balance: [
 			{ type: 'string', min: 1, max: 255, trigger: 'blur', message: t('validation.between.string', { min: 1, max: 255 }) },
 		],
+    stk: [
+      { type: 'string', min: 1, max: 255, trigger: 'blur', message: t('validation.between.string', { min: 1, max: 255 }) },
+    ],
 		status: [
 			{ type: 'enum', enum: (tm('apple.account.status.status') as any).map((item: any) => item.value), trigger: 'change', message: t('validation.select') },
 		],
@@ -98,6 +101,9 @@ const saveDrawer = reactive({
 				<ElFormItem :label="t('apple.account.name.balance')" prop="balance">
 					<ElInput v-model="saveForm.data.balance" :placeholder="t('apple.account.name.balance')" minlength="1" maxlength="255" :show-word-limit="true" :clearable="true" />
 				</ElFormItem>
+        <ElFormItem :label="t('stk')" prop="stk">
+          <ElInput v-model="saveForm.data.stk" :placeholder="t('stk')" minlength="1" maxlength="255" :show-word-limit="true" :clearable="true" />
+        </ElFormItem>
 				<ElFormItem :label="t('apple.account.name.status')" prop="status">
 					<ElRadioGroup v-model="saveForm.data.status">
 						<ElRadio v-for="(item, index) in (tm('apple.account.status.status') as any)" :key="index" :label="item.value">
