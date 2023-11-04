@@ -10,7 +10,7 @@ gfcli:
     # output: "../main"
   gen:
     dao:
-      - link: "mysql:root:Hym123456@tcp(0.0.0.0:3306)/web_apple_db"
+      - link: "mysql:web_apple_db:3Nmz5jprSdKLZDia@tcp(47.111.166.24:3306)/web_apple_db"
         group: "default"
         removePrefix: "apple_"
         daoPath: "dao/apple"
@@ -19,7 +19,7 @@ gfcli:
         tables: "apple_account"
         tplDaoIndexPath: "resource/gen/gen_dao_template_dao.txt"
         tplDaoInternalPath: "resource/gen/gen_dao_template_dao_internal.txt"
-        overwriteDao: true
+        overwriteDao: false
     pbentity:
 #      - link: "mysql:root:Hym123456@tcp(0.0.0.0:3306)/web_apple_db"
 #        tables: "auth_test"

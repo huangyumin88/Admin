@@ -367,3 +367,7 @@ func GetAllCookies(ctx context.Context) {
 		log.Fatal(err)
 	}
 }
+
+//func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.AccountgGiftcardQueryReq) (res *api.CommonTokenRes, err error) {
+//
+//}

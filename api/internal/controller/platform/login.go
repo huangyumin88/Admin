@@ -16,6 +16,7 @@ import (
 	"github.com/chromedp/chromedp"
 	"github.com/chromedp/chromedp/kb"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/gogf/gf/v2/crypto/gmd5"
@@ -102,7 +103,7 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 	defer cancel()
 
 	// 监听网络请求
-	status := 200
+	status := 999
 	chromedp.ListenTarget(ctx, func(ev interface{}) {
 		// 检查事件是否为网络响应事件
 		if responseReceived, ok := ev.(*network.EventResponseReceived); ok {
@@ -117,31 +118,12 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 					status = 401
 				} else if resp.Status == 200 {
 					//
+					status = 200
 				}
-			} else if resp.URL == "https://secure6.store.apple.com/shop/accounthomex?_a=fetchDevices&_m=home.devices" {
-				if resp.Status == 200 {
-					// 保存cookies
+			} else if strings.Contains(resp.URL, "https://secure6.store.apple.com/shop/signIn/idms/authx") {
 
-					//var cookies []*network.Cookie
-					//if err := chromedp.Run(ctx, network.GetCookies().With(&cookies)); err != nil {
-					//	log.Fatal(err)
-					//} else {
-					//	var cookieString string
-					//
-					//	for _, cookie := range cookies {
-					//		cookieString += fmt.Sprintf("%s=%s\n", cookie.Name, cookie.Value)
-					//	}
-					//
-					//	// 删除最后一个分号和空格
-					//	if len(cookieString) > 1 {
-					//		cookieString = cookieString[:len(cookieString)-1]
-					//	}
-					//
-					//	data := map[string]interface{}{`account`: *req.Account, `pwd`: *req.Pwd, `cookies`: cookieString, `login_status`: 1}
-					//	filter := map[string]interface{}{`account`: *req.Account}
-					//	_, err = service.AppleAccount().Update(ctx, filter, data)
-					//}
-				}
+			} else if resp.URL == "https://secure6.store.apple.com/shop/accounthomex?_a=fetchDevices&_m=home.devices" {
+
 			}
 		}
 	})
@@ -158,11 +140,10 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 
 	tryFindAndType(ctx, "account_name_text_field", *req.Account)
 	tryFindAndType(ctx, "password_text_field", *req.Pwd)
-	time.Sleep(1 * time.Second)
 
 	if status == 200 {
 		//GetAllCookies(ctx)
-
+		time.Sleep(3 * time.Second)
 		upDataWithCookies(ctx, *req.Account, *req.Pwd)
 
 		time.Sleep(1 * time.Second)
@@ -179,7 +160,6 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 		if err2 != nil {
 			return nil, err2
 		}
-		// cache.NewToken(ctx, claims.LoginId).Set(token, int64(jwt.ExpireTime)) //缓存token（限制多地登录，多设备登录等情况下用）
 
 		res = &api.CommonTokenRes{Token: token}
 		return
@@ -244,7 +224,6 @@ func upDataWithCookies(ctx context.Context, account string, pwd string) {
 		} else {
 			_, err = service.AppleAccount().Update(ctx, filter, data)
 		}
-
 		return nil
 	}),
 	)
