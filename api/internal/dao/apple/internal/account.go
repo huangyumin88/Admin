@@ -25,36 +25,42 @@ type AccountDao struct {
 
 // AccountColumns defines and stores column names for table apple_account.
 type AccountColumns struct {
-	Id          string //
-	Account     string // 账号
-	Pwd         string // 密码
-	CountryId   string // 国家id
-	Balance     string // 余额
-	Status      string // 禁用：0否 1是
-	Info        string // 信息
-	Cookies     string // cookies
-	LoginStatus string // 登录：0否 1是
-	IsStop      string // 停用：0否 1是
-	UpdatedAt   string // 更新时间
-	CreatedAt   string // 创建时间
-	Stk         string // x-aos-stk
+	Id           string //
+	Account      string // 账号
+	Pwd          string // 密码
+	CountryId    string // 国家id
+	CountryCode  string // 国家代码
+	Balance      string // 余额
+	Status       string // 禁用：0否 1是
+	Info         string // 信息
+	Cookies      string // cookies
+	LoginStatus  string // 登录：0否 1是
+	IsStop       string // 停用：0否 1是
+	UpdatedAt    string // 更新时间
+	CreatedAt    string // 创建时间
+	Stk          string // x-aos-stk
+	DeviceId     string // 设备id
+	StrTimestamp string // 时间戳
 }
 
 // accountColumns holds the columns for table apple_account.
 var accountColumns = AccountColumns{
-	Id:          "id",
-	Account:     "account",
-	Pwd:         "pwd",
-	CountryId:   "country_id",
-	Balance:     "balance",
-	Status:      "status",
-	Info:        "info",
-	Cookies:     "cookies",
-	LoginStatus: "login_status",
-	IsStop:      "isStop",
-	UpdatedAt:   "updatedAt",
-	CreatedAt:   "createdAt",
-	Stk:         "stk",
+	Id:           "id",
+	Account:      "account",
+	Pwd:          "pwd",
+	CountryId:    "country_id",
+	CountryCode:  "country_code",
+	Balance:      "balance",
+	Status:       "status",
+	Info:         "info",
+	Cookies:      "cookies",
+	LoginStatus:  "login_status",
+	IsStop:       "isStop",
+	UpdatedAt:    "updatedAt",
+	CreatedAt:    "createdAt",
+	Stk:          "stk",
+	DeviceId:     "device_id",
+	StrTimestamp: "str_timestamp",
 }
 
 // NewAccountDao creates and returns a new DAO object for table data access.

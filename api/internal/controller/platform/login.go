@@ -105,7 +105,8 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 
 	// 监听网络请求
 	status := 999
-
+	var deviceID string
+	var str_timestamp string
 	chromedp.ListenTarget(ctx, func(ev interface{}) {
 		// 检查事件是否为网络响应事件
 		if responseReceived, ok := ev.(*network.EventResponseReceived); ok {
@@ -130,6 +131,37 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 
 			}
 		}
+
+	})
+
+	chromedp.ListenTarget(ctx, func(ev interface{}) {
+		if req, ok := ev.(*network.EventRequestWillBeSent); ok {
+			request := req.Request
+			if request.URL == "https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck" {
+				if request.PostData != "" {
+					// 处理 post data
+					fmt.Println("request.PostData ", request.PostData)
+
+					// 查找字符串 "giftCardBalanceCheck.deviceID="
+					startIndex := strings.Index(request.PostData, "giftCardBalanceCheck.deviceID=")
+
+					if startIndex != -1 {
+						// 如果未找到指定的字符串，执行相应的错误处理
+						deviceID = request.PostData[startIndex+len("giftCardBalanceCheck.deviceID="):]
+
+						fmt.Println("Extracted data:", deviceID)
+					} else {
+						fmt.Println("String not found.")
+					}
+
+					//deviceID
+					fmt.Println("request.Headers ", request.Headers)
+				} else {
+					// 没有 post data
+					fmt.Println("没有请求数据 ")
+				}
+			}
+		}
 	})
 
 	url := "https://secure6.store.apple.com/shop/account/home"
@@ -147,18 +179,32 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 	time.Sleep(3 * time.Second)
 	if status == 200 {
 		//GetAllCookies(ctx)
+		var cookieString string
+		var stk string
+		var countryCode string
 
-		upDataWithCookies(ctx, *req.Account, *req.Pwd)
+		upDataWithCookies(ctx, &cookieString, &stk, &countryCode)
+		// 继续处理余额的页面
 
-		time.Sleep(1 * time.Second)
-		// 关闭浏览器
-		if err := chromedp.Cancel(ctx); err != nil {
-			log.Fatal(err)
+		url = "https://secure.store.apple.com/shop/giftcard/balance"
+
+		err = chromedp.Run(ctx,
+			chromedp.Navigate(url),
+			chromedp.Sleep(1*time.Second),
+		)
+		if err != nil {
+			panic(err)
 		}
 
-		info, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(g.Map{`account`: *req.Account}).GetModel().One()
+		tryFindAndBalanceType(ctx)
 
-		claims := utils.CustomClaims{LoginId: info[daoApple.Account.PrimaryKey()].Uint()}
+		saveDataWith(ctx, *req.Account, *req.Pwd, cookieString, stk, countryCode, deviceID, str_timestamp)
+
+		time.Sleep(5 * time.Second)
+
+		info1, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(g.Map{`account`: *req.Account}).GetModel().One()
+
+		claims := utils.CustomClaims{LoginId: info1[daoApple.Account.PrimaryKey()].Uint()}
 		jwt := utils.NewJWT(ctx, utils.GetCtxSceneInfo(ctx)[daoAuth.Scene.Columns().SceneConfig].Map())
 		token, err2 := jwt.CreateToken(claims)
 		if err2 != nil {
@@ -166,6 +212,12 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 		}
 
 		res = &api.CommonTokenRes{Token: token}
+
+		// 关闭浏览器
+		if err := chromedp.Cancel(ctx); err != nil {
+			log.Fatal(err)
+		}
+
 		return
 	} else if status == 401 {
 		if err := chromedp.Cancel(ctx); err != nil {
@@ -178,6 +230,37 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 	chromedp.Cancel(ctx)
 	err = utils.NewErrorCode(ctx, 39990010, ``)
 	return
+}
+
+func saveDataWith(ctx context.Context, account string, pwd string, cookieString string, stk string, countryCode string, deviceID string, str_timestamp string) {
+	data2 := map[string]interface{}{`account`: account, `pwd`: pwd, `cookies`: cookieString, `login_status`: 1, `stk`: stk, `country_code`: countryCode, `device_id`: deviceID, `str_timestamp`: str_timestamp}
+	filter2 := map[string]interface{}{`account`: account}
+
+	info, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(g.Map{`account`: account}).GetModel().One()
+
+	if info.IsEmpty() {
+		_, err := service.AppleAccount().Create(ctx, data2)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		_, err := service.AppleAccount().Update(ctx, filter2, data2)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func tryFindAndBalanceType(ctx context.Context) {
+	err := chromedp.Run(ctx,
+		chromedp.SendKeys(`input.form-textbox-input`, "XJ36Q684TG4VGX7Q"),
+		chromedp.Sleep(1*time.Second),
+		chromedp.Click(`#balanceCheck-balance`),
+	)
+	time.Sleep(3 * time.Second)
+	if err != nil {
+		panic(err)
+	}
 }
 
 func tryFindAndType(ctx context.Context, selector, text string) {
@@ -200,14 +283,12 @@ func tryFindAndType(ctx context.Context, selector, text string) {
 	}
 }
 
-func upDataWithCookies(ctx context.Context, account string, pwd string) {
+func upDataWithCookies(ctx context.Context, cookieString *string, stk *string, countryCode *string) {
 
 	//var aosStk AosStk
 	var html string
 	var currentURL string
-	var cookieString string
-	var stk string
-	var countryCode string
+
 	err := chromedp.Run(ctx, chromedp.ActionFunc(func(ctx context.Context) error {
 		cookies, err := network.GetCookies().Do(ctx)
 		if err != nil {
@@ -215,14 +296,8 @@ func upDataWithCookies(ctx context.Context, account string, pwd string) {
 		}
 
 		for _, cookie := range cookies {
-			cookieString += fmt.Sprintf("%s=%s\n", cookie.Name, cookie.Value)
+			*cookieString += fmt.Sprintf("%s=%s\n", cookie.Name, cookie.Value)
 		}
-
-		// 删除最后一个分号和空格
-		if len(cookieString) > 1 {
-			cookieString = cookieString[:len(cookieString)-1]
-		}
-
 		return nil
 	}),
 		//chromedp.Evaluate(`document.documentElement.outerHTML`, &html),
@@ -238,12 +313,13 @@ func upDataWithCookies(ctx context.Context, account string, pwd string) {
 	re := regexp.MustCompile(`"x-aos-stk":"(.*?)"`)
 	match := re.FindStringSubmatch(html)
 	if len(match) > 1 {
-		stk = match[1]
-		ix := strings.Index(stk, `"`)
+		stk1 := match[1]
+		ix := strings.Index(stk1, `"`)
 		if ix > -1 {
-			stk = stk[:ix]
+			stk1 = stk1[:ix]
 		}
-		fmt.Printf("子字符串之后的 42 个字符: %s\n", stk)
+		fmt.Printf("子字符串之后的 42 个字符: %s\n", stk1)
+		*stk = stk1
 	} else {
 		fmt.Println("未查找到")
 	}
@@ -251,24 +327,14 @@ func upDataWithCookies(ctx context.Context, account string, pwd string) {
 	re1 := regexp.MustCompile(`"countryCode":"(.*?)"`)
 	match1 := re1.FindStringSubmatch(html)
 	if len(match1) > 1 {
-		countryCode = match1[1]
-		ix := strings.Index(countryCode, `"`)
+		countryCode1 := match1[1]
+		ix := strings.Index(countryCode1, `"`)
 		if ix > -1 {
-			countryCode = countryCode[:ix]
+			countryCode1 = countryCode1[:ix]
 		}
-		fmt.Printf("子字符串之后的 countryCode 个字符: %s\n", countryCode)
+		fmt.Printf("子字符串之后的 countryCode 个字符: %s\n", countryCode1)
+		*countryCode = countryCode1
 	} else {
 		fmt.Println("未查找到")
-	}
-
-	data := map[string]interface{}{`account`: account, `pwd`: pwd, `cookies`: cookieString, `login_status`: 1, `stk`: stk, `country_code`: countryCode}
-	filter := map[string]interface{}{`account`: account}
-
-	info, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(g.Map{`account`: account}).GetModel().One()
-	if info.IsEmpty() {
-		_, err = service.AppleAccount().Create(ctx, data)
-
-	} else {
-		_, err = service.AppleAccount().Update(ctx, filter, data)
 	}
 }

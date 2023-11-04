@@ -72,8 +72,8 @@ const table = reactive({
 		width: 150,
 	},
 	{
-		dataKey: 'country_id',
-		title: t('apple.account.name.country_id'),
+		dataKey: 'country_code',
+		title: t('国家'),
 		key: 'country_id',
 		align: 'center',
 		width: 150,

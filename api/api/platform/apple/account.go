@@ -24,6 +24,7 @@ type AccountListFilter struct {
 	Account        string      `json:"account,omitempty" v:"length:1,255" dc:"账号"`
 	Pwd            string      `json:"pwd,omitempty" v:"length:1,255" dc:"密码"`
 	CountryId      *int        `json:"country_id,omitempty" v:"integer|min:1" dc:"国家id"`
+	CountryCode    *string     `json:"country_code,omitempty" v:"length:1,255" dc:"国家"`
 	Balance        string      `json:"balance,omitempty" v:"length:1,255" dc:"余额"`
 	Status         *int        `json:"status,omitempty" v:"integer|in:0,1" dc:"禁用：0否 1是"`
 	LoginStatus    *int        `json:"login_status,omitempty" v:"integer|in:0,1" dc:"登录：0否 1是"`
@@ -38,20 +39,23 @@ type AccountListRes struct {
 }
 
 type AccountListItem struct {
-	Id          *uint       `json:"id,omitempty" dc:"ID"`
-	Label       *string     `json:"label,omitempty" dc:"标签。常用于前端组件"`
-	Account     *string     `json:"account,omitempty" dc:"账号"`
-	Pwd         *string     `json:"pwd,omitempty" dc:"密码"`
-	CountryId   *int        `json:"country_id,omitempty" dc:"国家id"`
-	Balance     *string     `json:"balance,omitempty" dc:"余额"`
-	Status      *int        `json:"status,omitempty" dc:"禁用：0否 1是"`
-	Info        *string     `json:"info,omitempty" dc:"信息"`
-	Cookies     *string     `json:"cookies,omitempty" dc:"cookies"`
-	Stk         *string     `json:"stk,omitempty" dc:"stk"`
-	LoginStatus *int        `json:"login_status,omitempty" dc:"登录：0否 1是"`
-	IsStop      *uint       `json:"isStop,omitempty" dc:"停用：0否 1是"`
-	UpdatedAt   *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
-	CreatedAt   *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
+	Id            *uint       `json:"id,omitempty" dc:"ID"`
+	Label         *string     `json:"label,omitempty" dc:"标签。常用于前端组件"`
+	Account       *string     `json:"account,omitempty" dc:"账号"`
+	Pwd           *string     `json:"pwd,omitempty" dc:"密码"`
+	CountryId     *int        `json:"country_id,omitempty" dc:"国家id"`
+	CountryCode   *string     `json:"country_code,omitempty" dc:"国家"`
+	Balance       *string     `json:"balance,omitempty" dc:"余额"`
+	Status        *int        `json:"status,omitempty" dc:"禁用：0否 1是"`
+	Info          *string     `json:"info,omitempty" dc:"信息"`
+	Device_id     *string     `json:"device_id,omitempty" dc:"设备"`
+	Str_timestamp *string     `json:"str_timestamp,omitempty" dc:"时间"`
+	Cookies       *string     `json:"cookies,omitempty" dc:"cookies"`
+	Stk           *string     `json:"stk,omitempty" dc:"stk"`
+	LoginStatus   *int        `json:"login_status,omitempty" dc:"登录：0否 1是"`
+	IsStop        *uint       `json:"isStop,omitempty" dc:"停用：0否 1是"`
+	UpdatedAt     *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
+	CreatedAt     *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
 }
 
 /*--------列表 结束--------*/
@@ -68,55 +72,64 @@ type AccountInfoRes struct {
 }
 
 type AccountInfo struct {
-	Id          *uint       `json:"id,omitempty" dc:"ID"`
-	Label       *string     `json:"label,omitempty" dc:"标签。常用于前端组件"`
-	Account     *string     `json:"account,omitempty" dc:"账号"`
-	Pwd         *string     `json:"pwd,omitempty" dc:"密码"`
-	CountryId   *int        `json:"country_id,omitempty" dc:"国家id"`
-	Balance     *string     `json:"balance,omitempty" dc:"余额"`
-	Status      *int        `json:"status,omitempty" dc:"禁用：0否 1是"`
-	Info        *string     `json:"info,omitempty" dc:"信息"`
-	Cookies     *string     `json:"cookies,omitempty" dc:"cookies"`
-	Stk         *string     `json:"stk,omitempty" dc:"stk"`
-	LoginStatus *int        `json:"login_status,omitempty" dc:"登录：0否 1是"`
-	IsStop      *uint       `json:"isStop,omitempty" dc:"停用：0否 1是"`
-	UpdatedAt   *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
-	CreatedAt   *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
+	Id            *uint       `json:"id,omitempty" dc:"ID"`
+	Label         *string     `json:"label,omitempty" dc:"标签。常用于前端组件"`
+	Account       *string     `json:"account,omitempty" dc:"账号"`
+	Pwd           *string     `json:"pwd,omitempty" dc:"密码"`
+	CountryId     *int        `json:"country_id,omitempty" dc:"国家id"`
+	CountryCode   *string     `json:"country_code,omitempty" dc:"国家"`
+	Balance       *string     `json:"balance,omitempty" dc:"余额"`
+	Status        *int        `json:"status,omitempty" dc:"禁用：0否 1是"`
+	Info          *string     `json:"info,omitempty" dc:"信息"`
+	Device_id     *string     `json:"device_id,omitempty" dc:"设备"`
+	Str_timestamp *string     `json:"str_timestamp,omitempty" dc:"时间"`
+	Cookies       *string     `json:"cookies,omitempty" dc:"cookies"`
+	Stk           *string     `json:"stk,omitempty" dc:"stk"`
+	LoginStatus   *int        `json:"login_status,omitempty" dc:"登录：0否 1是"`
+	IsStop        *uint       `json:"isStop,omitempty" dc:"停用：0否 1是"`
+	UpdatedAt     *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
+	CreatedAt     *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
 }
 
 /*--------详情 结束--------*/
 
 /*--------新增 开始--------*/
 type AccountCreateReq struct {
-	g.Meta      `path:"/account/create" method:"post" tags:"平台后台/苹果" sm:"创建"`
-	Account     *string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
-	Pwd         *string `json:"pwd,omitempty" v:"length:1,255" dc:"密码"`
-	CountryId   *int    `json:"country_id,omitempty" v:"integer|min:1" dc:"国家id"`
-	Balance     *string `json:"balance,omitempty" v:"length:1,255" dc:"余额"`
-	Status      *int    `json:"status,omitempty" v:"integer|in:0,1" dc:"禁用：0否 1是"`
-	Info        *string `json:"info,omitempty" v:"" dc:"信息"`
-	Cookies     *string `json:"cookies,omitempty" v:"" dc:"cookies"`
-	Stk         *string `json:"stk,omitempty" dc:"stk"`
-	LoginStatus *int    `json:"login_status,omitempty" v:"integer|in:0,1" dc:"登录：0否 1是"`
-	IsStop      *uint   `json:"isStop,omitempty" v:"integer|in:0,1" dc:"停用：0否 1是"`
+	g.Meta        `path:"/account/create" method:"post" tags:"平台后台/苹果" sm:"创建"`
+	Account       *string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
+	Pwd           *string `json:"pwd,omitempty" v:"length:1,255" dc:"密码"`
+	CountryId     *int    `json:"country_id,omitempty" v:"integer|min:1" dc:"国家id"`
+	CountryCode   *string `json:"country_code,omitempty" v:"length:1,255" dc:"国家"`
+	Balance       *string `json:"balance,omitempty" v:"length:1,255" dc:"余额"`
+	Status        *int    `json:"status,omitempty" v:"integer|in:0,1" dc:"禁用：0否 1是"`
+	Info          *string `json:"info,omitempty" v:"" dc:"信息"`
+	Device_id     *string `json:"device_id,omitempty" dc:"设备"`
+	Str_timestamp *string `json:"str_timestamp,omitempty" dc:"时间"`
+	Cookies       *string `json:"cookies,omitempty" v:"" dc:"cookies"`
+	Stk           *string `json:"stk,omitempty" dc:"stk"`
+	LoginStatus   *int    `json:"login_status,omitempty" v:"integer|in:0,1" dc:"登录：0否 1是"`
+	IsStop        *uint   `json:"isStop,omitempty" v:"integer|in:0,1" dc:"停用：0否 1是"`
 }
 
 /*--------新增 结束--------*/
 
 /*--------修改 开始--------*/
 type AccountUpdateReq struct {
-	g.Meta      `path:"/account/update" method:"post" tags:"平台后台/苹果" sm:"更新"`
-	IdArr       []uint  `json:"idArr,omitempty" v:"required|distinct|foreach|integer|foreach|min:1" dc:"ID数组"`
-	Account     *string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
-	Pwd         *string `json:"pwd,omitempty" v:"length:1,255" dc:"密码"`
-	CountryId   *int    `json:"country_id,omitempty" v:"integer|min:1" dc:"国家id"`
-	Balance     *string `json:"balance,omitempty" v:"length:1,255" dc:"余额"`
-	Status      *int    `json:"status,omitempty" v:"integer|in:0,1" dc:"禁用：0否 1是"`
-	Info        *string `json:"info,omitempty" v:"" dc:"信息"`
-	Cookies     *string `json:"cookies,omitempty" v:"" dc:"cookies"`
-	Stk         *string `json:"stk,omitempty" dc:"stk"`
-	LoginStatus *int    `json:"login_status,omitempty" v:"integer|in:0,1" dc:"登录：0否 1是"`
-	IsStop      *uint   `json:"isStop,omitempty" v:"integer|in:0,1" dc:"停用：0否 1是"`
+	g.Meta        `path:"/account/update" method:"post" tags:"平台后台/苹果" sm:"更新"`
+	IdArr         []uint  `json:"idArr,omitempty" v:"required|distinct|foreach|integer|foreach|min:1" dc:"ID数组"`
+	Account       *string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
+	Pwd           *string `json:"pwd,omitempty" v:"length:1,255" dc:"密码"`
+	CountryId     *int    `json:"country_id,omitempty" v:"integer|min:1" dc:"国家id"`
+	CountryCode   *string `json:"country_code,omitempty" v:"length:1,255" dc:"国家"`
+	Balance       *string `json:"balance,omitempty" v:"length:1,255" dc:"余额"`
+	Status        *int    `json:"status,omitempty" v:"integer|in:0,1" dc:"禁用：0否 1是"`
+	Info          *string `json:"info,omitempty" v:"" dc:"信息"`
+	Device_id     *string `json:"device_id,omitempty" v:"" dc:"设备"`
+	Str_timestamp *string `json:"str_timestamp,omitempty" v:"length:1,255" dc:"时间"`
+	Cookies       *string `json:"cookies,omitempty" v:"" dc:"cookies"`
+	Stk           *string `json:"stk,omitempty" dc:"stk"`
+	LoginStatus   *int    `json:"login_status,omitempty" v:"integer|in:0,1" dc:"登录：0否 1是"`
+	IsStop        *uint   `json:"isStop,omitempty" v:"integer|in:0,1" dc:"停用：0否 1是"`
 }
 
 /*--------修改 结束--------*/
@@ -137,8 +150,12 @@ type AccountLoginReq struct {
 
 type AccountgGiftcardQueryReq struct {
 	g.Meta      `path:"/account/giftcard/query" method:"post" tags:"苹果/礼品卡查询" sm:"礼品卡查询"`
+	Account     *string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
+	Pwd         *string `json:"pwd,omitempty" v:"length:1,255" dc:"密码"`
 	GiftCardPin *string `json:"giftCardPin,omitempty" v:"length:1,255" dc:"pin"`
 }
 
 type AccountgGiftcardInfo struct {
+	CountryCode *string `json:"country_code,omitempty" v:"length:1,255" dc:"国家"`
+	Balance     *string `json:"balance,omitempty" v:"length:1,255" dc:"余额"`
 }
