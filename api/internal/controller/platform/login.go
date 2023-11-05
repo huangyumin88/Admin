@@ -90,7 +90,7 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 	defer cancel()
 
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.Flag("headless", false),
+		chromedp.Flag("headless", true),
 		chromedp.Flag("incognito", true),        // 启用无痕模式
 		chromedp.Flag("incognito", true),        //# 不加载图片, 提升速度
 		chromedp.Flag("some-flag", true),        // 添加特定的标志
@@ -107,6 +107,7 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 	status := 999
 	var deviceID string
 	var str_timestamp string
+	var headersString string
 	chromedp.ListenTarget(ctx, func(ev interface{}) {
 		// 检查事件是否为网络响应事件
 		if responseReceived, ok := ev.(*network.EventResponseReceived); ok {
@@ -149,13 +150,31 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 						// 如果未找到指定的字符串，执行相应的错误处理
 						deviceID = request.PostData[startIndex+len("giftCardBalanceCheck.deviceID="):]
 
-						fmt.Println("Extracted data:", deviceID)
+						//fmt.Println("Extracted data:", deviceID)
+
+						re := regexp.MustCompile(`\d{13}`)
+
+						// 在输入字符串中查找匹配的时间戳
+						str_timestamp = re.FindString(deviceID)
+
+						if str_timestamp != "" {
+							fmt.Println("提取到的时间戳:", str_timestamp)
+						} else {
+							fmt.Println("未找到时间戳")
+						}
 					} else {
 						fmt.Println("String not found.")
 					}
 
-					//deviceID
-					fmt.Println("request.Headers ", request.Headers)
+					//fmt.Println("request.Headers ", request.Headers)
+
+					for name, value := range request.Headers {
+						headersString += name + ": " + fmt.Sprint(value) + "\r\n"
+					}
+					if len(headersString) > 2 {
+						headersString = headersString[:len(headersString)-2]
+					}
+					fmt.Println("request.Headers \n", headersString)
 				} else {
 					// 没有 post data
 					fmt.Println("没有请求数据 ")
@@ -185,7 +204,7 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 
 		upDataWithCookies(ctx, &cookieString, &stk, &countryCode)
 		// 继续处理余额的页面
-
+		time.Sleep(3 * time.Second)
 		url = "https://secure.store.apple.com/shop/giftcard/balance"
 
 		err = chromedp.Run(ctx,
@@ -198,9 +217,9 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 
 		tryFindAndBalanceType(ctx)
 
-		saveDataWith(ctx, *req.Account, *req.Pwd, cookieString, stk, countryCode, deviceID, str_timestamp)
+		saveDataWith(ctx, *req.Account, *req.Pwd, cookieString, stk, countryCode, deviceID, str_timestamp, headersString)
 
-		time.Sleep(5 * time.Second)
+		time.Sleep(1 * time.Second)
 
 		info1, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(g.Map{`account`: *req.Account}).GetModel().One()
 
@@ -232,8 +251,8 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 	return
 }
 
-func saveDataWith(ctx context.Context, account string, pwd string, cookieString string, stk string, countryCode string, deviceID string, str_timestamp string) {
-	data2 := map[string]interface{}{`account`: account, `pwd`: pwd, `cookies`: cookieString, `login_status`: 1, `stk`: stk, `country_code`: countryCode, `device_id`: deviceID, `str_timestamp`: str_timestamp}
+func saveDataWith(ctx context.Context, account string, pwd string, cookieString string, stk string, countryCode string, deviceID string, str_timestamp string, headersString string) {
+	data2 := map[string]interface{}{`account`: account, `pwd`: pwd, `cookies`: cookieString, `login_status`: 1, `stk`: stk, `country_code`: countryCode, `device_id`: deviceID, `str_timestamp`: str_timestamp, `info`: headersString}
 	filter2 := map[string]interface{}{`account`: account}
 
 	info, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(g.Map{`account`: account}).GetModel().One()
@@ -295,9 +314,14 @@ func upDataWithCookies(ctx context.Context, cookieString *string, stk *string, c
 			return err
 		}
 
-		for _, cookie := range cookies {
+		for i, cookie := range cookies {
 			*cookieString += fmt.Sprintf("%s=%s\n", cookie.Name, cookie.Value)
+
+			if i < len(cookies)-1 {
+				*cookieString += "\n"
+			}
 		}
+
 		return nil
 	}),
 		//chromedp.Evaluate(`document.documentElement.outerHTML`, &html),

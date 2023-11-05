@@ -2,9 +2,16 @@
 import account from "@/i18n/language/zh-cn/apple/account";
 
 const { t, tm } = useI18n()
-import { ElLoading } from 'element-plus'
 
 const isLoading = ref(false)
+
+const centerDialogVisible = ref(false)
+
+const strAccount = ref("")
+
+const input = ref('')
+
+import { ElNotification } from 'element-plus'
 
 const table = reactive({
 	columns: [{
@@ -190,7 +197,7 @@ const table = reactive({
 		title: t('common.name.action'),
 		key: 'action',
 		align: 'center',
-		width: 250,
+		width: 320,
 		fixed: 'right',
 		cellRenderer: (props: any): any => {
 			return [
@@ -200,6 +207,13 @@ const table = reactive({
           onClick: () => handleLogin(props.rowData.account,props.rowData.pwd)
         }, {
           default: () => [h(AutoiconEpOpportunity), t('common.login')]
+        }),
+        h(ElButton, {
+          type: 'success',
+          size: 'small',
+          onClick: () => handleSearch(props.rowData.account)
+        }, {
+          default: () => [h(AutoiconEpSearch), t('查询')]
         }),
 				h(ElButton, {
           type: 'danger',
@@ -236,6 +250,7 @@ const table = reactive({
 })
 
 const saveCommon = inject('saveCommon') as { visible: boolean, title: string, data: { [propName: string]: any } }
+let queryModel = inject('queryModel') as {country_code: string, balance: string}
 //新增
 const handleAdd = () => {
 	saveCommon.data = {}
@@ -272,6 +287,37 @@ const handleEditCopy = (id: number, type: string = 'edit') => {
 }
 
 // 登录
+
+const handleSearch = (accounts: string) => {
+
+  strAccount.value = accounts
+  centerDialogVisible.value = true
+}
+
+const handleSearching = () => {
+  centerDialogVisible.value = false
+  if (input.value === "") {
+    console.log("输入框内容为空");
+  } else
+  {
+    isLoading.value = true
+    request(t('config.VITE_HTTP_API_PREFIX') + '/apple/account/giftcard/query', { account: strAccount.value,pwd:"", giftCardPin:input.value}, false).then((res) => {
+      isLoading.value = false
+      queryModel = { ...res.data.info }
+
+      ElNotification.success({
+        title: '成功',
+        message: '剩余余额：' + queryModel.balance,
+        offset: 100,
+      })
+
+      // getList()
+    }).catch(() => {
+      isLoading.value = false
+    })
+
+  }
+}
 
 const handleLogin = (account: string,pwd: string) => {
   ElMessageBox.confirm('', {
@@ -406,4 +452,27 @@ defineExpose({
 			<ElPagination :total="pagination.total" v-model:currentPage="pagination.page" v-model:page-size="pagination.size" @size-change="pagination.sizeChange" @current-change="pagination.pageChange" :page-sizes="pagination.sizeList" :layout="pagination.layout" :background="true" />
 		</ElCol>
 	</ElRow>
+
+  <el-dialog
+      v-model="centerDialogVisible"
+      title="提示"
+      width="30%"
+      align-center
+  >
+    <el-input v-model="input" placeholder="请输入礼品卡" />
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="centerDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleSearching">
+          查询
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
+
+<style scoped>
+.dialog-footer button:first-child {
+  margin-right: 10px;
+}
+</style>
