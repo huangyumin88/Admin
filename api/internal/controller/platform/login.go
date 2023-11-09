@@ -200,7 +200,7 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 
 		saveDataWith(ctx, *req.Account, *req.Pwd, cookieString, stk, countryCode, deviceID, str_timestamp)
 
-		time.Sleep(5 * time.Second)
+		time.Sleep(1 * time.Second)
 
 		info1, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(g.Map{`account`: *req.Account}).GetModel().One()
 
@@ -305,6 +305,7 @@ func upDataWithCookies(ctx context.Context, cookieString *string, stk *string, c
 			chromedp.OuterHTML("html", &html),
 			chromedp.Location(&currentURL),
 		},
+		chromedp.Sleep(2*time.Second),
 	)
 	if err != nil {
 		log.Fatal(err)
