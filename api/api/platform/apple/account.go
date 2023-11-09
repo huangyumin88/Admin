@@ -148,14 +148,18 @@ type AccountLoginReq struct {
 	Pwd     *string `json:"pwd,omitempty" v:"length:1,255" dc:"密码"`
 }
 
-type AccountgGiftcardQueryReq struct {
+type AccountGiftCardQueryReq struct {
 	g.Meta      `path:"/account/giftcard/query" method:"post" tags:"苹果/礼品卡查询" sm:"礼品卡查询"`
 	Account     *string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
 	Pwd         *string `json:"pwd,omitempty" v:"length:1,255" dc:"密码"`
 	GiftCardPin *string `json:"giftCardPin,omitempty" v:"length:1,255" dc:"pin"`
 }
 
-type AccountgGiftcardInfo struct {
-	CountryCode *string `json:"country_code,omitempty" v:"length:1,255" dc:"国家"`
-	Balance     *string `json:"balance,omitempty" v:"length:1,255" dc:"余额"`
+type AccountGiftCardInfo struct {
+	CountryCode string `json:"country_code,omitempty" v:"length:1,255" dc:"国家"`
+	Balance     string `json:"balance,omitempty" v:"length:1,255" dc:"余额"`
+}
+
+type AccountGiftCardInfoRes struct {
+	Info AccountGiftCardInfo `json:"info" dc:"详情"`
 }
