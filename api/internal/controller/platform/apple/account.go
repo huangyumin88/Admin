@@ -421,7 +421,7 @@ func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.
 			values.Set(k, v)
 		}
 		reqBody := strings.NewReader(values.Encode())
-		url := "https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck"
+		url := "https://secure6.store.apple.com/uk/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck"
 		req, _ := http.NewRequest("POST", url, reqBody)
 		headers := strings.Split(headersString, "\r\n")
 		for _, h := range headers {
@@ -430,6 +430,8 @@ func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.
 				req.Header.Set(kv[0], kv[1])
 			}
 		}
+
+		req.Header.Set("Referer", "https://secure6.store.apple.com/uk/shop/giftcard/balancex")
 
 		cookies := strings.Split(cookiesString, "\n")
 		for _, cookie := range cookies {
@@ -485,7 +487,7 @@ func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.
 				fmt.Println("解析 JSON 字符串时出错:", err)
 
 			} else {
-				//printJSON(jsonData)
+				printJSON(jsonData)
 			}
 
 			// 打印响应内容

@@ -122,6 +122,15 @@ const initRouteList = [
                 },
                 meta: { isAuth: true, keepAlive: true, componentName: '/apple/account' }
             },
+            {
+                path: '/apple/cardUrl',
+                component: async () => {
+                    const component = await import('@/views/apple/cardUrl/Index.vue')
+                    component.default.name = '/apple/cardUrl'
+                    return component
+                },
+                meta: { isAuth: true, keepAlive: true, componentName: '/apple/cardUrl' }
+            },
             /*--------前端路由自动代码生成锚点（不允许修改和删除，否则将不能自动生成路由）--------*/
             {
                 path: '/profile',

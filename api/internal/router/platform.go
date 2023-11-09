@@ -2,6 +2,7 @@ package router
 
 import (
 	controllerApple "api/internal/controller/platform/apple"
+
 	"github.com/gogf/gf/v2/net/ghttp"
 
 	"api/internal/controller"
@@ -24,6 +25,7 @@ func InitRouterPlatform(s *ghttp.Server) {
 			})
 
 			group.Group(`/apple`, func(group *ghttp.RouterGroup) {
+				group.Bind(controllerApple.NewCardUrl())
 				group.Bind(controllerApple.NewAccount())
 			})
 		})

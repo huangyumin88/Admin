@@ -47,33 +47,11 @@ type (
 )
 
 var (
-	localAuthAction IAuthAction
 	localAuthMenu   IAuthMenu
 	localAuthRole   IAuthRole
 	localAuthScene  IAuthScene
+	localAuthAction IAuthAction
 )
-
-func AuthRole() IAuthRole {
-	if localAuthRole == nil {
-		panic("implement not found for interface IAuthRole, forgot register?")
-	}
-	return localAuthRole
-}
-
-func RegisterAuthRole(i IAuthRole) {
-	localAuthRole = i
-}
-
-func AuthScene() IAuthScene {
-	if localAuthScene == nil {
-		panic("implement not found for interface IAuthScene, forgot register?")
-	}
-	return localAuthScene
-}
-
-func RegisterAuthScene(i IAuthScene) {
-	localAuthScene = i
-}
 
 func AuthAction() IAuthAction {
 	if localAuthAction == nil {
@@ -95,4 +73,26 @@ func AuthMenu() IAuthMenu {
 
 func RegisterAuthMenu(i IAuthMenu) {
 	localAuthMenu = i
+}
+
+func AuthRole() IAuthRole {
+	if localAuthRole == nil {
+		panic("implement not found for interface IAuthRole, forgot register?")
+	}
+	return localAuthRole
+}
+
+func RegisterAuthRole(i IAuthRole) {
+	localAuthRole = i
+}
+
+func AuthScene() IAuthScene {
+	if localAuthScene == nil {
+		panic("implement not found for interface IAuthScene, forgot register?")
+	}
+	return localAuthScene
+}
+
+func RegisterAuthScene(i IAuthScene) {
+	localAuthScene = i
 }

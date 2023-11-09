@@ -1,17 +1,5 @@
 <script setup lang="ts">
-import account from "@/i18n/language/zh-cn/apple/account";
-
 const { t, tm } = useI18n()
-
-const isLoading = ref(false)
-
-const centerDialogVisible = ref(false)
-
-const strAccount = ref("")
-
-const input = ref('')
-
-// import { ElNotification } from 'element-plus'
 
 const table = reactive({
 	columns: [{
@@ -65,104 +53,22 @@ const table = reactive({
 		},
 	},
 	{
-		dataKey: 'account',
-		title: t('apple.account.name.account'),
-		key: 'account',
+		dataKey: 'url',
+		title: t('apple.cardUrl.name.url'),
+		key: 'url',
 		align: 'center',
-		width: 250,
-	},
-	{
-		dataKey: 'pwd',
-		title: t('apple.account.name.pwd'),
-		key: 'pwd',
-		align: 'center',
-		width: 150,
+		width: 200,
 	},
 	{
 		dataKey: 'country_code',
-		title: t('国家'),
-		key: 'country_id',
+		title: t('apple.cardUrl.name.country_code'),
+		key: 'country_code',
 		align: 'center',
 		width: 150,
-	},
-	{
-		dataKey: 'balance',
-		title: t('apple.account.name.balance'),
-		key: 'balance',
-		align: 'center',
-		width: 150,
-	},
-  {
-    dataKey: 'refresh',
-    title: t('登录状态'),
-    key: 'stk',
-    align: 'center',
-    width: 100,
-    cellRenderer: (props: any): any => {
-      return [
-        h(ElButton, {
-        	type: 'success',
-        	size: 'small',
-        	onClick: () => handleRefresh(props.rowData.account,props.rowData.pwd)
-        }, {
-        	default: () => [h(AutoiconEpRefresh), t('common.refresh')]
-        }),
-      ]
-    },
-  },
-	{
-		dataKey: 'status',
-		title: t('apple.account.name.status'),
-		key: 'status',
-		align: 'center',
-		width: 100,
-		cellRenderer: (props: any): any => {
-			let typeObj: any = { '0': '', '1': 'success' }
-			return [
-				h(ElTag as any, {
-					type: typeObj[props.rowData.status]
-				}, {
-					default: () => (tm('apple.account.status.status') as any).find((item: any) => { return item.value == props.rowData.status })?.label
-				})
-			]
-		},
-	},
-	{
-		dataKey: 'info',
-		title: t('apple.account.name.info'),
-		key: 'info',
-		align: 'center',
-		width: 200,
-		hidden: true,
-	},
-	{
-		dataKey: 'cookies',
-		title: t('apple.account.name.cookies'),
-		key: 'cookies',
-		align: 'center',
-		width: 200,
-		hidden: true,
-	},
-	{
-		dataKey: 'login_status',
-		title: t('apple.account.name.login_status'),
-		key: 'login_status',
-		align: 'center',
-		width: 100,
-		cellRenderer: (props: any): any => {
-			let typeObj: any = { '0': '', '1': 'success' }
-			return [
-				h(ElTag as any, {
-					type: typeObj[props.rowData.login_status]
-				}, {
-					default: () => (tm('apple.account.status.login_status') as any).find((item: any) => { return item.value == props.rowData.login_status })?.label
-				})
-			]
-		},
 	},
 	{
 		dataKey: 'isStop',
-		title: t('apple.account.name.isStop'),
+		title: t('apple.cardUrl.name.isStop'),
 		key: 'isStop',
 		align: 'center',
 		width: 100,
@@ -208,45 +114,31 @@ const table = reactive({
 		title: t('common.name.action'),
 		key: 'action',
 		align: 'center',
-		width: 320,
+		width: 250,
 		fixed: 'right',
 		cellRenderer: (props: any): any => {
 			return [
-        h(ElButton, {
-          type: 'primary',
-          size: 'small',
-          onClick: () => handleLogin(props.rowData.account,props.rowData.pwd)
-        }, {
-          default: () => [h(AutoiconEpOpportunity), t('common.login')]
-        }),
-        h(ElButton, {
-          type: 'success',
-          size: 'small',
-          onClick: () => handleSearch(props.rowData.account)
-        }, {
-          default: () => [h(AutoiconEpSearch), t('查询')]
-        }),
 				h(ElButton, {
-          type: 'danger',
+					type: 'primary',
 					size: 'small',
 					onClick: () => handleEditCopy(props.rowData.id)
 				}, {
 					default: () => [h(AutoiconEpEdit), t('common.edit')]
 				}),
 				h(ElButton, {
-					type: 'warning',
+					type: 'danger',
 					size: 'small',
 					onClick: () => handleDelete([props.rowData.id])
 				}, {
 					default: () => [h(AutoiconEpDelete), t('common.delete')]
 				}),
-				// h(ElButton, {
-				// 	type: 'warning',
-				// 	size: 'small',
-				// 	onClick: () => handleEditCopy(props.rowData.id, 'copy')
-				// }, {
-				// 	default: () => [h(AutoiconEpDocumentCopy), t('common.copy')]
-				// }),
+				h(ElButton, {
+					type: 'warning',
+					size: 'small',
+					onClick: () => handleEditCopy(props.rowData.id, 'copy')
+				}, {
+					default: () => [h(AutoiconEpDocumentCopy), t('common.copy')]
+				}),
 			]
 		},
 	}] as any,
@@ -261,7 +153,6 @@ const table = reactive({
 })
 
 const saveCommon = inject('saveCommon') as { visible: boolean, title: string, data: { [propName: string]: any } }
-let queryModel = inject('queryModel') as {country_code: string, balance: string}
 //新增
 const handleAdd = () => {
 	saveCommon.data = {}
@@ -284,7 +175,7 @@ const handleBatchDelete = () => {
 }
 //编辑|复制
 const handleEditCopy = (id: number, type: string = 'edit') => {
-	request(t('config.VITE_HTTP_API_PREFIX') + '/apple/account/info', { id: id }).then((res) => {
+	request(t('config.VITE_HTTP_API_PREFIX') + '/apple/cardUrl/info', { id: id }).then((res) => {
 		saveCommon.data = { ...res.data.info }
 		switch (type) {
 			case 'edit':
@@ -292,75 +183,14 @@ const handleEditCopy = (id: number, type: string = 'edit') => {
 				delete saveCommon.data.id
 				saveCommon.title = t('common.edit')
 				break;
+			case 'copy':
+				delete saveCommon.data.id
+				saveCommon.title = t('common.copy')
+				break;
 		}
 		saveCommon.visible = true
 	}).catch(() => { })
 }
-
-// 登录
-
-const handleSearch = (accounts: string) => {
-
-  strAccount.value = accounts
-  centerDialogVisible.value = true
-}
-
-const handleSearching = () => {
-  centerDialogVisible.value = false
-  if (input.value === "") {
-    console.log("输入框内容为空");
-  } else
-  {
-    isLoading.value = true
-    request(t('config.VITE_HTTP_API_PREFIX') + '/apple/account/giftcard/query', { account: strAccount.value,pwd:"", giftCardPin:input.value}, false).then((res) => {
-      isLoading.value = false
-      queryModel = { ...res.data.info }
-
-      ElNotification.success({
-        title: '成功',
-        message: '剩余余额：' + queryModel.balance,
-        offset: 100,
-      })
-
-      // getList()
-    }).catch(() => {
-      isLoading.value = false
-    })
-
-  }
-}
-
-const handleRefresh =  (account: string,pwd: string) => {
-  ElMessageBox.confirm('', {
-    type: 'warning',
-    title: t('common.tip.configRefresh'),
-    center: true,
-    showClose: false,
-  }).then(() => {
-    request(t('config.VITE_HTTP_API_PREFIX') + '/apple/account/refresh', { account: account,pwd: pwd }, true).then((res) => {
-      getList()
-    }).catch(() => { })
-  }).catch(() => { })
-}
-
-const handleLogin = (account: string,pwd: string) => {
-  ElMessageBox.confirm('', {
-    type: 'warning',
-    title: t('common.tip.configLogin'),
-    center: true,
-    showClose: false,
-  }).then(() => {
-
-    isLoading.value = true
-    request(t('config.VITE_HTTP_API_PREFIX') + '/login/apple/login', { account: account,pwd:pwd }, true).then((res) => {
-      isLoading.value = false
-      getList()
-    }).catch(() => {
-      isLoading.value = false
-    })
-  }).catch(() => { })
-}
-
 //删除
 const handleDelete = (idArr: number[]) => {
 	ElMessageBox.confirm('', {
@@ -369,14 +199,14 @@ const handleDelete = (idArr: number[]) => {
 		center: true,
 		showClose: false,
 	}).then(() => {
-		request(t('config.VITE_HTTP_API_PREFIX') + '/apple/account/del', { idArr: idArr }, true).then((res) => {
+		request(t('config.VITE_HTTP_API_PREFIX') + '/apple/cardUrl/del', { idArr: idArr }, true).then((res) => {
 			getList()
 		}).catch(() => { })
 	}).catch(() => { })
 }
 //更新
 const handleUpdate = async (param: { idArr: number[], [propName: string]: any }) => {
-	await request(t('config.VITE_HTTP_API_PREFIX') + '/apple/account/update', param, true)
+	await request(t('config.VITE_HTTP_API_PREFIX') + '/apple/cardUrl/update', param, true)
 }
 
 //分页
@@ -410,7 +240,7 @@ const getList = async (resetPage: boolean = false) => {
 	}
 	table.loading = true
 	try {
-		const res = await request(t('config.VITE_HTTP_API_PREFIX') + '/apple/account/list', param)
+		const res = await request(t('config.VITE_HTTP_API_PREFIX') + '/apple/cardUrl/list', param)
 		table.data = res.data.list?.length ? res.data.list : []
 		pagination.total = res.data.count
 	} catch (error) { }
@@ -438,7 +268,7 @@ defineExpose({
 		</ElCol>
 		<ElCol :span="8" style="text-align: right;">
 			<ElSpace :size="10" style="height: 100%;">
-				<MyExportButton :headerList="table.columns" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/apple/account/list', param: { filter: queryCommon.data, sort: table.sort.key + ' ' + table.sort.order } }" />
+				<MyExportButton :headerList="table.columns" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/apple/cardUrl/list', param: { filter: queryCommon.data, sort: table.sort.key + ' ' + table.sort.order } }" />
 				<ElDropdown max-height="300" :hide-on-click="false">
 					<ElButton type="info" :circle="true">
 						<AutoiconEpHide />
@@ -460,7 +290,7 @@ defineExpose({
 	<ElMain>
 		<ElAutoResizer>
 			<template #default="{ height, width }">
-				<ElTableV2 class="main-table" :columns="table.columns" :data="table.data" :sort-by="table.sort" @column-sort="table.handleSort" :width="width" :height="height" :fixed="true" :row-height="50" v-loading="isLoading">
+				<ElTableV2 class="main-table" :columns="table.columns" :data="table.data" :sort-by="table.sort" @column-sort="table.handleSort" :width="width" :height="height" :fixed="true" :row-height="50">
 					<template v-if="table.loading" #overlay>
 						<ElIcon class="is-loading" color="var(--el-color-primary)" :size="25">
 							<AutoiconEpLoading />
@@ -476,27 +306,4 @@ defineExpose({
 			<ElPagination :total="pagination.total" v-model:currentPage="pagination.page" v-model:page-size="pagination.size" @size-change="pagination.sizeChange" @current-change="pagination.pageChange" :page-sizes="pagination.sizeList" :layout="pagination.layout" :background="true" />
 		</ElCol>
 	</ElRow>
-
-  <el-dialog
-      v-model="centerDialogVisible"
-      title="提示"
-      width="30%"
-      align-center
-  >
-    <el-input v-model="input" placeholder="请输入礼品卡" />
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="centerDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="handleSearching">
-          查询
-        </el-button>
-      </span>
-    </template>
-  </el-dialog>
 </template>
-
-<style scoped>
-.dialog-footer button:first-child {
-  margin-right: 10px;
-}
-</style>

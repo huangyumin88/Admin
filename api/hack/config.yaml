@@ -16,7 +16,7 @@ gfcli:
         daoPath: "dao/apple"
         doPath: "model/do/apple"
         entityPath: "model/entity/apple"
-        tables: "apple_account"
+        tables: "apple_card_url"
         tplDaoIndexPath: "resource/gen/gen_dao_template_dao.txt"
         tplDaoInternalPath: "resource/gen/gen_dao_template_dao_internal.txt"
         overwriteDao: false
