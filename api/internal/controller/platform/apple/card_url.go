@@ -35,6 +35,17 @@ func (controllerThis *CardUrl) List(ctx context.Context, req *apiApple.CardUrlLi
 	allowField = append(allowField, `id`)
 	field := allowField
 	if len(req.Field) > 0 {
+		target := "label"
+		replacement := "country_code"
+
+		// 遍历并替换
+		for i, v := range req.Field {
+			if v == target {
+				req.Field[i] = replacement
+				order[0] = "id asc"
+				break // 如果只替换第一个匹配项，找到后即可停止循环
+			}
+		}
 		field = gset.NewStrSetFrom(req.Field).Intersect(gset.NewStrSetFrom(allowField)).Slice()
 		if len(field) == 0 {
 			field = allowField
@@ -56,6 +67,7 @@ func (controllerThis *CardUrl) List(ctx context.Context, req *apiApple.CardUrlLi
 		return
 	}
 	list, err := daoHandlerThis.Field(field).Order(order).JoinGroupByPrimaryKey().GetModel().Page(page, limit).All()
+
 	if err != nil {
 		return
 	}
@@ -63,7 +75,18 @@ func (controllerThis *CardUrl) List(ctx context.Context, req *apiApple.CardUrlLi
 	res = &apiApple.CardUrlListRes{
 		Count: count,
 	}
+
 	list.Structs(&res.List)
+
+	//for _, item := range res.List {
+	//	//str := "Hello, World!"
+	//	//item.CountryCode = &str
+	//	println(*item.CountryCode)
+	//}
+	for i := range res.List {
+		// 直接通过索引修改 list 中的元素
+		res.List[i].Label = res.List[i].CountryCode
+	}
 	return
 }
 

@@ -19,7 +19,7 @@ const table = reactive({
 		title: t('common.name.id'),
 		key: 'id',
 		align: 'center',
-		width: 200,
+		width: 150,
 		fixed: 'left',
 		sortable: true,
 		headerCellRenderer: () => {

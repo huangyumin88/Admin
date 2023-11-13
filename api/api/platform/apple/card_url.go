@@ -34,6 +34,7 @@ type CardUrlListRes struct {
 
 type CardUrlListItem struct {
 	Id          *uint       `json:"id,omitempty" dc:"ID"`
+	Label       *string     `json:"label,omitempty" dc:"label"`
 	Url         *string     `json:"url,omitempty" dc:"请求链接"`
 	CountryCode *string     `json:"country_code,omitempty" dc:"国家代码"`
 	IsStop      *uint       `json:"isStop,omitempty" dc:"停用：0否 1是"`
