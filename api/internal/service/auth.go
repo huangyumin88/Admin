@@ -47,10 +47,10 @@ type (
 )
 
 var (
-	localAuthMenu   IAuthMenu
-	localAuthRole   IAuthRole
 	localAuthScene  IAuthScene
 	localAuthAction IAuthAction
+	localAuthMenu   IAuthMenu
+	localAuthRole   IAuthRole
 )
 
 func AuthAction() IAuthAction {

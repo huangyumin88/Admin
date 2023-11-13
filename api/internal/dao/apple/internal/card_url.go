@@ -27,8 +27,10 @@ type CardUrlDao struct {
 type CardUrlColumns struct {
 	Id          string //
 	Url         string // 请求链接
+	AccountId   string // 苹果账号ID
 	CountryCode string // 国家代码
 	IsStop      string // 停用：0否 1是
+	IsAutoLogin string // 自动登录：0否 1是
 	UpdatedAt   string // 更新时间
 	CreatedAt   string // 创建时间
 }
@@ -37,8 +39,10 @@ type CardUrlColumns struct {
 var cardUrlColumns = CardUrlColumns{
 	Id:          "id",
 	Url:         "url",
+	AccountId:   "account_id",
 	CountryCode: "country_code",
 	IsStop:      "isStop",
+	IsAutoLogin: "isAutoLogin",
 	UpdatedAt:   "updatedAt",
 	CreatedAt:   "createdAt",
 }

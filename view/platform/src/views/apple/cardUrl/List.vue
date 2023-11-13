@@ -60,6 +60,13 @@ const table = reactive({
 		width: 200,
 	},
 	{
+		dataKey: 'account_name',
+		title: t('apple.cardUrl.name.account_id'),
+		key: 'account_id',
+		align: 'center',
+		width: 150,
+	},
+	{
 		dataKey: 'country_code',
 		title: t('apple.cardUrl.name.country_code'),
 		key: 'country_code',
@@ -88,6 +95,34 @@ const table = reactive({
 							isStop: val
 						}).then((res) => {
 							props.rowData.isStop = val
+						}).catch((error) => { })
+					}
+				})
+			]
+		},
+	},
+	{
+		dataKey: 'isAutoLogin',
+		title: t('apple.cardUrl.name.isAutoLogin'),
+		key: 'isAutoLogin',
+		align: 'center',
+		width: 100,
+		cellRenderer: (props: any): any => {
+			return [
+				h(ElSwitch as any, {
+					'model-value': props.rowData.isAutoLogin,
+					'active-value': 1,
+					'inactive-value': 0,
+					'inline-prompt': true,
+					'active-text': t('common.yes'),
+					'inactive-text': t('common.no'),
+					style: '--el-switch-on-color: var(--el-color-danger); --el-switch-off-color: var(--el-color-success)',
+					onChange: (val: number) => {
+						handleUpdate({
+							idArr: [props.rowData.id],
+							isAutoLogin: val
+						}).then((res) => {
+							props.rowData.isAutoLogin = val
 						}).catch((error) => { })
 					}
 				})

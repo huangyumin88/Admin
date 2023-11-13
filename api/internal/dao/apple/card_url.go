@@ -8,14 +8,13 @@ import (
 	"api/internal/dao/apple/internal"
 	"context"
 	"database/sql"
-	"sync"
-
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
+	"sync"
 )
 
 // internalCardUrlDao is internal type for wrapping internal DAO implements.
@@ -189,6 +188,12 @@ func (daoThis *cardUrlDao) ParseField(field []string, fieldWithParam map[string]
 			*afterField = append(*afterField, v) */
 			case `id`:
 				m = m.Fields(tableThis + `.` + daoThis.PrimaryKey() + ` AS ` + v)
+			case Account.Columns().Account:
+				tableAccount := Account.ParseDbTable(ctx)
+				m = m.Fields(tableAccount + `.` + v)
+				m = m.Handler(daoThis.ParseJoin(tableAccount, joinTableArr))
+			case `label`:
+				m = m.Fields(tableThis + `.` + daoThis.Columns().CountryCode + ` AS ` + v)
 			default:
 				if daoThis.ColumnArrG().Contains(v) {
 					m = m.Fields(tableThis + `.` + v)
@@ -259,6 +264,8 @@ func (daoThis *cardUrlDao) ParseFilter(filter map[string]interface{}, joinTableA
 				}
 			case `id`, `idArr`:
 				m = m.Where(tableThis+`.`+daoThis.PrimaryKey(), v)
+			case `label`:
+				m = m.WhereLike(tableThis+`.`+daoThis.Columns().CountryCode, `%`+gconv.String(v)+`%`)
 			case `timeRangeStart`:
 				m = m.WhereGTE(tableThis+`.`+daoThis.Columns().CreatedAt, v)
 			case `timeRangeEnd`:
@@ -332,6 +339,10 @@ func (daoThis *cardUrlDao) ParseJoin(joinCode string, joinTableArr *[]string) gd
 		/* case Xxxx.ParseDbTable(ctx):
 		m = m.LeftJoin(joinCode, joinCode+`.`+Xxxx.Columns().XxxxId+` = `+tableThis+`.`+daoThis.PrimaryKey())
 		// m = m.LeftJoin(Xxxx.ParseDbTable(ctx)+` AS `+joinCode, joinCode+`.`+Xxxx.Columns().XxxxId+` = `+tableThis+`.`+daoThis.PrimaryKey()) */
+		case daoAcc:
+
+		case Account.ParseDbTable(ctx):
+			m = m.LeftJoin(joinCode, joinCode+`.`+Account.PrimaryKey()+` = `+tableThis+`.`+daoThis.Columns().AccountId)
 		default:
 			m = m.LeftJoin(joinCode, joinCode+`.`+daoThis.PrimaryKey()+` = `+tableThis+`.`+daoThis.PrimaryKey())
 		}
