@@ -90,7 +90,7 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 	defer cancel()
 
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.Flag("headless", false),
+		chromedp.Flag("headless", true),
 		chromedp.Flag("incognito", true),        // 启用无痕模式
 		chromedp.Flag("incognito", true),        //# 不加载图片, 提升速度
 		chromedp.Flag("some-flag", true),        // 添加特定的标志
@@ -329,7 +329,6 @@ func upDataWithCookies(ctx context.Context, cookieString *string, stk *string, c
 			chromedp.OuterHTML("html", &html),
 			chromedp.Location(&currentURL),
 		},
-
 	)
 	time.Sleep(2 * time.Second)
 	if err != nil {
@@ -362,5 +361,6 @@ func upDataWithCookies(ctx context.Context, cookieString *string, stk *string, c
 		*countryCode = countryCode1
 	} else {
 		fmt.Println("未查找到")
+		*countryCode = "United States"
 	}
 }

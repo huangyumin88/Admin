@@ -103,7 +103,7 @@ const table = reactive({
         h(ElButton, {
         	type: 'success',
         	size: 'small',
-        	onClick: () => handleRefresh(props.rowData.account,props.rowData.pwd)
+        	onClick: () => handleRefresh(props.rowData.account)
         }, {
         	default: () => [h(AutoiconEpRefresh), t('common.refresh')]
         }),
@@ -330,16 +330,19 @@ const handleSearching = () => {
   }
 }
 
-const handleRefresh =  (account: string,pwd: string) => {
+const handleRefresh =  (account: string) => {
   ElMessageBox.confirm('', {
     type: 'warning',
     title: t('common.tip.configRefresh'),
     center: true,
     showClose: false,
   }).then(() => {
-    request(t('config.VITE_HTTP_API_PREFIX') + '/apple/account/refresh', { account: account,pwd: pwd }, true).then((res) => {
-      getList()
-    }).catch(() => { })
+    isLoading.value = true
+    request(t('config.VITE_HTTP_API_PREFIX') + '/apple/account/refresh', { account: account }, true).then((res) => {
+      isLoading.value = false
+    }).catch(() => {
+      isLoading.value = false
+    })
   }).catch(() => { })
 }
 

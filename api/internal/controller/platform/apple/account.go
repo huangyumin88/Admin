@@ -421,7 +421,7 @@ func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.
 			values.Set(k, v)
 		}
 		reqBody := strings.NewReader(values.Encode())
-		url := "https://secure6.store.apple.com/uk/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck"
+		url := "https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck"
 		req, _ := http.NewRequest("POST", url, reqBody)
 		headers := strings.Split(headersString, "\r\n")
 		for _, h := range headers {
@@ -431,7 +431,7 @@ func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.
 			}
 		}
 
-		req.Header.Set("Referer", "https://secure6.store.apple.com/uk/shop/giftcard/balancex")
+		req.Header.Set("Referer", "https://secure6.store.apple.com/shop/giftcard/balancex")
 
 		cookies := strings.Split(cookiesString, "\n")
 		for _, cookie := range cookies {
@@ -454,6 +454,8 @@ func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.
 			return
 		}
 		defer resp.Body.Close()
+
+		fmt.Println("StatusCode = ", resp.StatusCode)
 
 		if resp.StatusCode == 200 {
 
@@ -548,4 +550,197 @@ func insertPercentage(s string, interval int) string {
 
 	// 将结果转换为字符串并返回
 	return string(result)
+}
+
+func (controllerThis *Account) Refresh(ctx context.Context, req *apiApple.AccountRefreshReq) (res *api.CommonNoDataRes, err error) {
+	//filter := map[string]interface{}{`account`: req.Account}
+	//info, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(filter).GetModel().One()
+	//if info.IsEmpty() {
+	//	err = utils.NewErrorCode(ctx, 39990010, ``)
+	//	return
+	//} else {
+	//	headersString := info["info"].String()
+	//
+	//	cookiesString := info["cookies"].String()
+	//
+	//	//fmt.Println("headers = ", headersString)
+	//	//fmt.Println("str_timestamp = ", str_timestamp)
+	//	//fmt.Println("cookies = ", cookiesString)
+	//	//fmt.Println("device_id = ", device_id)
+	//
+	//	requestData := map[string]string{}
+	//
+	//	values := url.Values{}
+	//	for k, v := range requestData {
+	//		values.Set(k, v)
+	//	}
+	//	reqBody := strings.NewReader(values.Encode())
+	//	url := "https://secure4.store.apple.com/shop/account/home"
+	//	req, _ := http.NewRequest("POST", url, reqBody)
+	//	headers := strings.Split(headersString, "\r\n")
+	//	for _, h := range headers {
+	//		kv := strings.SplitN(h, ":", 2)
+	//		if len(kv) == 2 {
+	//			req.Header.Set(kv[0], kv[1])
+	//		}
+	//	}
+	//
+	//	req.Header.Set("Referer", "https://secure4.store.apple.com/shop/account/home")
+	//
+	//	cookies := strings.Split(cookiesString, "\n")
+	//	for _, cookie := range cookies {
+	//		kv := strings.SplitN(cookie, "=", 2)
+	//		if len(kv) == 2 {
+	//			req.AddCookie(&http.Cookie{Name: kv[0], Value: kv[1]})
+	//		}
+	//	}
+	//
+	//	// 3. 创建客户端
+	//	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	//	client := &http.Client{Transport: tr}
+	//
+	//	// 4. 发送请求
+	//	resp, _ := client.Do(req)
+	//	if err != nil {
+	//		// 处理错误
+	//		fmt.Println("发送请求时出错:", err)
+	//		err = utils.NewErrorCode(ctx, 29999999, ``)
+	//		return
+	//	}
+	//	defer resp.Body.Close()
+	//
+	//	if resp.StatusCode == 200 {
+	//		var response Response
+	//		status := response.Head.Status
+	//		fmt.Println("status = ", status)
+	//		fmt.Println("StatusCode = ", resp.StatusCode)
+	//		if resp.StatusCode == 302 {
+	//			err = utils.NewErrorCode(ctx, 39994005, ``)
+	//			return
+	//		}
+	//		return
+	//	}
+	//}
+	//
+	//err = utils.NewErrorCode(ctx, 29999999, ``)
+	//return
+	fmt.Println(req.Account)
+	filter := map[string]interface{}{`account`: req.Account}
+	info, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(filter).GetModel().One()
+	if info.IsEmpty() {
+		err = utils.NewErrorCode(ctx, 39990010, ``)
+		return
+	} else {
+		headersString := info["info"].String()
+		str_timestamp := info["str_timestamp"].String()
+		cookiesString := info["cookies"].String()
+		device_id := info["device_id"].String()
+		//fmt.Println("headers = ", headersString)
+		//fmt.Println("str_timestamp = ", str_timestamp)
+		//fmt.Println("cookies = ", cookiesString)
+		//fmt.Println("device_id = ", device_id)
+		giftCardPin := insertPercentage("XQ47RVKND43RFCGW", 4)
+		fmt.Println("giftCardPin = ", giftCardPin)
+		timestamp := time.Now().UnixNano() / 1e6
+		deviceID := strings.Replace(device_id, str_timestamp, string(timestamp), -1)
+
+		requestData := map[string]string{
+			"giftCardBalanceCheck.giftCardPin": giftCardPin,
+			"giftCardBalanceCheck.deviceID":    deviceID,
+		}
+
+		values := url.Values{}
+		for k, v := range requestData {
+			values.Set(k, v)
+		}
+		reqBody := strings.NewReader(values.Encode())
+		url := "https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck"
+		req, _ := http.NewRequest("POST", url, reqBody)
+		headers := strings.Split(headersString, "\r\n")
+		for _, h := range headers {
+			kv := strings.SplitN(h, ":", 2)
+			if len(kv) == 2 {
+				req.Header.Set(kv[0], kv[1])
+			}
+		}
+
+		req.Header.Set("Referer", "https://secure6.store.apple.com/shop/giftcard/balancex")
+
+		cookies := strings.Split(cookiesString, "\n")
+		for _, cookie := range cookies {
+			kv := strings.SplitN(cookie, "=", 2)
+			if len(kv) == 2 {
+				req.AddCookie(&http.Cookie{Name: kv[0], Value: kv[1]})
+			}
+		}
+
+		// 3. 创建客户端
+		tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+		client := &http.Client{Transport: tr}
+
+		// 4. 发送请求
+		resp, _ := client.Do(req)
+		if err != nil {
+			// 处理错误
+			fmt.Println("发送请求时出错:", err)
+			err = utils.NewErrorCode(ctx, 29999999, ``)
+			return
+		}
+		defer resp.Body.Close()
+
+		fmt.Println("StatusCode = ", resp.StatusCode)
+
+		if resp.StatusCode == 200 {
+
+			body, err1 := io.ReadAll(resp.Body)
+			if err1 != nil {
+				fmt.Println("读取响应内容时出错:", err1)
+
+				err = utils.NewErrorCode(ctx, 29999999, ``)
+				return
+			}
+
+			// 解析JSON
+			var response Response
+			err = json.Unmarshal(body, &response)
+			if err != nil {
+				fmt.Println("解析JSON错误:", err)
+				err = utils.NewErrorCode(ctx, 29999999, ``)
+				return
+			}
+			status := response.Head.Status
+
+			fmt.Println("status = ", status)
+			if status == 302 {
+				err = utils.NewErrorCode(ctx, 39994005, ``)
+				return
+			}
+
+			var jsonData map[string]interface{}
+			err3 := json.Unmarshal(body, &jsonData)
+			if err3 != nil {
+				fmt.Println("解析 JSON 字符串时出错:", err)
+
+			} else {
+				printJSON(jsonData)
+			}
+
+			return
+		} else {
+			// 打印响应内容
+			fmt.Println("响应错误:", resp.Status)
+			body, err1 := io.ReadAll(resp.Body)
+			if err1 != nil {
+				fmt.Println("读取响应内容时出错:", err1)
+				return
+			}
+
+			// 打印响应内容
+			fmt.Println("响应错误内容:", string(body))
+		}
+	}
+
+	err = utils.NewErrorCode(ctx, 29999999, ``)
+
+	return
 }

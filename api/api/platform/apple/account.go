@@ -148,6 +148,11 @@ type AccountLoginReq struct {
 	Pwd     *string `json:"pwd,omitempty" v:"length:1,255" dc:"密码"`
 }
 
+type AccountRefreshReq struct {
+	g.Meta  `path:"/account/refresh" method:"post" tags:"平台后台/苹果" sm:"刷新"`
+	Account *string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
+}
+
 type AccountGiftCardQueryReq struct {
 	g.Meta      `path:"/account/giftcard/query" method:"post" tags:"苹果/礼品卡查询" sm:"礼品卡查询"`
 	Account     *string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
