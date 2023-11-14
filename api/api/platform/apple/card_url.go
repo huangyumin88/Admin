@@ -38,14 +38,12 @@ type CardUrlListItem struct {
 	Id          *uint        `json:"id,omitempty" dc:"ID"`
 	Label       *string      `json:"label,omitempty" dc:"标签。常用于前端组件"`
 	Url         *string      `json:"url,omitempty" dc:"请求链接"`
-	Account     *string      `json:"account,omitempty" v:"length:1,255" dc:"账号"`
 	AccountId   *int         `json:"account_id,omitempty" dc:"苹果账号ID"`
 	CountryCode *string      `json:"country_code,omitempty" dc:"国家代码"`
 	IsStop      *uint        `json:"isStop,omitempty" dc:"停用：0否 1是"`
 	IsAutoLogin *int         `json:"isAutoLogin,omitempty" dc:"自动登录：0否 1是"`
 	UpdatedAt   *gtime.Time  `json:"updatedAt,omitempty" dc:"更新时间"`
 	CreatedAt   *gtime.Time  `json:"createdAt,omitempty" dc:"创建时间"`
-	AccountName *string      `json:"account_name,omitempty" dc:"苹果账号"`
 	AccountInfo *AccountInfo `json:"account_info,omitempty" dc:"账号详情"`
 }
 
@@ -56,6 +54,10 @@ type CardUrlInfoReq struct {
 	g.Meta `path:"/cardUrl/info" method:"post" tags:"平台后台/苹果礼品卡查询地址" sm:"详情"`
 	Id     uint     `json:"id" v:"required|integer|min:1" dc:"ID"`
 	Field  []string `json:"field" v:"distinct|foreach|min-length:1" dc:"查询字段，传值参考返回的字段名，默认返回全部字段。注意：如前端页面所需字段较少，建议传指定字段，可大幅减轻服务器及数据库压力"`
+}
+
+type CardUrlAutomaticLoginReq struct {
+	g.Meta `path:"/cardUrl/automaticLogin" method:"post" tags:"平台后台/苹果礼品卡查询地址" sm:"自动登录"`
 }
 
 type CardUrlInfoRes struct {
@@ -104,6 +106,11 @@ type CardUrlUpdateReq struct {
 type CardUrlDeleteReq struct {
 	g.Meta `path:"/cardUrl/del" method:"post" tags:"平台后台/苹果礼品卡查询地址" sm:"删除"`
 	IdArr  []uint `json:"idArr,omitempty" v:"required|distinct|foreach|integer|foreach|min:1" dc:"ID数组"`
+}
+
+type CardUrlQueryReq struct {
+	g.Meta      `path:"/cardUrl/giftcard/query" method:"post" tags:"平台后台/苹果礼品卡查询地址" sm:"删除"`
+	GiftCardPin *string `json:"giftCardPin,omitempty" v:"length:1,255" dc:"pin"`
 }
 
 /*--------删除 结束--------*/

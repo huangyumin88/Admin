@@ -3,6 +3,7 @@ package controller
 import (
 	"api/api"
 	apiCurrent "api/api/platform"
+	apiApple "api/api/platform/apple"
 	"api/internal/cache"
 	"api/internal/dao"
 	daoApple "api/internal/dao/apple"
@@ -103,11 +104,29 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 	ctx, cancel = chromedp.NewContext(allocCtx)
 	defer cancel()
 
+	// 获取登录的国家
+	// 默认美国
+
+	code := req.Code
+	if code == 0 {
+		code = 1
+	}
+	fmt.Println(code)
+	var cardUrlModel *apiApple.CardUrlInfo
+	cardUrl, _ := dao.NewDaoHandler(ctx, &daoApple.CardUrl).Filter(g.Map{`id`: code}).GetModel().One()
+	cardUrl.Struct(&cardUrlModel)
+	if cardUrl.IsEmpty() == true {
+		fmt.Println("未找到相应的国家")
+		err = utils.NewErrorCode(ctx, 39990012, ``)
+		return
+	}
+
 	// 监听网络请求
 	status := 999
 	var deviceID string
 	var str_timestamp string
 	var headersString string
+	//url1 := strings.Replace("https://idmsa.apple.com/appleauth/auth/signin/complete?isRememberMeEnabled=true", "apple.com/", *cardUrlModel.Url, -1)
 	chromedp.ListenTarget(ctx, func(ev interface{}) {
 		// 检查事件是否为网络响应事件
 		if responseReceived, ok := ev.(*network.EventResponseReceived); ok {
@@ -116,6 +135,7 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 
 			// 打印请求 URL 和响应状态码
 			//fmt.Printf("URL: %s, Status Code: %d\n", resp.URL, resp.Status)
+
 			if resp.URL == "https://idmsa.apple.com/appleauth/auth/signin/complete?isRememberMeEnabled=true" {
 				fmt.Printf("URL: %s, Status Code: %d\n", resp.URL, resp.Status)
 				if resp.Status == 401 {
@@ -124,21 +144,23 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 					//
 					status = 200
 				}
-			} else if strings.Contains(resp.URL, "https://secure6.store.apple.com/shop/signIn/idms/authx") {
-
-			} else if resp.URL == "https://secure6.store.apple.com/shop/accounthomex?_a=fetchDevices&_m=home.devices" {
-
-			} else if resp.URL == "https://secure6.store.apple.com/shop/account/home" {
-
 			}
+			//else if strings.Contains(resp.URL, "https://secure6.store.apple.com/shop/signIn/idms/authx") {
+			//
+			//} else if resp.URL == "https://secure6.store.apple.com/shop/accounthomex?_a=fetchDevices&_m=home.devices" {
+			//
+			//} else if resp.URL == "https://secure6.store.apple.com/shop/account/home" {
+			//
+			//}
 		}
 
 	})
 
+	url2 := strings.Replace("https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck", "apple.com/", *cardUrlModel.Url, -1)
 	chromedp.ListenTarget(ctx, func(ev interface{}) {
 		if req, ok := ev.(*network.EventRequestWillBeSent); ok {
 			request := req.Request
-			if request.URL == "https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck" {
+			if request.URL == url2 {
 				if request.PostData != "" {
 					// 处理 post data
 					fmt.Println("request.PostData ", request.PostData)
@@ -183,10 +205,11 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 		}
 	})
 
-	url := "https://secure6.store.apple.com/shop/account/home"
+	url3 := strings.Replace("https://secure6.store.apple.com/shop/account/home", "apple.com/", *cardUrlModel.Url, -1)
+	//url := "https://secure6.store.apple.com/shop/account/home"
 
 	err = chromedp.Run(ctx,
-		chromedp.Navigate(url),
+		chromedp.Navigate(url3),
 		chromedp.Sleep(1*time.Second),
 	)
 	if err != nil {
@@ -205,10 +228,10 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 		upDataWithCookies(ctx, &cookieString, &stk, &countryCode)
 		// 继续处理余额的页面
 		time.Sleep(3 * time.Second)
-		url = "https://secure.store.apple.com/shop/giftcard/balance"
+		url4 := strings.Replace("https://secure.store.apple.com/shop/giftcard/balance", "apple.com/", *cardUrlModel.Url, -1)
 
 		err = chromedp.Run(ctx,
-			chromedp.Navigate(url),
+			chromedp.Navigate(url4),
 			chromedp.Sleep(1*time.Second),
 		)
 		if err != nil {
@@ -217,7 +240,7 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 
 		tryFindAndBalanceType(ctx)
 
-		saveDataWith(ctx, *req.Account, *req.Pwd, cookieString, stk, countryCode, deviceID, str_timestamp, headersString)
+		saveDataWith(ctx, *req.Account, *req.Pwd, cookieString, stk, countryCode, deviceID, str_timestamp, headersString, cardUrlModel)
 
 		time.Sleep(1 * time.Second)
 
@@ -251,7 +274,7 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 	return
 }
 
-func saveDataWith(ctx context.Context, account string, pwd string, cookieString string, stk string, countryCode string, deviceID string, str_timestamp string, headersString string) {
+func saveDataWith(ctx context.Context, account string, pwd string, cookieString string, stk string, countryCode string, deviceID string, str_timestamp string, headersString string, cardUrlModel *apiApple.CardUrlInfo) {
 	data2 := map[string]interface{}{`account`: account, `pwd`: pwd, `cookies`: cookieString, `login_status`: 1, `stk`: stk, `country_code`: countryCode, `device_id`: deviceID, `str_timestamp`: str_timestamp, `info`: headersString}
 	filter2 := map[string]interface{}{`account`: account}
 
@@ -264,6 +287,20 @@ func saveDataWith(ctx context.Context, account string, pwd string, cookieString 
 		}
 	} else {
 		_, err := service.AppleAccount().Update(ctx, filter2, data2)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	data3 := map[string]interface{}{`account`: account, `country_code`: countryCode, `str_timestamp`: str_timestamp, `cookies`: cookieString, `headers`: headersString, `device_id`: deviceID, `country_id`: cardUrlModel.Id}
+	cookiesRow, _ := dao.NewDaoHandler(ctx, &daoApple.Cookies).Filter(g.Map{`account`: account, `country_id`: cardUrlModel.Id}).GetModel().One()
+	if cookiesRow.IsEmpty() {
+
+		_, err := service.AppleCookies().Create(ctx, data3)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		_, err := service.AppleCookies().Update(ctx, g.Map{`account`: account, `country_id`: cardUrlModel.Id}, data3)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -329,7 +366,6 @@ func upDataWithCookies(ctx context.Context, cookieString *string, stk *string, c
 			chromedp.OuterHTML("html", &html),
 			chromedp.Location(&currentURL),
 		},
-
 	)
 	time.Sleep(2 * time.Second)
 	if err != nil {

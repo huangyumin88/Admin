@@ -9,6 +9,8 @@ const centerDialogVisible = ref(false)
 
 const strAccount = ref("")
 
+const numberCode = ref(0)
+
 const input = ref('')
 
 // import { ElNotification } from 'element-plus'
@@ -215,14 +217,14 @@ const table = reactive({
         h(ElButton, {
           type: 'primary',
           size: 'small',
-          onClick: () => handleLogin(props.rowData.account,props.rowData.pwd)
+          onClick: () => handleLogin(props.rowData.account,props.rowData.pwd,props.rowData.country_id)
         }, {
           default: () => [h(AutoiconEpOpportunity), t('common.login')]
         }),
         h(ElButton, {
           type: 'success',
           size: 'small',
-          onClick: () => handleSearch(props.rowData.account)
+          onClick: () => handleSearch(props.rowData.account,props.rowData.country_id)
         }, {
           default: () => [h(AutoiconEpSearch), t('查询')]
         }),
@@ -299,8 +301,8 @@ const handleEditCopy = (id: number, type: string = 'edit') => {
 
 // 登录
 
-const handleSearch = (accounts: string) => {
-
+const handleSearch = (accounts: string,code: number) => {
+  numberCode.value = code
   strAccount.value = accounts
   centerDialogVisible.value = true
 }
@@ -312,7 +314,7 @@ const handleSearching = () => {
   } else
   {
     isLoading.value = true
-    request(t('config.VITE_HTTP_API_PREFIX') + '/apple/account/giftcard/query', { account: strAccount.value,pwd:"", giftCardPin:input.value}, false).then((res) => {
+    request(t('config.VITE_HTTP_API_PREFIX') + '/apple/account/giftcard/query', { account: strAccount.value,pwd:"", giftCardPin:input.value,code:numberCode.value}, false).then((res) => {
       isLoading.value = false
       queryModel = { ...res.data.info }
 
@@ -343,7 +345,7 @@ const handleRefresh =  (account: string,pwd: string) => {
   }).catch(() => { })
 }
 
-const handleLogin = (account: string,pwd: string) => {
+const handleLogin = (account: string,pwd: string,code: number) => {
   ElMessageBox.confirm('', {
     type: 'warning',
     title: t('common.tip.configLogin'),
@@ -352,7 +354,7 @@ const handleLogin = (account: string,pwd: string) => {
   }).then(() => {
 
     isLoading.value = true
-    request(t('config.VITE_HTTP_API_PREFIX') + '/login/apple/login', { account: account,pwd:pwd }, true).then((res) => {
+    request(t('config.VITE_HTTP_API_PREFIX') + '/login/apple/login', { account: account,pwd:pwd,code:code }, true).then((res) => {
       isLoading.value = false
       getList()
     }).catch(() => {

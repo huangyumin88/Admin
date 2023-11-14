@@ -8,34 +8,34 @@ import (
 	"api/internal/dao/apple/internal"
 	"context"
 	"database/sql"
-	"fmt"
+	"sync"
+
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
-	"sync"
 )
 
-// internalCardUrlDao is internal type for wrapping internal DAO implements.
-type internalCardUrlDao = *internal.CardUrlDao
+// internalCookiesDao is internal type for wrapping internal DAO implements.
+type internalCookiesDao = *internal.CookiesDao
 
-// cardUrlDao is the data access object for table apple_card_url.
+// cookiesDao is the data access object for table apple_cookies.
 // You can define custom methods on it to extend its functionality as you wish.
-type cardUrlDao struct {
-	internalCardUrlDao
+type cookiesDao struct {
+	internalCookiesDao
 }
 
 var (
-	// CardUrl is globally public accessible object for table apple_card_url operations.
-	CardUrl = cardUrlDao{
-		internal.NewCardUrlDao(),
+	// Cookies is globally public accessible object for table apple_cookies operations.
+	Cookies = cookiesDao{
+		internal.NewCookiesDao(),
 	}
 )
 
 // 解析分库
-func (daoThis *cardUrlDao) ParseDbGroup(ctx context.Context, dbGroupSelData ...map[string]interface{}) string {
+func (daoThis *cookiesDao) ParseDbGroup(ctx context.Context, dbGroupSelData ...map[string]interface{}) string {
 	group := daoThis.Group()
 	// 分库逻辑
 	/* if len(dbGroupSelData) > 0 {
@@ -44,7 +44,7 @@ func (daoThis *cardUrlDao) ParseDbGroup(ctx context.Context, dbGroupSelData ...m
 }
 
 // 解析分表
-func (daoThis *cardUrlDao) ParseDbTable(ctx context.Context, dbTableSelData ...map[string]interface{}) string {
+func (daoThis *cookiesDao) ParseDbTable(ctx context.Context, dbTableSelData ...map[string]interface{}) string {
 	table := daoThis.Table()
 	// 分表逻辑
 	/* if len(dbTableSelData) > 0 {
@@ -53,7 +53,7 @@ func (daoThis *cardUrlDao) ParseDbTable(ctx context.Context, dbTableSelData ...m
 }
 
 // 解析分库分表（对外暴露使用）
-func (daoThis *cardUrlDao) ParseDbCtx(ctx context.Context, dbSelDataList ...map[string]interface{}) *gdb.Model {
+func (daoThis *cookiesDao) ParseDbCtx(ctx context.Context, dbSelDataList ...map[string]interface{}) *gdb.Model {
 	switch len(dbSelDataList) {
 	case 1:
 		return g.DB(daoThis.ParseDbGroup(ctx, dbSelDataList[0])).Model(daoThis.ParseDbTable(ctx)).Ctx(ctx)
@@ -65,7 +65,7 @@ func (daoThis *cardUrlDao) ParseDbCtx(ctx context.Context, dbSelDataList ...map[
 }
 
 // 解析insert
-func (daoThis *cardUrlDao) ParseInsert(insert map[string]interface{}) gdb.ModelHandler {
+func (daoThis *cookiesDao) ParseInsert(insert map[string]interface{}) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		insertData := map[string]interface{}{}
 		hookData := map[string]interface{}{}
@@ -88,7 +88,7 @@ func (daoThis *cardUrlDao) ParseInsert(insert map[string]interface{}) gdb.ModelH
 }
 
 // hook insert
-func (daoThis *cardUrlDao) HookInsert(data map[string]interface{}) gdb.HookHandler {
+func (daoThis *cookiesDao) HookInsert(data map[string]interface{}) gdb.HookHandler {
 	return gdb.HookHandler{
 		Insert: func(ctx context.Context, in *gdb.HookInsertInput) (result sql.Result, err error) {
 			result, err = in.Next(ctx)
@@ -102,7 +102,7 @@ func (daoThis *cardUrlDao) HookInsert(data map[string]interface{}) gdb.HookHandl
 }
 
 // 解析update
-func (daoThis *cardUrlDao) ParseUpdate(update map[string]interface{}) gdb.ModelHandler {
+func (daoThis *cookiesDao) ParseUpdate(update map[string]interface{}) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -138,7 +138,7 @@ func (daoThis *cardUrlDao) ParseUpdate(update map[string]interface{}) gdb.ModelH
 }
 
 // hook update
-func (daoThis *cardUrlDao) HookUpdate(data map[string]interface{}, idArr ...int) gdb.HookHandler {
+func (daoThis *cookiesDao) HookUpdate(data map[string]interface{}, idArr ...int) gdb.HookHandler {
 	return gdb.HookHandler{
 		Update: func(ctx context.Context, in *gdb.HookUpdateInput) (result sql.Result, err error) {
 			/* //不能这样拿idArr，联表时会有bug
@@ -161,7 +161,7 @@ func (daoThis *cardUrlDao) HookUpdate(data map[string]interface{}, idArr ...int)
 }
 
 // hook delete
-func (daoThis *cardUrlDao) HookDelete(idArr ...int) gdb.HookHandler {
+func (daoThis *cookiesDao) HookDelete(idArr ...int) gdb.HookHandler {
 	return gdb.HookHandler{
 		Delete: func(ctx context.Context, in *gdb.HookDeleteInput) (result sql.Result, err error) {
 			result, err = in.Next(ctx)
@@ -178,7 +178,7 @@ func (daoThis *cardUrlDao) HookDelete(idArr ...int) gdb.HookHandler {
 }
 
 // 解析field
-func (daoThis *cardUrlDao) ParseField(field []string, fieldWithParam map[string]interface{}, afterField *[]string, afterFieldWithParam map[string]interface{}, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *cookiesDao) ParseField(field []string, fieldWithParam map[string]interface{}, afterField *[]string, afterFieldWithParam map[string]interface{}, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -189,12 +189,8 @@ func (daoThis *cardUrlDao) ParseField(field []string, fieldWithParam map[string]
 			*afterField = append(*afterField, v) */
 			case `id`:
 				m = m.Fields(tableThis + `.` + daoThis.PrimaryKey() + ` AS ` + v)
-			case Account.Columns().Account:
-				tableAccount := Account.ParseDbTable(ctx)
-				m = m.Fields(tableAccount + `.` + v)
-				m = m.Handler(daoThis.ParseJoin(tableAccount, joinTableArr))
 			case `label`:
-				m = m.Fields(tableThis + `.` + daoThis.Columns().CountryCode + ` AS ` + v)
+				m = m.Fields(tableThis + `.` + daoThis.Columns().Account + ` AS ` + v)
 			default:
 				if daoThis.ColumnArrG().Contains(v) {
 					m = m.Fields(tableThis + `.` + v)
@@ -214,8 +210,7 @@ func (daoThis *cardUrlDao) ParseField(field []string, fieldWithParam map[string]
 }
 
 // hook select
-func (daoThis *cardUrlDao) HookSelect(afterField *[]string, afterFieldWithParam map[string]interface{}) gdb.HookHandler {
-
+func (daoThis *cookiesDao) HookSelect(afterField *[]string, afterFieldWithParam map[string]interface{}) gdb.HookHandler {
 	return gdb.HookHandler{
 		Select: func(ctx context.Context, in *gdb.HookSelectInput) (result gdb.Result, err error) {
 			result, err = in.Next(ctx)
@@ -226,14 +221,11 @@ func (daoThis *cardUrlDao) HookSelect(afterField *[]string, afterFieldWithParam 
 			for _, record := range result {
 				wg.Add(1)
 				go func(record gdb.Record) {
-
 					defer wg.Done()
 					for _, v := range *afterField {
-
 						switch v {
 						/* case `xxxx`:
 						record[v] = gvar.New(``) */
-
 						}
 					}
 					/* for k, v := range afterFieldWithParam {
@@ -251,7 +243,7 @@ func (daoThis *cardUrlDao) HookSelect(afterField *[]string, afterFieldWithParam 
 }
 
 // 解析filter
-func (daoThis *cardUrlDao) ParseFilter(filter map[string]interface{}, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *cookiesDao) ParseFilter(filter map[string]interface{}, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -270,7 +262,7 @@ func (daoThis *cardUrlDao) ParseFilter(filter map[string]interface{}, joinTableA
 			case `id`, `idArr`:
 				m = m.Where(tableThis+`.`+daoThis.PrimaryKey(), v)
 			case `label`:
-				m = m.WhereLike(tableThis+`.`+daoThis.Columns().CountryCode, `%`+gconv.String(v)+`%`)
+				m = m.WhereLike(tableThis+`.`+daoThis.Columns().Account, `%`+gconv.String(v)+`%`)
 			case `timeRangeStart`:
 				m = m.WhereGTE(tableThis+`.`+daoThis.Columns().CreatedAt, v)
 			case `timeRangeEnd`:
@@ -288,7 +280,7 @@ func (daoThis *cardUrlDao) ParseFilter(filter map[string]interface{}, joinTableA
 }
 
 // 解析group
-func (daoThis *cardUrlDao) ParseGroup(group []string, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *cookiesDao) ParseGroup(group []string, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -309,7 +301,7 @@ func (daoThis *cardUrlDao) ParseGroup(group []string, joinTableArr *[]string) gd
 }
 
 // 解析order
-func (daoThis *cardUrlDao) ParseOrder(order []string, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *cookiesDao) ParseOrder(order []string, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -332,9 +324,7 @@ func (daoThis *cardUrlDao) ParseOrder(order []string, joinTableArr *[]string) gd
 }
 
 // 解析join
-func (daoThis *cardUrlDao) ParseJoin(joinCode string, joinTableArr *[]string) gdb.ModelHandler {
-
-	fmt.Println(joinCode)
+func (daoThis *cookiesDao) ParseJoin(joinCode string, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		if garray.NewStrArrayFrom(*joinTableArr).Contains(joinCode) {
 			return m
@@ -342,14 +332,10 @@ func (daoThis *cardUrlDao) ParseJoin(joinCode string, joinTableArr *[]string) gd
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
 		*joinTableArr = append(*joinTableArr, joinCode)
-
 		switch joinCode {
 		/* case Xxxx.ParseDbTable(ctx):
 		m = m.LeftJoin(joinCode, joinCode+`.`+Xxxx.Columns().XxxxId+` = `+tableThis+`.`+daoThis.PrimaryKey())
 		// m = m.LeftJoin(Xxxx.ParseDbTable(ctx)+` AS `+joinCode, joinCode+`.`+Xxxx.Columns().XxxxId+` = `+tableThis+`.`+daoThis.PrimaryKey()) */
-
-		case Account.ParseDbTable(ctx):
-			m = m.LeftJoin(joinCode, joinCode+`.`+Account.PrimaryKey()+` = `+tableThis+`.`+daoThis.Columns().AccountId)
 		default:
 			m = m.LeftJoin(joinCode, joinCode+`.`+daoThis.PrimaryKey()+` = `+tableThis+`.`+daoThis.PrimaryKey())
 		}

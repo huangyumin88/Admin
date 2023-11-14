@@ -26,6 +26,8 @@ export default {
     closeAll: '关闭全部',
     upTop: '置顶',
     batchDelete: '批量删除',
+    batchAutomatic: '自动登录-查询',
+    batchQuery: '兑换卡-查询',
 
     name: {
         id: 'ID',
@@ -55,7 +57,7 @@ export default {
         uploadFail: '上传失败，请稍后再试！',
         notAcceptFileType: '文件格式不在允许范围内',
         notWithinFileSize: '文件大小不在允许范围内',
-
+        configAutomatic: '确定重置自动登录？',
         notDuplicate: '不能与现有记录重复',
         notRequired: '不填则不修改',
     },
