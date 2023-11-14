@@ -12,6 +12,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"github.com/gogf/gf/v2/frame/g"
 	"io"
 	"log"
 	"net/http"
@@ -392,13 +393,27 @@ type Response struct {
 
 func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.AccountGiftCardQueryReq) (res *apiApple.AccountGiftCardInfoRes, err error) {
 
-	filter := map[string]interface{}{`account`: req.Account}
-	info, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(filter).GetModel().One()
+	code := req.Code
+	if code == 0 {
+		code = 1
+	}
+	//fmt.Println(code)
+	var cardUrlModel *apiApple.CardUrlInfo
+	cardUrl, _ := dao.NewDaoHandler(ctx, &daoApple.CardUrl).Filter(g.Map{`id`: code}).GetModel().One()
+	cardUrl.Struct(&cardUrlModel)
+	if cardUrl.IsEmpty() == true {
+		fmt.Println("未找到相应的国家")
+		err = utils.NewErrorCode(ctx, 39990012, ``)
+		return
+	}
+
+	filter := map[string]interface{}{`account`: req.Account, `country_id`: code}
+	info, _ := dao.NewDaoHandler(ctx, &daoApple.Cookies).Filter(filter).GetModel().One()
 	if info.IsEmpty() {
 		err = utils.NewErrorCode(ctx, 39990010, ``)
 		return
 	} else {
-		headersString := info["info"].String()
+		headersString := info["headers"].String()
 		str_timestamp := info["str_timestamp"].String()
 		cookiesString := info["cookies"].String()
 		device_id := info["device_id"].String()
@@ -421,7 +436,8 @@ func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.
 			values.Set(k, v)
 		}
 		reqBody := strings.NewReader(values.Encode())
-		url := "https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck"
+
+		url := strings.Replace("https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck", "apple.com/", *cardUrlModel.Url, -1)
 		req, _ := http.NewRequest("POST", url, reqBody)
 		headers := strings.Split(headersString, "\r\n")
 		for _, h := range headers {
@@ -430,8 +446,6 @@ func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.
 				req.Header.Set(kv[0], kv[1])
 			}
 		}
-
-		req.Header.Set("Referer", "https://secure6.store.apple.com/shop/giftcard/balancex")
 
 		cookies := strings.Split(cookiesString, "\n")
 		for _, cookie := range cookies {

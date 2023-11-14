@@ -11,15 +11,21 @@ const saveForm = reactive({
 		...saveCommon.data
 	} as { [propName: string]: any },
 	rules: {
-		url: [
-			{ type: 'string', min: 1, max: 255, trigger: 'blur', message: t('validation.between.string', { min: 1, max: 255 }) },
-			{ type: 'url', trigger: 'change', message: t('validation.url') },
+		// url: [
+		// 	{ type: 'string', min: 1, max: 255, trigger: 'blur', message: t('validation.between.string', { min: 1, max: 255 }) },
+		// 	{ type: 'url', trigger: 'change', message: t('validation.url') },
+		// ],
+		account_id: [
+			{ type: 'integer', min: 1, trigger: 'change', message: t('validation.select') },
 		],
 		country_code: [
 			{ type: 'string', min: 1, max: 255, trigger: 'blur', message: t('validation.between.string', { min: 1, max: 255 }) },
 			{ pattern: /^[\p{L}\p{M}\p{N}_-]+$/u, trigger: 'blur', message: t('validation.alpha_dash') },
 		],
 		isStop: [
+			{ type: 'enum', enum: (tm('common.status.whether') as any).map((item: any) => item.value), trigger: 'change', message: t('validation.select') },
+		],
+		isAutoLogin: [
 			{ type: 'enum', enum: (tm('common.status.whether') as any).map((item: any) => item.value), trigger: 'change', message: t('validation.select') },
 		],
 	} as any,
@@ -75,11 +81,17 @@ const saveDrawer = reactive({
 				<ElFormItem :label="t('apple.cardUrl.name.url')" prop="url">
 					<ElInput v-model="saveForm.data.url" :placeholder="t('apple.cardUrl.name.url')" minlength="1" maxlength="255" :show-word-limit="true" :clearable="true" />
 				</ElFormItem>
+				<ElFormItem :label="t('apple.cardUrl.name.account_id')" prop="account_id">
+					<MySelect v-model="saveForm.data.account_id" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/apple/account/list' }" />
+				</ElFormItem>
 				<ElFormItem :label="t('apple.cardUrl.name.country_code')" prop="country_code">
 					<ElInput v-model="saveForm.data.country_code" :placeholder="t('apple.cardUrl.name.country_code')" minlength="1" maxlength="255" :show-word-limit="true" :clearable="true" />
 				</ElFormItem>
 				<ElFormItem :label="t('apple.cardUrl.name.isStop')" prop="isStop">
 					<ElSwitch v-model="saveForm.data.isStop" :active-value="1" :inactive-value="0" :inline-prompt="true" :active-text="t('common.yes')" :inactive-text="t('common.no')" style="--el-switch-on-color: var(--el-color-danger); --el-switch-off-color: var(--el-color-success);" />
+				</ElFormItem>
+				<ElFormItem :label="t('apple.cardUrl.name.isAutoLogin')" prop="isAutoLogin">
+					<ElSwitch v-model="saveForm.data.isAutoLogin" :active-value="1" :inactive-value="0" :inline-prompt="true" :active-text="t('common.yes')" :inactive-text="t('common.no')" style="--el-switch-on-color: var(--el-color-danger); --el-switch-off-color: var(--el-color-success);" />
 				</ElFormItem>
 			</ElForm>
 		</ElScrollbar>

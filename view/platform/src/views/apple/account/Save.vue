@@ -96,7 +96,7 @@ const saveDrawer = reactive({
 					<ElInput v-model="saveForm.data.pwd" :placeholder="t('apple.account.name.pwd')" minlength="1" maxlength="255" :show-word-limit="true" :clearable="true" />
 				</ElFormItem>
 				<ElFormItem :label="t('apple.account.name.country_id')" prop="country_id">
-					<MySelect v-model="saveForm.data.country_id" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/apple/country/list' }" />
+					<MySelect v-model="saveForm.data.country_id" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/apple/cardUrl/list' }" />
 				</ElFormItem>
 				<ElFormItem :label="t('apple.account.name.balance')" prop="balance">
 					<ElInput v-model="saveForm.data.balance" :placeholder="t('apple.account.name.balance')" minlength="1" maxlength="255" :show-word-limit="true" :clearable="true" />

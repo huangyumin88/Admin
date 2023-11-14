@@ -25,6 +25,7 @@ func InitRouterPlatform(s *ghttp.Server) {
 			})
 
 			group.Group(`/apple`, func(group *ghttp.RouterGroup) {
+				group.Bind(controllerApple.NewCookies())
 				group.Bind(controllerApple.NewCardUrl())
 				group.Bind(controllerApple.NewAccount())
 			})

@@ -1,6 +1,12 @@
 <script setup lang="ts">
 const { t, tm } = useI18n()
 
+const isLoading = ref(false)
+
+const centerDialogVisible = ref(false)
+
+const input = ref('')
+
 const table = reactive({
 	columns: [{
 		dataKey: 'id',
@@ -60,6 +66,13 @@ const table = reactive({
 		width: 200,
 	},
 	{
+		dataKey: 'account_info.account',
+		title: t('apple.cardUrl.name.account_id'),
+		key: 'account_id',
+		align: 'center',
+		width: 150,
+	},
+	{
 		dataKey: 'country_code',
 		title: t('apple.cardUrl.name.country_code'),
 		key: 'country_code',
@@ -88,6 +101,34 @@ const table = reactive({
 							isStop: val
 						}).then((res) => {
 							props.rowData.isStop = val
+						}).catch((error) => { })
+					}
+				})
+			]
+		},
+	},
+	{
+		dataKey: 'isAutoLogin',
+		title: t('apple.cardUrl.name.isAutoLogin'),
+		key: 'isAutoLogin',
+		align: 'center',
+		width: 100,
+		cellRenderer: (props: any): any => {
+			return [
+				h(ElSwitch as any, {
+					'model-value': props.rowData.isAutoLogin,
+					'active-value': 1,
+					'inactive-value': 0,
+					'inline-prompt': true,
+					'active-text': t('common.yes'),
+					'inactive-text': t('common.no'),
+					style: '--el-switch-on-color: var(--el-color-danger); --el-switch-off-color: var(--el-color-success)',
+					onChange: (val: number) => {
+						handleUpdate({
+							idArr: [props.rowData.id],
+							isAutoLogin: val
+						}).then((res) => {
+							props.rowData.isAutoLogin = val
 						}).catch((error) => { })
 					}
 				})
@@ -173,6 +214,50 @@ const handleBatchDelete = () => {
 		ElMessage.error(t('common.tip.selectDelete'))
 	}
 }
+
+const handleBatchbatchAutomatic = () => {
+  ElMessageBox.confirm('', {
+    type: 'warning',
+    title: t('common.tip.configAutomatic'),
+    center: true,
+    showClose: false,
+  }).then(() => {
+    request(t('config.VITE_HTTP_API_PREFIX') + '/apple/cardUrl/automaticLogin', {  }, true).then((res) => {
+
+    }).catch(() => { })
+  }).catch(() => { })
+}
+
+const handleBatchbatchQuery = () => {
+  centerDialogVisible.value = true
+}
+let queryModel = inject('queryModel') as {country_code: string, balance: string}
+const handleSearching = () => {
+  centerDialogVisible.value = false
+  if (input.value === "") {
+    console.log("输入框内容为空");
+  } else
+  {
+    isLoading.value = true
+    request(t('config.VITE_HTTP_API_PREFIX') + '/apple/cardUrl/giftcard/query', { account: "",pwd:"", giftCardPin:input.value,code:0}, false).then((res) => {
+      isLoading.value = false
+      queryModel = { ...res.data.info }
+
+      ElNotification.success({
+        title: '成功',
+        message: '剩余余额：' + queryModel.balance,
+        offset: 100,
+      })
+
+      // getList()
+    }).catch(() => {
+      isLoading.value = false
+    })
+
+  }
+}
+
+
 //编辑|复制
 const handleEditCopy = (id: number, type: string = 'edit') => {
 	request(t('config.VITE_HTTP_API_PREFIX') + '/apple/cardUrl/info', { id: id }).then((res) => {
@@ -264,6 +349,12 @@ defineExpose({
 				<ElButton type="danger" @click="handleBatchDelete">
 					<AutoiconEpDeleteFilled />{{ t('common.batchDelete') }}
 				</ElButton>
+        <ElButton type="success" @click="handleBatchbatchAutomatic">
+          <AutoiconEpRefresh />{{ t('common.batchAutomatic') }}
+        </ElButton>
+        <ElButton type="warning" @click="handleBatchbatchQuery">
+          <AutoiconEpSearch />{{ t('common.batchQuery') }}
+        </ElButton>
 			</ElSpace>
 		</ElCol>
 		<ElCol :span="8" style="text-align: right;">
@@ -290,7 +381,7 @@ defineExpose({
 	<ElMain>
 		<ElAutoResizer>
 			<template #default="{ height, width }">
-				<ElTableV2 class="main-table" :columns="table.columns" :data="table.data" :sort-by="table.sort" @column-sort="table.handleSort" :width="width" :height="height" :fixed="true" :row-height="50">
+				<ElTableV2 class="main-table" :columns="table.columns" :data="table.data" :sort-by="table.sort" @column-sort="table.handleSort" :width="width" :height="height" :fixed="true" :row-height="50" v-loading="isLoading">
 					<template v-if="table.loading" #overlay>
 						<ElIcon class="is-loading" color="var(--el-color-primary)" :size="25">
 							<AutoiconEpLoading />
@@ -306,4 +397,21 @@ defineExpose({
 			<ElPagination :total="pagination.total" v-model:currentPage="pagination.page" v-model:page-size="pagination.size" @size-change="pagination.sizeChange" @current-change="pagination.pageChange" :page-sizes="pagination.sizeList" :layout="pagination.layout" :background="true" />
 		</ElCol>
 	</ElRow>
+
+  <el-dialog
+      v-model="centerDialogVisible"
+      title="提示"
+      width="30%"
+      align-center
+  >
+    <el-input v-model="input" placeholder="请输入礼品卡" />
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="centerDialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="handleSearching">
+          查询
+        </el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>

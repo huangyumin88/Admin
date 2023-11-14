@@ -3,6 +3,11 @@ package controller
 import (
 	"api/api"
 	apiApple "api/api/platform/apple"
+	"fmt"
+	"sync"
+	//"api/api/platform"
+	apiLogin "api/api/platform"
+	controllerLogin "api/internal/controller/platform"
 	"api/internal/dao"
 	daoApple "api/internal/dao/apple"
 	"api/internal/service"
@@ -32,9 +37,21 @@ func (controllerThis *CardUrl) List(ctx context.Context, req *apiApple.CardUrlLi
 
 	//columnsThis := daoApple.CardUrl.Columns()
 	allowField := daoApple.CardUrl.ColumnArr()
-	allowField = append(allowField, `id`)
+	allowField = append(allowField, `id`, `label`)
 	field := allowField
 	if len(req.Field) > 0 {
+		target := "label"
+		replacement := "country_code"
+
+		// 遍历并替换
+		for i, v := range req.Field {
+			if v == target {
+				req.Field[i] = replacement
+				order[0] = "id asc"
+				break // 如果只替换第一个匹配项，找到后即可停止循环
+			}
+		}
+
 		field = gset.NewStrSetFrom(req.Field).Intersect(gset.NewStrSetFrom(allowField)).Slice()
 		if len(field) == 0 {
 			field = allowField
@@ -64,6 +81,18 @@ func (controllerThis *CardUrl) List(ctx context.Context, req *apiApple.CardUrlLi
 		Count: count,
 	}
 	list.Structs(&res.List)
+	for i := range res.List {
+		// 直接通过索引修改 list 中的元素
+		res.List[i].Label = res.List[i].CountryCode
+
+		filter1 := map[string]interface{}{}
+		filter1["id"] = res.List[i].AccountId
+
+		info, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(filter1).JoinGroupByPrimaryKey().GetModel().One()
+		if info != nil {
+			info.Struct(&res.List[i].AccountInfo)
+		}
+	}
 	return
 }
 
@@ -162,4 +191,93 @@ func (controllerThis *CardUrl) Delete(ctx context.Context, req *apiApple.CardUrl
 
 	_, err = service.AppleCardUrl().Delete(ctx, filter)
 	return
+}
+
+func (controllerThis *CardUrl) AutomaticLogin(ctx context.Context, req *apiApple.CardUrlAutomaticLoginReq) (res *api.CommonNoDataRes, err error) {
+	var IsStop uint = 0
+	filter := apiApple.CardUrlListFilter{IsStop: &IsStop}
+
+	var reqs = &apiApple.CardUrlListReq{Limit: 0, Page: 1, Filter: filter}
+
+	reps, _ := controllerThis.List(ctx, reqs)
+	println(len(reps.List))
+	go processRequests(ctx, reps.List)
+
+	return
+}
+
+func processRequests(ctx context.Context, List []apiApple.CardUrlListItem) {
+	for _, item := range List {
+		var reqs = &apiLogin.LoginAppleReq{Account: item.AccountInfo.Account, Pwd: item.AccountInfo.Pwd, Code: *item.Id}
+		loginApi := controllerLogin.NewLogin()
+		loginApi.AppleLogin(ctx, reqs)
+	}
+}
+
+func (controllerThis *CardUrl) GiftcardAutoQuery(ctx context.Context, req *apiApple.CardUrlQueryReq) (res *apiApple.AccountGiftCardInfoRes, err error) {
+	var IsStop uint = 0
+	filter := apiApple.CardUrlListFilter{IsStop: &IsStop}
+
+	var reqs = &apiApple.CardUrlListReq{Limit: 0, Page: 1, Filter: filter}
+
+	reps, _ := controllerThis.List(ctx, reqs)
+
+	var wg sync.WaitGroup
+
+	results := make(chan apiApple.AccountGiftCardInfoRes)
+	done := make(chan struct{})
+	maxConcurrency := 3
+
+	// 控制并发数量
+	concurrencyControl := make(chan struct{}, maxConcurrency)
+
+	// 启动协程处理请求
+	for _, item := range reps.List {
+		wg.Add(1)
+		concurrencyControl <- struct{}{}
+		go func(data apiApple.CardUrlListItem) {
+			defer func() { <-concurrencyControl }()
+			processCheckRequests(ctx, item, req.GiftCardPin, results, done, &wg)
+		}(item)
+	}
+
+	// 等待结果并检查是否有code == 200
+	go func() {
+		for res := range results {
+			if len(res.Info.Balance) > 0 {
+				close(done)
+				fmt.Println("找到code == 200的响应:", res, res.Info.Balance)
+
+				return
+			}
+		}
+	}()
+
+	// 等待所有请求完成
+	wg.Wait()
+	close(results)
+
+	info := apiApple.AccountGiftCardInfo{
+		CountryCode: "US",
+		Balance:     "100.0",
+	}
+
+	println(len(reps.List))
+	res = &apiApple.AccountGiftCardInfoRes{Info: info}
+	return
+}
+
+func processCheckRequests(ctx context.Context, item apiApple.CardUrlListItem, giftCardPin *string, results chan<- apiApple.AccountGiftCardInfoRes, done chan struct{}, wg *sync.WaitGroup) {
+	defer wg.Done()
+
+	var reqs = &apiApple.AccountGiftCardQueryReq{Account: item.AccountInfo.Account, Pwd: item.AccountInfo.Pwd, Code: *item.Id, GiftCardPin: giftCardPin}
+
+	account := Account{}
+	response, _ := account.GiftcardQuery(ctx, reqs)
+
+	select {
+	case results <- *response:
+	case <-done:
+		return
+	}
 }

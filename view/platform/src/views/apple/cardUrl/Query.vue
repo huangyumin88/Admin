@@ -51,11 +51,17 @@ const queryForm = reactive({
 		<ElFormItem prop="url">
 			<ElInput v-model="queryCommon.data.url" :placeholder="t('apple.cardUrl.name.url')" minlength="1" maxlength="255" :clearable="true" />
 		</ElFormItem>
+		<ElFormItem prop="account_id">
+			<MySelect v-model="queryCommon.data.account_id" :placeholder="t('apple.cardUrl.name.account_id')" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/apple/account/list' }" />
+		</ElFormItem>
 		<ElFormItem prop="country_code">
 			<ElInput v-model="queryCommon.data.country_code" :placeholder="t('apple.cardUrl.name.country_code')" minlength="1" maxlength="255" :clearable="true" />
 		</ElFormItem>
 		<ElFormItem prop="isStop" style="width: 120px;">
 			<ElSelectV2 v-model="queryCommon.data.isStop" :options="tm('common.status.whether')" :placeholder="t('apple.cardUrl.name.isStop')" :clearable="true" />
+		</ElFormItem>
+		<ElFormItem prop="isAutoLogin" style="width: 120px;">
+			<ElSelectV2 v-model="queryCommon.data.isAutoLogin" :options="tm('common.status.whether')" :placeholder="t('apple.cardUrl.name.isAutoLogin')" :clearable="true" />
 		</ElFormItem>
 		<ElFormItem prop="timeRange">
 			<ElDatePicker v-model="queryCommon.data.timeRange" type="datetimerange" range-separator="-" :default-time="[new Date(2000, 0, 1, 0, 0, 0), new Date(2000, 0, 1, 23, 59, 59)]" :start-placeholder="t('common.name.timeRangeStart')" :end-placeholder="t('common.name.timeRangeEnd')" />

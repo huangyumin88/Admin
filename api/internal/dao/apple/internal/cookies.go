@@ -13,51 +13,55 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 )
 
-// CardUrlDao is the data access object for table apple_card_url.
-type CardUrlDao struct {
+// CookiesDao is the data access object for table apple_cookies.
+type CookiesDao struct {
 	table      string           // table is the underlying table name of the DAO.
 	group      string           // group is the database configuration group name of current DAO.
-	columns    CardUrlColumns   // columns contains all the column names of Table for convenient usage.
+	columns    CookiesColumns   // columns contains all the column names of Table for convenient usage.
 	primaryKey string           // 主键ID
 	columnArr  []string         // 所有字段的数组
 	columnArrG *garray.StrArray // 所有字段的数组（该格式更方便使用）
 }
 
-// CardUrlColumns defines and stores column names for table apple_card_url.
-type CardUrlColumns struct {
-	Id          string //
-	Url         string // 请求链接
-	AccountId   string // 苹果账号ID
-	CountryCode string // 国家代码
-	IsStop      string // 停用：0否 1是
-	IsAutoLogin string // 自动登录：0否 1是
-	UpdatedAt   string // 更新时间
-	CreatedAt   string // 创建时间
+// CookiesColumns defines and stores column names for table apple_cookies.
+type CookiesColumns struct {
+	Id           string // Id
+	Cookies      string // cookies
+	CountryId    string // 国家id
+	CountryCode  string // 国家代码
+	UpdatedAt    string // 更新时间
+	CreatedAt    string // 创建时间
+	Headers      string // 信息头
+	StrTimestamp string // 时间戳
+	Account      string // 账号
+	DeviceId     string // 设备id
 }
 
-// cardUrlColumns holds the columns for table apple_card_url.
-var cardUrlColumns = CardUrlColumns{
-	Id:          "id",
-	Url:         "url",
-	AccountId:   "account_id",
-	CountryCode: "country_code",
-	IsStop:      "isStop",
-	IsAutoLogin: "isAutoLogin",
-	UpdatedAt:   "updatedAt",
-	CreatedAt:   "createdAt",
+// cookiesColumns holds the columns for table apple_cookies.
+var cookiesColumns = CookiesColumns{
+	Id:           "id",
+	Cookies:      "cookies",
+	CountryId:    "country_id",
+	CountryCode:  "country_code",
+	UpdatedAt:    "updatedAt",
+	CreatedAt:    "createdAt",
+	Headers:      "headers",
+	StrTimestamp: "str_timestamp",
+	Account:      "account",
+	DeviceId:     "device_id",
 }
 
-// NewCardUrlDao creates and returns a new DAO object for table data access.
-func NewCardUrlDao() *CardUrlDao {
-	return &CardUrlDao{
+// NewCookiesDao creates and returns a new DAO object for table data access.
+func NewCookiesDao() *CookiesDao {
+	return &CookiesDao{
 		group:   `default`,
-		table:   `apple_card_url`,
-		columns: cardUrlColumns,
+		table:   `apple_cookies`,
+		columns: cookiesColumns,
 		primaryKey: func() string {
-			return reflect.ValueOf(cardUrlColumns).Field(0).String()
+			return reflect.ValueOf(cookiesColumns).Field(0).String()
 		}(),
 		columnArr: func() []string {
-			v := reflect.ValueOf(cardUrlColumns)
+			v := reflect.ValueOf(cookiesColumns)
 			count := v.NumField()
 			column := make([]string, count)
 			for i := 0; i < count; i++ {
@@ -66,7 +70,7 @@ func NewCardUrlDao() *CardUrlDao {
 			return column
 		}(),
 		columnArrG: func() *garray.StrArray {
-			v := reflect.ValueOf(cardUrlColumns)
+			v := reflect.ValueOf(cookiesColumns)
 			count := v.NumField()
 			column := make([]string, count)
 			for i := 0; i < count; i++ {
@@ -78,28 +82,28 @@ func NewCardUrlDao() *CardUrlDao {
 }
 
 // DB retrieves and returns the underlying raw database management object of current DAO.
-func (dao *CardUrlDao) DB() gdb.DB {
+func (dao *CookiesDao) DB() gdb.DB {
 	return g.DB(dao.group)
 }
 
 // Table returns the table name of current dao.
-func (dao *CardUrlDao) Table() string {
+func (dao *CookiesDao) Table() string {
 	return dao.table
 }
 
 // Columns returns all column names of current dao.
 // 使用较为频繁。为优化内存考虑，改成返回指针更为合适，但切忌使用过程中不可修改，否则会污染全局
-func (dao *CardUrlDao) Columns() *CardUrlColumns {
+func (dao *CookiesDao) Columns() *CookiesColumns {
 	return &dao.columns
 }
 
 // Group returns the configuration group name of database of current dao.
-func (dao *CardUrlDao) Group() string {
+func (dao *CookiesDao) Group() string {
 	return dao.group
 }
 
 // Ctx creates and returns the Model for current DAO, It automatically sets the context for current operation.
-func (dao *CardUrlDao) Ctx(ctx context.Context) *gdb.Model {
+func (dao *CookiesDao) Ctx(ctx context.Context) *gdb.Model {
 	return dao.DB().Model(dao.table).Safe().Ctx(ctx)
 }
 
@@ -109,21 +113,21 @@ func (dao *CardUrlDao) Ctx(ctx context.Context) *gdb.Model {
 //
 // Note that, you should not Commit or Rollback the transaction in function f
 // as it is automatically handled by this function.
-func (dao *CardUrlDao) Transaction(ctx context.Context, f func(ctx context.Context, tx gdb.TX) error) (err error) {
+func (dao *CookiesDao) Transaction(ctx context.Context, f func(ctx context.Context, tx gdb.TX) error) (err error) {
 	return dao.Ctx(ctx).Transaction(ctx, f)
 }
 
 // 主键ID
-func (dao *CardUrlDao) PrimaryKey() string {
+func (dao *CookiesDao) PrimaryKey() string {
 	return dao.primaryKey
 }
 
 // 所有字段的数组
-func (dao *CardUrlDao) ColumnArr() []string {
+func (dao *CookiesDao) ColumnArr() []string {
 	return dao.columnArr
 }
 
 // 所有字段的数组（该格式更方便使用）
-func (dao *CardUrlDao) ColumnArrG() *garray.StrArray {
+func (dao *CookiesDao) ColumnArrG() *garray.StrArray {
 	return dao.columnArrG
 }

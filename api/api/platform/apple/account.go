@@ -158,6 +158,7 @@ type AccountGiftCardQueryReq struct {
 	Account     *string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
 	Pwd         *string `json:"pwd,omitempty" v:"length:1,255" dc:"密码"`
 	GiftCardPin *string `json:"giftCardPin,omitempty" v:"length:1,255" dc:"pin"`
+	Code        uint    `json:"code,omitempty" v:"integer|min:1" dc:"ID"`
 }
 
 type AccountGiftCardInfo struct {
