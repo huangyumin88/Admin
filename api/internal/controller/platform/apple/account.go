@@ -407,7 +407,10 @@ func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.
 		return
 	}
 
-	filter := map[string]interface{}{`account`: req.Account, `country_id`: code}
+	println("country_id:", code)
+	println("account:", *req.Account)
+
+	filter := map[string]interface{}{`account`: *req.Account, `country_id`: code}
 	info, _ := dao.NewDaoHandler(ctx, &daoApple.Cookies).Filter(filter).GetModel().One()
 	if info.IsEmpty() {
 		err = utils.NewErrorCode(ctx, 39990010, ``)
@@ -507,7 +510,7 @@ func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.
 			}
 
 			// 打印响应内容
-			fmt.Println("Balance = ", response.Body.GiftCardBalanceCheck.D.Balance)
+			//fmt.Println("Balance = ", response.Body.GiftCardBalanceCheck.D.Balance)
 			if response.Body.GiftCardBalanceCheck.D.Balance == "" {
 
 				err = utils.NewErrorCode(ctx, 39990011, ``)
@@ -517,6 +520,7 @@ func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.
 			info1 := apiApple.AccountGiftCardInfo{
 				CountryCode: info["country_code"].String(),
 				Balance:     response.Body.GiftCardBalanceCheck.D.Balance,
+				Status:      1,
 			}
 			res = &apiApple.AccountGiftCardInfoRes{Info: info1}
 			return

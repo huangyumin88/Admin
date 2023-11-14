@@ -164,6 +164,7 @@ type AccountGiftCardQueryReq struct {
 type AccountGiftCardInfo struct {
 	CountryCode string `json:"country_code,omitempty" v:"length:1,255" dc:"国家"`
 	Balance     string `json:"balance,omitempty" v:"length:1,255" dc:"余额"`
+	Status      int    `json:"status,omitempty" v:"integer|min:1" dc:"状态"`
 }
 
 type AccountGiftCardInfoRes struct {
