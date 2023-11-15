@@ -16,6 +16,7 @@ type Cookies struct {
 	Cookies      interface{} // cookies
 	CountryId    interface{} // 国家id
 	CountryCode  interface{} // 国家代码
+	Url          interface{} // 请求链接
 	UpdatedAt    *gtime.Time // 更新时间
 	CreatedAt    *gtime.Time // 创建时间
 	Headers      interface{} // 信息头

@@ -23,6 +23,7 @@ type CookiesListFilter struct {
 	Label          string      `json:"label,omitempty" v:"length:1,30|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"标签。常用于前端组件"`
 	CountryId      *int        `json:"country_id,omitempty" v:"integer|min:1" dc:"国家id"`
 	CountryCode    string      `json:"country_code,omitempty" v:"length:1,255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家代码"`
+	Url            *string     `json:"url,omitempty" v:"length:1,255" dc:"请求链接"`
 	TimeRangeStart *gtime.Time `json:"timeRangeStart,omitempty" v:"date-format:Y-m-d H:i:s" dc:"开始时间：YYYY-mm-dd HH:ii:ss"`
 	TimeRangeEnd   *gtime.Time `json:"timeRangeEnd,omitempty" v:"date-format:Y-m-d H:i:s|after-equal:TimeRangeStart" dc:"结束时间：YYYY-mm-dd HH:ii:ss"`
 	StrTimestamp   string      `json:"str_timestamp,omitempty" v:"length:1,30" dc:"时间戳"`
@@ -40,6 +41,7 @@ type CookiesListItem struct {
 	Cookies      *string     `json:"cookies,omitempty" dc:"cookies"`
 	CountryId    *int        `json:"country_id,omitempty" dc:"国家id"`
 	CountryCode  *string     `json:"country_code,omitempty" dc:"国家代码"`
+	Url          *string     `json:"url,omitempty"  dc:"请求链接"`
 	UpdatedAt    *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
 	CreatedAt    *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
 	Headers      *string     `json:"headers,omitempty" dc:"信息头"`
@@ -67,6 +69,7 @@ type CookiesInfo struct {
 	Cookies      *string     `json:"cookies,omitempty" dc:"cookies"`
 	CountryId    *int        `json:"country_id,omitempty" dc:"国家id"`
 	CountryCode  *string     `json:"country_code,omitempty" dc:"国家代码"`
+	Url          *string     `json:"url,omitempty" dc:"请求链接"`
 	UpdatedAt    *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
 	CreatedAt    *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
 	Headers      *string     `json:"headers,omitempty" dc:"信息头"`
@@ -83,6 +86,7 @@ type CookiesCreateReq struct {
 	Cookies      *string `json:"cookies,omitempty" v:"" dc:"cookies"`
 	CountryId    *int    `json:"country_id,omitempty" v:"integer|min:1" dc:"国家id"`
 	CountryCode  *string `json:"country_code,omitempty" v:"length:1,255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家代码"`
+	Url          *string `json:"url,omitempty" v:"length:1,255" dc:"请求链接"`
 	Headers      *string `json:"headers,omitempty" v:"" dc:"信息头"`
 	StrTimestamp *string `json:"str_timestamp,omitempty" v:"length:1,30" dc:"时间戳"`
 	Account      *string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
@@ -98,6 +102,7 @@ type CookiesUpdateReq struct {
 	Cookies      *string `json:"cookies,omitempty" v:"" dc:"cookies"`
 	CountryId    *int    `json:"country_id,omitempty" v:"integer|min:1" dc:"国家id"`
 	CountryCode  *string `json:"country_code,omitempty" v:"length:1,255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家代码"`
+	Url          *string `json:"url,omitempty" v:"length:1,255" dc:"请求链接"`
 	Headers      *string `json:"headers,omitempty" v:"" dc:"信息头"`
 	StrTimestamp *string `json:"str_timestamp,omitempty" v:"length:1,30" dc:"时间戳"`
 	Account      *string `json:"account,omitempty" v:"length:1,255" dc:"账号"`

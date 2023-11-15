@@ -11,12 +11,15 @@ import (
 	daoPlatform "api/internal/dao/platform"
 	"api/internal/service"
 	"api/internal/utils"
+	"bufio"
 	"context"
 	"fmt"
 	"github.com/chromedp/cdproto/network"
 	"github.com/chromedp/chromedp"
 	"github.com/chromedp/chromedp/kb"
 	"log"
+	"math/rand"
+	"os"
 	"regexp"
 	"strings"
 	"time"
@@ -87,16 +90,43 @@ func (controllerThis *Login) Login(ctx context.Context, req *apiCurrent.LoginLog
 
 func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.LoginAppleReq) (res *api.CommonTokenRes, err error) {
 
+	file, err := os.Open("user-agents_chrome_macosx.txt")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	var userAgents []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		userAgents = append(userAgents, scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+
+	// 从列表中随机选择一个 User-Agent
+	// 使用当前时间作为种子初始化随机源
+	src := rand.NewSource(time.Now().UnixNano())
+	rnd := rand.New(src)
+
+	// 从列表中随机选择一个 User-Agent
+	randomUserAgent := userAgents[rnd.Intn(len(userAgents))]
+
+	fmt.Println("randomUserAgent:", randomUserAgent)
+
 	ctx, cancel := chromedp.NewContext(context.Background())
 	defer cancel()
 
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
+
 		chromedp.Flag("headless", true),
 		chromedp.Flag("incognito", true),        // 启用无痕模式
 		chromedp.Flag("incognito", true),        //# 不加载图片, 提升速度
 		chromedp.Flag("some-flag", true),        // 添加特定的标志
 		chromedp.Flag("no-sandbox", true),       // 禁用沙盒模式
 		chromedp.Flag("disable-infobars", true), // 禁用信息栏
+		chromedp.UserAgent(randomUserAgent),
 	)
 	allocCtx, allocCancel := chromedp.NewExecAllocator(ctx, opts...)
 	defer allocCancel()
@@ -126,16 +156,14 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 	var deviceID string
 	var str_timestamp string
 	var headersString string
+	var requestUrl string
 	//url1 := strings.Replace("https://idmsa.apple.com/appleauth/auth/signin/complete?isRememberMeEnabled=true", "apple.com/", *cardUrlModel.Url, -1)
+	//url2 := strings.Replace("https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck", "apple.com/", *cardUrlModel.Url, -1)
 	chromedp.ListenTarget(ctx, func(ev interface{}) {
 		// 检查事件是否为网络响应事件
 		if responseReceived, ok := ev.(*network.EventResponseReceived); ok {
 			// 获取响应信息
 			resp := responseReceived.Response
-
-			// 打印请求 URL 和响应状态码
-			//fmt.Printf("URL: %s, Status Code: %d\n", resp.URL, resp.Status)
-
 			if resp.URL == "https://idmsa.apple.com/appleauth/auth/signin/complete?isRememberMeEnabled=true" {
 				fmt.Printf("URL: %s, Status Code: %d\n", resp.URL, resp.Status)
 				if resp.Status == 401 {
@@ -145,22 +173,61 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 					status = 200
 				}
 			}
-			//else if strings.Contains(resp.URL, "https://secure6.store.apple.com/shop/signIn/idms/authx") {
-			//
-			//} else if resp.URL == "https://secure6.store.apple.com/shop/accounthomex?_a=fetchDevices&_m=home.devices" {
-			//
-			//} else if resp.URL == "https://secure6.store.apple.com/shop/account/home" {
-			//
-			//}
 		}
+
+		//if req, ok := ev.(*network.EventRequestWillBeSent); ok {
+		//	request := req.Request
+		//	if request.URL == url2 {
+		//		if request.PostData != "" {
+		//			// 处理 post data
+		//			fmt.Println("request.PostData ", request.PostData)
+		//
+		//			// 查找字符串 "giftCardBalanceCheck.deviceID="
+		//			startIndex := strings.Index(request.PostData, "giftCardBalanceCheck.deviceID=")
+		//
+		//			if startIndex != -1 {
+		//				// 如果未找到指定的字符串，执行相应的错误处理
+		//				deviceID = request.PostData[startIndex+len("giftCardBalanceCheck.deviceID="):]
+		//
+		//				//fmt.Println("Extracted data:", deviceID)
+		//
+		//				re := regexp.MustCompile(`\d{13}`)
+		//
+		//				// 在输入字符串中查找匹配的时间戳
+		//				str_timestamp = re.FindString(deviceID)
+		//
+		//				if str_timestamp != "" {
+		//					fmt.Println("提取到的时间戳:", str_timestamp)
+		//				} else {
+		//					fmt.Println("未找到时间戳")
+		//				}
+		//			} else {
+		//				fmt.Println("String not found.")
+		//			}
+		//
+		//			for name, value := range request.Headers {
+		//				headersString += name + ": " + fmt.Sprint(value) + "\r\n"
+		//			}
+		//			if len(headersString) > 2 {
+		//				headersString = headersString[:len(headersString)-2]
+		//			}
+		//			fmt.Println("request.Headers \n", headersString)
+		//		} else {
+		//			// 没有 post data
+		//			fmt.Println("没有请求数据 ")
+		//		}
+		//	}
+		//}
 
 	})
 
-	url2 := strings.Replace("https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck", "apple.com/", *cardUrlModel.Url, -1)
+	//url2 := strings.Replace("https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck", "apple.com/", *cardUrlModel.Url, -1)
+
 	chromedp.ListenTarget(ctx, func(ev interface{}) {
 		if req, ok := ev.(*network.EventRequestWillBeSent); ok {
 			request := req.Request
-			if request.URL == url2 {
+			if strings.Contains(request.URL, "giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck") {
+				requestUrl = request.URL
 				if request.PostData != "" {
 					// 处理 post data
 					fmt.Println("request.PostData ", request.PostData)
@@ -227,7 +294,7 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 
 		upDataWithCookies(ctx, &cookieString, &stk, &countryCode)
 		// 继续处理余额的页面
-		time.Sleep(3 * time.Second)
+		//time.Sleep(3 * time.Second)
 		url4 := strings.Replace("https://secure.store.apple.com/shop/giftcard/balance", "apple.com/", *cardUrlModel.Url, -1)
 
 		err = chromedp.Run(ctx,
@@ -240,7 +307,7 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 
 		tryFindAndBalanceType(ctx)
 
-		saveDataWith(ctx, *req.Account, *req.Pwd, cookieString, stk, countryCode, deviceID, str_timestamp, headersString, cardUrlModel)
+		saveDataWith(ctx, *req.Account, *req.Pwd, cookieString, stk, countryCode, deviceID, str_timestamp, headersString, cardUrlModel, requestUrl)
 
 		time.Sleep(1 * time.Second)
 
@@ -274,7 +341,7 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 	return
 }
 
-func saveDataWith(ctx context.Context, account string, pwd string, cookieString string, stk string, countryCode string, deviceID string, str_timestamp string, headersString string, cardUrlModel *apiApple.CardUrlInfo) {
+func saveDataWith(ctx context.Context, account string, pwd string, cookieString string, stk string, countryCode string, deviceID string, str_timestamp string, headersString string, cardUrlModel *apiApple.CardUrlInfo, requestUrl string) {
 	data2 := map[string]interface{}{`account`: account, `pwd`: pwd, `cookies`: cookieString, `login_status`: 1, `stk`: stk, `country_code`: countryCode, `device_id`: deviceID, `str_timestamp`: str_timestamp, `info`: headersString}
 	filter2 := map[string]interface{}{`account`: account}
 
@@ -291,7 +358,7 @@ func saveDataWith(ctx context.Context, account string, pwd string, cookieString 
 			log.Fatal(err)
 		}
 	}
-	data3 := map[string]interface{}{`account`: account, `country_code`: countryCode, `str_timestamp`: str_timestamp, `cookies`: cookieString, `headers`: headersString, `device_id`: deviceID, `country_id`: cardUrlModel.Id}
+	data3 := map[string]interface{}{`account`: account, `country_code`: countryCode, `str_timestamp`: str_timestamp, `cookies`: cookieString, `headers`: headersString, `device_id`: deviceID, `country_id`: cardUrlModel.Id, `url`: requestUrl}
 	cookiesRow, _ := dao.NewDaoHandler(ctx, &daoApple.Cookies).Filter(g.Map{`account`: account, `country_id`: cardUrlModel.Id}).GetModel().One()
 	if cookiesRow.IsEmpty() {
 
@@ -345,29 +412,39 @@ func upDataWithCookies(ctx context.Context, cookieString *string, stk *string, c
 	var html string
 	var currentURL string
 
-	err := chromedp.Run(ctx, chromedp.ActionFunc(func(ctx context.Context) error {
-		cookies, err := network.GetCookies().Do(ctx)
-		if err != nil {
-			return err
-		}
+	err := chromedp.Run(ctx,
+		chromedp.Sleep(1*time.Second),
+		chromedp.WaitReady(`body`, chromedp.ByQuery),
+		chromedp.Evaluate(`
+        if(document.body) {
+            window.scrollTo(0, document.body.scrollHeight);
+        }`, nil),
+		chromedp.Sleep(1*time.Second),
+		chromedp.ActionFunc(func(ctx context.Context) error {
 
-		for i, cookie := range cookies {
-			*cookieString += fmt.Sprintf("%s=%s\n", cookie.Name, cookie.Value)
-
-			if i < len(cookies)-1 {
-				*cookieString += "\n"
+			cookies, err := network.GetCookies().Do(ctx)
+			if err != nil {
+				return err
 			}
-		}
 
-		return nil
-	}),
+			for i, cookie := range cookies {
+				*cookieString += fmt.Sprintf("%s=%s\n", cookie.Name, cookie.Value)
+
+				if i < len(cookies)-1 {
+					*cookieString += "\n"
+				}
+			}
+
+			return nil
+		}),
 		//chromedp.Evaluate(`document.documentElement.outerHTML`, &html),
 		chromedp.Tasks{
 			chromedp.OuterHTML("html", &html),
 			chromedp.Location(&currentURL),
 		},
+		chromedp.Sleep(1*time.Second),
 	)
-	time.Sleep(2 * time.Second)
+	//time.Sleep(2 * time.Second)
 	if err != nil {
 		log.Fatal(err)
 	}

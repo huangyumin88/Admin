@@ -14,6 +14,7 @@ type Cookies struct {
 	Cookies      string      `json:"cookies"      ` // cookies
 	CountryId    int         `json:"countryId"    ` // 国家id
 	CountryCode  string      `json:"countryCode"  ` // 国家代码
+	Url          string      `json:"url"          ` // 请求链接
 	UpdatedAt    *gtime.Time `json:"updatedAt"    ` // 更新时间
 	CreatedAt    *gtime.Time `json:"createdAt"    ` // 创建时间
 	Headers      string      `json:"headers"      ` // 信息头

@@ -29,6 +29,7 @@ type CookiesColumns struct {
 	Cookies      string // cookies
 	CountryId    string // 国家id
 	CountryCode  string // 国家代码
+	Url          string // 请求链接
 	UpdatedAt    string // 更新时间
 	CreatedAt    string // 创建时间
 	Headers      string // 信息头
@@ -43,6 +44,7 @@ var cookiesColumns = CookiesColumns{
 	Cookies:      "cookies",
 	CountryId:    "country_id",
 	CountryCode:  "country_code",
+	Url:          "url",
 	UpdatedAt:    "updatedAt",
 	CreatedAt:    "createdAt",
 	Headers:      "headers",

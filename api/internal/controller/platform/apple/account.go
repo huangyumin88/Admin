@@ -13,11 +13,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gogf/gf/v2/frame/g"
+	"golang.org/x/net/publicsuffix"
 	"io"
 	"log"
 	"net/http"
+	"net/http/cookiejar"
 	"net/url"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 
@@ -409,8 +412,9 @@ func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.
 
 	println("country_id:", code)
 	println("account:", *req.Account)
-
-	filter := map[string]interface{}{`account`: *req.Account, `country_id`: code}
+	account := *req.Account
+	country_id := code
+	filter := map[string]interface{}{`account`: account, `country_id`: country_id}
 	info, _ := dao.NewDaoHandler(ctx, &daoApple.Cookies).Filter(filter).GetModel().One()
 	if info.IsEmpty() {
 		err = utils.NewErrorCode(ctx, 39990010, ``)
@@ -440,8 +444,20 @@ func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.
 		}
 		reqBody := strings.NewReader(values.Encode())
 
-		url := strings.Replace("https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck", "apple.com/", *cardUrlModel.Url, -1)
-		req, _ := http.NewRequest("POST", url, reqBody)
+		urlx := info["url"].String()
+		if len(urlx) == 0 {
+			urlx = "https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck"
+		}
+
+		println("url = ", urlx)
+
+		jar, errx := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
+
+		if errx != nil {
+			log.Fatal(errx)
+		}
+
+		req, _ := http.NewRequest("POST", urlx, reqBody)
 		headers := strings.Split(headersString, "\r\n")
 		for _, h := range headers {
 			kv := strings.SplitN(h, ":", 2)
@@ -460,7 +476,7 @@ func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.
 
 		// 3. 创建客户端
 		tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-		client := &http.Client{Transport: tr}
+		client := &http.Client{Transport: tr, Jar: jar}
 
 		// 4. 发送请求
 		resp, _ := client.Do(req)
@@ -506,8 +522,47 @@ func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.
 				fmt.Println("解析 JSON 字符串时出错:", err)
 
 			} else {
-				printJSON(jsonData)
+				//printJSON(jsonData)
+
+				url, _ := url.Parse(urlx)
+				cookiesx := jar.Cookies(url)
+
+				// 输出 cookies
+				for _, cookie := range cookiesx {
+					if strings.Contains(cookie.Name, "as_ltn") {
+						fmt.Printf("Cookiex: %s = %s\n", cookie.Name, cookie.Value)
+
+						pattern := cookie.Name + `=[^
+
+]+`
+						re := regexp.MustCompile(pattern)
+						newValue := cookie.Name + "=" + cookie.Value
+						newStr := re.ReplaceAllString(cookiesString, newValue)
+						//fmt.Println(newStr)
+
+						cookiesRow, _ := dao.NewDaoHandler(ctx, &daoApple.Cookies).Filter(g.Map{`account`: account, `country_id`: country_id}).GetModel().One()
+						if cookiesRow.IsEmpty() {
+
+						} else {
+							data3 := map[string]interface{}{`cookies`: newStr}
+							_, err := service.AppleCookies().Update(ctx, g.Map{`account`: account, `country_id`: country_id}, data3)
+							time.Sleep(1)
+							if err != nil {
+								log.Fatal(err)
+							}
+						}
+					}
+				}
 			}
+
+			//var headersStringx string
+			//for name, value := range resp.Header {
+			//	headersStringx += name + ": " + fmt.Sprint(value) + "\r\n"
+			//}
+			//if len(headersStringx) > 2 {
+			//	headersStringx = headersStringx[:len(headersStringx)-2]
+			//}
+			//fmt.Println("request.Headers \n", headersStringx)
 
 			// 打印响应内容
 			//fmt.Println("Balance = ", response.Body.GiftCardBalanceCheck.D.Balance)
@@ -526,6 +581,7 @@ func (controllerThis *Account) GiftcardQuery(ctx context.Context, req *apiApple.
 			return
 		} else {
 			// 打印响应内容
+			fmt.Println("响应错误URL:", req.URL)
 			fmt.Println("响应错误:", resp.Status)
 			body, err1 := io.ReadAll(resp.Body)
 			if err1 != nil {
@@ -642,14 +698,39 @@ func (controllerThis *Account) Refresh(ctx context.Context, req *apiApple.Accoun
 	//
 	//err = utils.NewErrorCode(ctx, 29999999, ``)
 	//return
-	fmt.Println(req.Account)
-	filter := map[string]interface{}{`account`: req.Account}
-	info, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(filter).GetModel().One()
+
+	code := req.Code
+	if code == 0 {
+		code = 1
+	}
+	//fmt.Println(code)
+	var cardUrlModel *apiApple.CardUrlInfo
+	cardUrl, _ := dao.NewDaoHandler(ctx, &daoApple.CardUrl).Filter(g.Map{`id`: code}).GetModel().One()
+	cardUrl.Struct(&cardUrlModel)
+	if cardUrl.IsEmpty() == true {
+		fmt.Println("未找到相应的国家")
+		err = utils.NewErrorCode(ctx, 39990012, ``)
+		return
+	}
+
+	account := *req.Account
+	country_id := code
+
+	println("country_id:", code)
+	println("account:", *req.Account)
+
+	//fmt.Println(req.Account)
+	//filter := map[string]interface{}{`account`: req.Account}
+	//info, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(filter).GetModel().One()
+
+	filter := map[string]interface{}{`account`: *req.Account, `country_id`: code}
+	info, _ := dao.NewDaoHandler(ctx, &daoApple.Cookies).Filter(filter).GetModel().One()
+
 	if info.IsEmpty() {
 		err = utils.NewErrorCode(ctx, 39990010, ``)
 		return
 	} else {
-		headersString := info["info"].String()
+		headersString := info["headers"].String()
 		str_timestamp := info["str_timestamp"].String()
 		cookiesString := info["cookies"].String()
 		device_id := info["device_id"].String()
@@ -672,8 +753,24 @@ func (controllerThis *Account) Refresh(ctx context.Context, req *apiApple.Accoun
 			values.Set(k, v)
 		}
 		reqBody := strings.NewReader(values.Encode())
-		url := "https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck"
-		req, _ := http.NewRequest("POST", url, reqBody)
+		//url := "https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck"
+
+		//url := strings.Replace("https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck", "apple.com/", *cardUrlModel.Url, -1)
+
+		urlx := info["url"].String()
+		if len(urlx) == 0 {
+			urlx = "https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck"
+		}
+
+		println("url = ", urlx)
+
+		jar, errx := cookiejar.New(&cookiejar.Options{PublicSuffixList: publicsuffix.List})
+
+		if errx != nil {
+			log.Fatal(errx)
+		}
+
+		req, _ := http.NewRequest("POST", urlx, reqBody)
 		headers := strings.Split(headersString, "\r\n")
 		for _, h := range headers {
 			kv := strings.SplitN(h, ":", 2)
@@ -681,8 +778,6 @@ func (controllerThis *Account) Refresh(ctx context.Context, req *apiApple.Accoun
 				req.Header.Set(kv[0], kv[1])
 			}
 		}
-
-		req.Header.Set("Referer", "https://secure6.store.apple.com/shop/giftcard/balancex")
 
 		cookies := strings.Split(cookiesString, "\n")
 		for _, cookie := range cookies {
@@ -740,7 +835,37 @@ func (controllerThis *Account) Refresh(ctx context.Context, req *apiApple.Accoun
 				fmt.Println("解析 JSON 字符串时出错:", err)
 
 			} else {
-				printJSON(jsonData)
+				//printJSON(jsonData)
+
+				url, _ := url.Parse(urlx)
+				cookiesx := jar.Cookies(url)
+
+				// 输出 cookies
+				for _, cookie := range cookiesx {
+					if strings.Contains(cookie.Name, "as_ltn") {
+						fmt.Printf("Cookiex: %s = %s\n", cookie.Name, cookie.Value)
+
+						pattern := cookie.Name + `=[^
+
+]+`
+						re := regexp.MustCompile(pattern)
+						newValue := cookie.Name + "=" + cookie.Value
+						newStr := re.ReplaceAllString(cookiesString, newValue)
+						//fmt.Println(newStr)
+
+						cookiesRow, _ := dao.NewDaoHandler(ctx, &daoApple.Cookies).Filter(g.Map{`account`: account, `country_id`: country_id}).GetModel().One()
+						if cookiesRow.IsEmpty() {
+
+						} else {
+							data3 := map[string]interface{}{`cookies`: newStr}
+							_, err := service.AppleCookies().Update(ctx, g.Map{`account`: account, `country_id`: country_id}, data3)
+							time.Sleep(1)
+							if err != nil {
+								log.Fatal(err)
+							}
+						}
+					}
+				}
 			}
 
 			return

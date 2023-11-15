@@ -105,7 +105,7 @@ const table = reactive({
         h(ElButton, {
         	type: 'success',
         	size: 'small',
-        	onClick: () => handleRefresh(props.rowData.account)
+        	onClick: () => handleRefresh(props.rowData.account,props.rowData.country_id)
         }, {
         	default: () => [h(AutoiconEpRefresh), t('common.refresh')]
         }),
@@ -332,7 +332,7 @@ const handleSearching = () => {
   }
 }
 
-const handleRefresh =  (account: string) => {
+const handleRefresh =  (account: string , code: number) => {
   ElMessageBox.confirm('', {
     type: 'warning',
     title: t('common.tip.configRefresh'),

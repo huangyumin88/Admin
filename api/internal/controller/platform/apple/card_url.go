@@ -3,8 +3,6 @@ package controller
 import (
 	"api/api"
 	apiApple "api/api/platform/apple"
-	"sync"
-
 	//"api/api/platform"
 	apiLogin "api/api/platform"
 	controllerLogin "api/internal/controller/platform"
@@ -282,6 +280,92 @@ func processRequests(ctx context.Context, List []apiApple.CardUrlListItem) {
 //	}
 //}
 
+//func (controllerThis *CardUrl) GiftcardAutoQuery(ctx context.Context, req *apiApple.CardUrlQueryReq) (res *apiApple.AccountGiftCardInfoRes, err error) {
+//	// 创建一个可取消的上下文
+//	ctx, cancel := context.WithCancel(ctx)
+//	defer cancel()
+//
+//	var IsStop uint = 0
+//	filter := apiApple.CardUrlListFilter{IsStop: &IsStop}
+//	reqs := &apiApple.CardUrlListReq{Limit: 0, Page: 1, Filter: filter}
+//
+//	reps, err := controllerThis.List(ctx, reqs)
+//	if err != nil {
+//		return nil, err
+//	}
+//
+//	var wg sync.WaitGroup
+//	results := make(chan apiApple.AccountGiftCardInfoRes)
+//	maxConcurrency := 3
+//
+//	// 控制并发数量
+//	concurrencyControl := make(chan struct{}, maxConcurrency)
+//
+//	for _, item := range reps.List {
+//		wg.Add(1)
+//		concurrencyControl <- struct{}{}
+//		go func(data apiApple.CardUrlListItem) {
+//			defer func() { <-concurrencyControl }()
+//			processCheckRequests(ctx, data, req.GiftCardPin, results, &wg)
+//		}(item)
+//	}
+//
+//	go func() {
+//		for res := range results {
+//
+//			if res.Info.Status == 1 {
+//				cancel() // 满足条件时取消上下文
+//				break
+//			}
+//		}
+//	}()
+//
+//	wg.Wait()
+//
+//	for r := range results {
+//		println("Status = ", r.Info.Status)
+//		println("Balance = ", r.Info.Balance)
+//
+//		if r.Info.Status == 1 {
+//			close(results)
+//			info := apiApple.AccountGiftCardInfo{}
+//
+//			info.Balance = r.Info.Balance
+//			info.CountryCode = r.Info.CountryCode
+//			info.Status = 1
+//			res = &apiApple.AccountGiftCardInfoRes{Info: info}
+//			return
+//		}
+//	}
+//	close(results)
+//	err = utils.NewErrorCode(ctx, 39990011, ``)
+//	return
+//}
+//
+//func processCheckRequests(ctx context.Context, item apiApple.CardUrlListItem, giftCardPin *string, results chan<- apiApple.AccountGiftCardInfoRes, wg *sync.WaitGroup) {
+//	defer wg.Done()
+//
+//	// 检查上下文是否已被取消
+//	if ctx.Err() != nil {
+//		return
+//	}
+//
+//	// 执行请求
+//	reqs := &apiApple.AccountGiftCardQueryReq{Account: item.AccountInfo.Account, Pwd: item.AccountInfo.Pwd, Code: *item.Id, GiftCardPin: giftCardPin}
+//	account := Account{}
+//	response, err := account.GiftcardQuery(ctx, reqs)
+//	if err != nil {
+//		// 处理错误
+//		return
+//	}
+//
+//	select {
+//	case results <- *response:
+//	case <-ctx.Done(): // 检查是否接收到取消信号
+//		return
+//	}
+//}
+
 func (controllerThis *CardUrl) GiftcardAutoQuery(ctx context.Context, req *apiApple.CardUrlQueryReq) (res *apiApple.AccountGiftCardInfoRes, err error) {
 	// 创建一个可取消的上下文
 	ctx, cancel := context.WithCancel(ctx)
@@ -296,74 +380,48 @@ func (controllerThis *CardUrl) GiftcardAutoQuery(ctx context.Context, req *apiAp
 		return nil, err
 	}
 
-	var wg sync.WaitGroup
 	results := make(chan apiApple.AccountGiftCardInfoRes)
-	maxConcurrency := 3
-
-	// 控制并发数量
-	concurrencyControl := make(chan struct{}, maxConcurrency)
+	concurrencyControl := make(chan struct{}, 3) // 控制并发数量
 
 	for _, item := range reps.List {
-		wg.Add(1)
 		concurrencyControl <- struct{}{}
 		go func(data apiApple.CardUrlListItem) {
-			defer func() { <-concurrencyControl }()
-			processCheckRequests(ctx, data, req.GiftCardPin, results, &wg)
+			defer func() {
+				<-concurrencyControl
+			}()
+			processCheckRequests(ctx, data, req.GiftCardPin, results)
 		}(item)
 	}
 
-	go func() {
-		for res := range results {
-
-			if res.Info.Status == 1 {
-				cancel() // 满足条件时取消上下文
-				break
-			}
-		}
-	}()
-
-	wg.Wait()
-
-	for r := range results {
-		println("Status = ", r.Info.Status)
-		println("Balance = ", r.Info.Balance)
-
-		if r.Info.Status == 1 {
+	for i := 0; i < len(reps.List); i++ {
+		res := <-results
+		if res.Info.Status == 1 {
+			cancel() // 满足条件时取消上下文
+			close(concurrencyControl)
 			close(results)
-			info := apiApple.AccountGiftCardInfo{}
-
-			info.Balance = r.Info.Balance
-			info.CountryCode = r.Info.CountryCode
-			info.Status = 1
-			res = &apiApple.AccountGiftCardInfoRes{Info: info}
-			return
+			return &res, nil
 		}
 	}
-	close(results)
-	err = utils.NewErrorCode(ctx, 39990011, ``)
-	return
+
+	return nil, utils.NewErrorCode(ctx, 39990011, ``)
 }
 
-func processCheckRequests(ctx context.Context, item apiApple.CardUrlListItem, giftCardPin *string, results chan<- apiApple.AccountGiftCardInfoRes, wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	// 检查上下文是否已被取消
+func processCheckRequests(ctx context.Context, item apiApple.CardUrlListItem, giftCardPin *string, results chan<- apiApple.AccountGiftCardInfoRes) {
 	if ctx.Err() != nil {
 		return
 	}
 
-	// 执行请求
 	reqs := &apiApple.AccountGiftCardQueryReq{Account: item.AccountInfo.Account, Pwd: item.AccountInfo.Pwd, Code: *item.Id, GiftCardPin: giftCardPin}
 	account := Account{}
 	response, err := account.GiftcardQuery(ctx, reqs)
 	if err != nil {
-		// 处理错误
+		// 可以在这里记录错误
 		return
 	}
 
 	select {
 	case results <- *response:
-	case <-ctx.Done(): // 检查是否接收到取消信号
+	case <-ctx.Done():
 		return
 	}
 }

@@ -109,7 +109,7 @@ type CardUrlDeleteReq struct {
 }
 
 type CardUrlQueryReq struct {
-	g.Meta      `path:"/cardUrl/giftcard/query" method:"post" tags:"平台后台/苹果礼品卡查询地址" sm:"删除"`
+	g.Meta      `path:"/cardUrl/giftcard/query" method:"post" tags:"平台后台/苹果礼品卡查询地址" sm:"自动查询"`
 	GiftCardPin *string `json:"giftCardPin,omitempty" v:"length:1,255" dc:"pin"`
 }
 

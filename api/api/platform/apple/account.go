@@ -151,6 +151,7 @@ type AccountLoginReq struct {
 type AccountRefreshReq struct {
 	g.Meta  `path:"/account/refresh" method:"post" tags:"平台后台/苹果" sm:"刷新"`
 	Account *string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
+	Code    uint    `json:"code,omitempty" v:"integer|min:1" dc:"ID"`
 }
 
 type AccountGiftCardQueryReq struct {
