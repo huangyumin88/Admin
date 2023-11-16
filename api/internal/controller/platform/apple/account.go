@@ -7,6 +7,8 @@ import (
 	daoApple "api/internal/dao/apple"
 	"api/internal/service"
 	"api/internal/utils"
+	"api/ipatool/common"
+	"api/ipatool/pkg/appstore"
 	"context"
 	"crypto/tls"
 	"encoding/base64"
@@ -885,5 +887,53 @@ func (controllerThis *Account) Refresh(ctx context.Context, req *apiApple.Accoun
 
 	err = utils.NewErrorCode(ctx, 29999999, ``)
 
+	return
+}
+
+func (controllerThis *Account) AppleIDInfo(ctx context.Context, req *apiApple.AccountAppleIDInfoReq) (res *apiApple.AccountAppleIDInfoRes, err error) {
+
+	account := *req.Account
+	pwd := *req.Pwd
+	println("account:", account)
+	println("pwd:", pwd)
+
+	common.InitWithCommand()
+	output, err := common.Dependenciexs.AppStore.Login(appstore.LoginInput{Email: account, Password: pwd, AuthCode: ""})
+	if err != nil {
+		err = utils.NewErrorCode(ctx, 29999999, fmt.Sprintf("请求错误: %v", err))
+		return
+	}
+
+	balance := output.Account.Balance
+	if balance == "" {
+		balance = "$0.00"
+	}
+	dsid := output.Account.DirectoryServicesID
+	name := output.Account.Name
+	fmt.Println("balance = ", balance)
+	fmt.Println("dsid = ", dsid)
+	fmt.Println("name = ", name)
+	fmt.Println("StoreFront = ", output.Account.StoreFront)
+
+	info, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(g.Map{`account`: account}).GetModel().One()
+	if info.IsEmpty() {
+
+	} else {
+		data2 := map[string]interface{}{`balance`: balance, `dsid`: dsid, `name`: name}
+		filter2 := map[string]interface{}{`account`: account}
+		_, err := service.AppleAccount().Update(ctx, filter2, data2)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	info1 := apiApple.AccountAppleIDInfo{
+		Account: account,
+		Name:    name,
+		Balance: balance,
+		Dsid:    dsid,
+	}
+
+	res = &apiApple.AccountAppleIDInfoRes{Info: info1}
 	return
 }

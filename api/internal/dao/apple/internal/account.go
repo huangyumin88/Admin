@@ -31,6 +31,7 @@ type AccountColumns struct {
 	CountryId    string // 国家id
 	CountryCode  string // 国家代码
 	Balance      string // 余额
+	Dsid         string // Dsid
 	Status       string // 禁用：0否 1是
 	Info         string // 信息
 	Cookies      string // cookies
@@ -51,6 +52,7 @@ var accountColumns = AccountColumns{
 	CountryId:    "country_id",
 	CountryCode:  "country_code",
 	Balance:      "balance",
+	Dsid:         "dsid",
 	Status:       "status",
 	Info:         "info",
 	Cookies:      "cookies",

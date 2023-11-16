@@ -16,6 +16,7 @@ type Account struct {
 	CountryId    int         `json:"countryId"    ` // 国家id
 	CountryCode  string      `json:"countryCode"  ` // 国家代码
 	Balance      string      `json:"balance"      ` // 余额
+	Dsid         string      `json:"dsid"         ` // Dsid
 	Status       int         `json:"status"       ` // 禁用：0否 1是
 	Info         string      `json:"info"         ` // 信息
 	Cookies      string      `json:"cookies"      ` // cookies

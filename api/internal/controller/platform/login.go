@@ -174,51 +174,6 @@ func (controllerThis *Login) AppleLogin(ctx context.Context, req *apiCurrent.Log
 				}
 			}
 		}
-
-		//if req, ok := ev.(*network.EventRequestWillBeSent); ok {
-		//	request := req.Request
-		//	if request.URL == url2 {
-		//		if request.PostData != "" {
-		//			// 处理 post data
-		//			fmt.Println("request.PostData ", request.PostData)
-		//
-		//			// 查找字符串 "giftCardBalanceCheck.deviceID="
-		//			startIndex := strings.Index(request.PostData, "giftCardBalanceCheck.deviceID=")
-		//
-		//			if startIndex != -1 {
-		//				// 如果未找到指定的字符串，执行相应的错误处理
-		//				deviceID = request.PostData[startIndex+len("giftCardBalanceCheck.deviceID="):]
-		//
-		//				//fmt.Println("Extracted data:", deviceID)
-		//
-		//				re := regexp.MustCompile(`\d{13}`)
-		//
-		//				// 在输入字符串中查找匹配的时间戳
-		//				str_timestamp = re.FindString(deviceID)
-		//
-		//				if str_timestamp != "" {
-		//					fmt.Println("提取到的时间戳:", str_timestamp)
-		//				} else {
-		//					fmt.Println("未找到时间戳")
-		//				}
-		//			} else {
-		//				fmt.Println("String not found.")
-		//			}
-		//
-		//			for name, value := range request.Headers {
-		//				headersString += name + ": " + fmt.Sprint(value) + "\r\n"
-		//			}
-		//			if len(headersString) > 2 {
-		//				headersString = headersString[:len(headersString)-2]
-		//			}
-		//			fmt.Println("request.Headers \n", headersString)
-		//		} else {
-		//			// 没有 post data
-		//			fmt.Println("没有请求数据 ")
-		//		}
-		//	}
-		//}
-
 	})
 
 	//url2 := strings.Replace("https://secure6.store.apple.com/shop/giftcard/balancex?_a=checkBalance&_m=giftCardBalanceCheck", "apple.com/", *cardUrlModel.Url, -1)

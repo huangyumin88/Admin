@@ -18,6 +18,7 @@ type Account struct {
 	CountryId    interface{} // 国家id
 	CountryCode  interface{} // 国家代码
 	Balance      interface{} // 余额
+	Dsid         interface{} // Dsid
 	Status       interface{} // 禁用：0否 1是
 	Info         interface{} // 信息
 	Cookies      interface{} // cookies

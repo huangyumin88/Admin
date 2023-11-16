@@ -95,29 +95,47 @@ const table = reactive({
 		width: 150,
 	},
   {
-    dataKey: 'refresh',
-    title: t('登录状态'),
+    dataKey: 'gain',
+    title: t('账号信息'),
     key: 'stk',
     align: 'center',
-    width: 100,
+    width: 80,
     cellRenderer: (props: any): any => {
       return [
         h(ElButton, {
-        	type: 'success',
+        	type: 'danger',
         	size: 'small',
-        	onClick: () => handleRefresh(props.rowData.account,props.rowData.country_id)
+        	onClick: () => handleGainInfo(props.rowData.account,props.rowData.pwd,props.rowData.country_id)
         }, {
-        	default: () => [h(AutoiconEpRefresh), t('common.refresh')]
+        	default: () => [h(AutoiconEpAim), t('common.gain')]
         }),
       ]
     },
   },
+    {
+      dataKey: 'refresh',
+      title: t('登录状态'),
+      key: 'stk',
+      align: 'center',
+      width: 100,
+      cellRenderer: (props: any): any => {
+        return [
+          h(ElButton, {
+            type: 'success',
+            size: 'small',
+            onClick: () => handleRefresh(props.rowData.account,props.rowData.country_id)
+          }, {
+            default: () => [h(AutoiconEpRefresh), t('common.refresh')]
+          }),
+        ]
+      },
+    },
 	{
 		dataKey: 'status',
 		title: t('apple.account.name.status'),
 		key: 'status',
 		align: 'center',
-		width: 100,
+		width: 80,
 		cellRenderer: (props: any): any => {
 			let typeObj: any = { '0': '', '1': 'success' }
 			return [
@@ -330,6 +348,23 @@ const handleSearching = () => {
     })
 
   }
+}
+
+const handleGainInfo = (account: string,pwd: string,code: number) => {
+  ElMessageBox.confirm('', {
+    type: 'warning',
+    title: t('common.tip.configGain'),
+    center: true,
+    showClose: false,
+  }).then(() => {
+    isLoading.value = true
+    request(t('config.VITE_HTTP_API_PREFIX') + '/apple/account/appleid/info', { account: account ,pwd:pwd,code:code}, true).then((res) => {
+      isLoading.value = false
+      getList()
+    }).catch(() => {
+      isLoading.value = false
+    })
+  }).catch(() => { })
 }
 
 const handleRefresh =  (account: string , code: number) => {

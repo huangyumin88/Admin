@@ -171,3 +171,21 @@ type AccountGiftCardInfo struct {
 type AccountGiftCardInfoRes struct {
 	Info AccountGiftCardInfo `json:"info" dc:"详情"`
 }
+
+type AccountAppleIDInfoReq struct {
+	g.Meta  `path:"/account/appleid/info" method:"post" tags:"平台后台/苹果" sm:"Apple ID 账户信息查询"`
+	Account *string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
+	Pwd     *string `json:"pwd,omitempty" v:"length:1,255" dc:"密码"`
+	Code    uint    `json:"code,omitempty" v:"integer|min:1" dc:"ID"`
+}
+
+type AccountAppleIDInfoRes struct {
+	Info AccountAppleIDInfo `json:"info" dc:"详情"`
+}
+
+type AccountAppleIDInfo struct {
+	Account string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
+	Balance string `json:"balance,omitempty" v:"length:1,255" dc:"当前账户余额"`
+	Name    string `json:"name,omitempty" v:"length:1,255" dc:"用户姓名"`
+	Dsid    string `json:"dsid,omitempty" v:"length:1,255" dc:"dsid-自己的"`
+}
