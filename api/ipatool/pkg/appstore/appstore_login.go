@@ -23,6 +23,14 @@ type LoginOutput struct {
 	Account Account
 }
 
+func (t *appstore) GetCountryCode(storeFront string) (string, error) {
+	countryCode, err := countryCodeFromStoreFront(storeFront)
+	if err != nil {
+		return "", fmt.Errorf("country code is invalid: %w", err)
+	}
+	return countryCode, nil
+}
+
 func (t *appstore) Login(input LoginInput) (LoginOutput, error) {
 	macAddr, err := t.machine.MacAddress()
 	if err != nil {
@@ -100,10 +108,12 @@ func (t *appstore) login(email, password, authCode, guid string, attempt int) (A
 		return Account{}, fmt.Errorf("failed to marshal json: %w", err)
 	}
 
-	err = t.keychain.Set("account", data)
-	if err != nil {
-		return Account{}, fmt.Errorf("failed to save account in keychain: %w", err)
-	}
+	println(data)
+
+	//err = t.keychain.Set("account", data)
+	//if err != nil {
+	//	return Account{}, fmt.Errorf("failed to save account in keychain: %w", err)
+	//}
 
 	return acc, nil
 }

@@ -20,6 +20,8 @@ type AppStore interface {
 	Lookup(input LookupInput) (LookupOutput, error)
 	// Search searches the App Store for apps matching the specified term.
 	Search(input SearchInput) (SearchOutput, error)
+
+	GetCountryCode(storeFront string) (string, error)
 	// Purchase acquires a license for the desired app.
 	// Note: only free apps are supported.
 	Purchase(input PurchaseInput) error

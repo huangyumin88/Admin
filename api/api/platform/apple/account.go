@@ -184,8 +184,9 @@ type AccountAppleIDInfoRes struct {
 }
 
 type AccountAppleIDInfo struct {
-	Account string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
-	Balance string `json:"balance,omitempty" v:"length:1,255" dc:"当前账户余额"`
-	Name    string `json:"name,omitempty" v:"length:1,255" dc:"用户姓名"`
-	Dsid    string `json:"dsid,omitempty" v:"length:1,255" dc:"dsid-自己的"`
+	Account     string `json:"account,omitempty" v:"length:1,255" dc:"账号"`
+	Balance     string `json:"balance,omitempty" v:"length:1,255" dc:"当前账户余额"`
+	Name        string `json:"name,omitempty" v:"length:1,255" dc:"用户姓名"`
+	Dsid        string `json:"dsid,omitempty" v:"length:1,255" dc:"dsid-自己的"`
+	CountryCode string `json:"country_code,omitempty" v:"length:1,255" dc:"国家代码"`
 }

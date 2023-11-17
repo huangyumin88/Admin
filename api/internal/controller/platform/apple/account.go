@@ -204,7 +204,7 @@ func (controllerThis *Account) Login(ctx context.Context, req *apiApple.AccountL
 	defer cancel()
 
 	opts := append(chromedp.DefaultExecAllocatorOptions[:],
-		chromedp.Flag("headless", false),
+		chromedp.Flag("headless", true),
 		chromedp.Flag("incognito", true),        // 启用无痕模式
 		chromedp.Flag("incognito", true),        //# 不加载图片, 提升速度
 		chromedp.Flag("some-flag", true),        // 添加特定的标志
@@ -915,6 +915,9 @@ func (controllerThis *Account) AppleIDInfo(ctx context.Context, req *apiApple.Ac
 	fmt.Println("name = ", name)
 	fmt.Println("StoreFront = ", output.Account.StoreFront)
 
+	country_code, _ := common.Dependenciexs.AppStore.GetCountryCode(output.Account.StoreFront)
+	fmt.Println("country_code = ", country_code)
+
 	info, _ := dao.NewDaoHandler(ctx, &daoApple.Account).Filter(g.Map{`account`: account}).GetModel().One()
 	if info.IsEmpty() {
 
@@ -928,10 +931,11 @@ func (controllerThis *Account) AppleIDInfo(ctx context.Context, req *apiApple.Ac
 	}
 
 	info1 := apiApple.AccountAppleIDInfo{
-		Account: account,
-		Name:    name,
-		Balance: balance,
-		Dsid:    dsid,
+		Account:     account,
+		Name:        name,
+		Balance:     balance,
+		Dsid:        dsid,
+		CountryCode: country_code,
 	}
 
 	res = &apiApple.AccountAppleIDInfoRes{Info: info1}
