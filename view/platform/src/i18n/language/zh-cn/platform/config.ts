@@ -4,6 +4,7 @@ export default {
 		uploadConfig: '上传',
 		smsConfig: '短信',
 		idCardConfig: '实名认证',
+		emailSMTPConfig: '邮箱SMTP',
 	},
 	name: {
 		hotSearch: '热门搜索',
@@ -34,6 +35,12 @@ export default {
 		aliyunIdCardHost: '阿里云IdCard-域名',
 		aliyunIdCardPath: '阿里云IdCard-请求路径',
 		aliyunIdCardAppcode: '阿里云IdCard-Appcode',
+
+		emailSMTPType: 'SMTP服务器配置',
+		emailSMTPHost: 'SMTP服务器地址',
+		emailSMTPPort: 'SMTP服务器端口',
+		emailSMTPEmail: 'SMTP服务器发送者邮箱',
+		emailSMTPPwd: 'SMTP服务器发送者邮箱密码',
 	},
 	status: {
 		uploadType: [

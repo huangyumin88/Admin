@@ -13,6 +13,7 @@ const WebsiteConfig = defineAsyncComponent(() => import('./tabPane/WebsiteConfig
 const UploadConfig = defineAsyncComponent(() => import('./tabPane/UploadConfig.vue'))
 const SmsConfig = defineAsyncComponent(() => import('./tabPane/SmsConfig.vue'))
 const IdCardConfig = defineAsyncComponent(() => import('./tabPane/IdCardConfig.vue'))
+const EmailSMTPConfig = defineAsyncComponent(() => import('./tabPane/EmailSMTPConfig.vue'))
 
 const { t } = useI18n()
 </script>
@@ -32,6 +33,9 @@ const { t } = useI18n()
                 </ElTabPane>
                 <ElTabPane :label="t('platform.config.label.idCardConfig')" :lazy="true">
                     <IdCardConfig />
+                </ElTabPane>
+                <ElTabPane :label="t('platform.config.label.emailSMTPConfig')" :lazy="true">
+                  <EmailSMTPConfig />
                 </ElTabPane>
             </ElTabs>
         </ElMain>

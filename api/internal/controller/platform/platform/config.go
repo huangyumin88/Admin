@@ -7,14 +7,89 @@ import (
 	"api/internal/service"
 	"api/internal/utils"
 	"context"
-
+	"fmt"
 	"github.com/gogf/gf/v2/util/gconv"
+	"net/smtp"
 )
 
 type Config struct{}
 
 func NewConfig() *Config {
 	return &Config{}
+}
+
+func (controllerThis *Config) Test(ctx context.Context, req *apiPlatform.ConfigSmtpTestReq) (res *api.CommonNoDataRes, err error) {
+
+	smtpServer := *req.SmtpHost
+	smtpPort := *req.SmtpPort
+	//smtpPort, err := strconv.Atoi(*req.SmtpPort)
+	//if err != nil {
+	//	// handle error
+	//	return
+	//}
+
+	senderEmail := *req.SmtpEmail
+	password := *req.SmtpPwd
+	println(smtpServer)
+	println(smtpPort)
+	println(senderEmail)
+	println(password)
+
+	// 设置收件人和邮件内容
+	recipient := "477603590@qq.com"
+	subject := "Subject: Your Subject Here\n"
+	body := "This is the body of the email."
+
+	// 创建邮件内容
+	message := []byte(subject + "\n" + body)
+
+	// 设置身份验证信息
+	auth := smtp.PlainAuth("", senderEmail, password, smtpServer)
+
+	// 发送邮件
+	err = smtp.SendMail(smtpServer+":"+smtpPort, auth, senderEmail, []string{recipient}, message)
+	if err != nil {
+		fmt.Println("Failed to authenticate:", err)
+		return
+	}
+
+	//// 连接SMTP服务器
+	//c, err := smtp.Dial(host + ":" + strconv.Itoa(port))
+	//if err != nil {
+	//	fmt.Println("Failed to connect to SMTP server:", err)
+	//	return
+	//}
+	//
+	//auth := smtp.PlainAuth("", addr, pwd, host)
+	//
+	//if err != nil {
+	//	fmt.Println("Failed to authenticate:", err)
+	//	return
+	//}
+	//
+	//// 身份验证
+	//err = c.Auth(auth)
+	//if err != nil {
+	//	// handle error
+	//
+	//	return
+	//}
+	//
+	//// 设置邮箱地址
+	//err = c.Mail(addr)
+	//err = c.Rcpt("477603590@qq.com")
+	//
+	//// 构建邮件内容
+	//w, err := c.Data()
+	//w.Write([]byte("This is the email body."))
+	//
+	//// 发送邮件
+	//err = w.Close()
+	//
+	//// 关闭连接
+	//c.Quit()
+
+	return
 }
 
 // 获取

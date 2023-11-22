@@ -26,6 +26,7 @@ export default {
     closeAll: '关闭全部',
     upTop: '置顶',
     batchDelete: '批量删除',
+    send: '发送测试邮件',
 
     name: {
         id: 'ID',
