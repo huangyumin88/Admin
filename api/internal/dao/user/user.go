@@ -11,12 +11,10 @@ import (
 
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/container/gvar"
-	"github.com/gogf/gf/v2/crypto/gmd5"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
-	"github.com/gogf/gf/v2/util/grand"
 )
 
 // internalUserDao is internal type for wrapping internal DAO implements.
@@ -74,25 +72,6 @@ func (daoThis *userDao) ParseInsert(insert map[string]interface{}) gdb.ModelHand
 			switch k {
 			case `id`:
 				insertData[daoThis.PrimaryKey()] = v
-			case daoThis.Columns().Phone:
-				insertData[k] = v
-				if gconv.String(v) == `` {
-					insertData[k] = nil
-				}
-			case daoThis.Columns().Account:
-				insertData[k] = v
-				if gconv.String(v) == `` {
-					insertData[k] = nil
-				}
-			case daoThis.Columns().Password:
-				password := gconv.String(v)
-				if len(password) != 32 {
-					password = gmd5.MustEncrypt(password)
-				}
-				salt := grand.S(8)
-				insertData[daoThis.Columns().Salt] = salt
-				password = gmd5.MustEncrypt(password + salt)
-				insertData[k] = password
 			default:
 				if daoThis.ColumnArrG().Contains(k) {
 					insertData[k] = v
@@ -131,25 +110,6 @@ func (daoThis *userDao) ParseUpdate(update map[string]interface{}) gdb.ModelHand
 			switch k {
 			case `id`:
 				updateData[tableThis+`.`+daoThis.PrimaryKey()] = v
-			case daoThis.Columns().Phone:
-				updateData[tableThis+`.`+k] = v
-				if gconv.String(v) == `` {
-					updateData[tableThis+`.`+k] = nil
-				}
-			case daoThis.Columns().Account:
-				updateData[tableThis+`.`+k] = v
-				if gconv.String(v) == `` {
-					updateData[tableThis+`.`+k] = nil
-				}
-			case daoThis.Columns().Password:
-				password := gconv.String(v)
-				if len(password) != 32 {
-					password = gmd5.MustEncrypt(password)
-				}
-				salt := grand.S(8)
-				updateData[tableThis+`.`+daoThis.Columns().Salt] = salt
-				password = gmd5.MustEncrypt(password + salt)
-				updateData[tableThis+`.`+k] = password
 			default:
 				if daoThis.ColumnArrG().Contains(k) {
 					updateData[tableThis+`.`+k] = gvar.New(v) //因下面bug处理方式，json类型字段传参必须是gvar变量，否则不会自动生成json格式
@@ -228,8 +188,6 @@ func (daoThis *userDao) ParseField(field []string, fieldWithParam map[string]int
 			*afterField = append(*afterField, v) */
 			case `id`:
 				m = m.Fields(tableThis + `.` + daoThis.PrimaryKey() + ` AS ` + v)
-			case `label`:
-				m = m.Fields(`IFNULL(` + tableThis + `.` + daoThis.Columns().Account + `, ` + tableThis + `.` + daoThis.Columns().Phone + `) AS ` + v)
 			default:
 				if daoThis.ColumnArrG().Contains(v) {
 					m = m.Fields(tableThis + `.` + v)
@@ -294,20 +252,6 @@ func (daoThis *userDao) ParseFilter(filter map[string]interface{}, joinTableArr 
 				}
 			case `id`, `idArr`:
 				m = m.Where(tableThis+`.`+daoThis.PrimaryKey(), v)
-			case `label`:
-				m = m.Where(m.Builder().WhereLike(tableThis+`.`+daoThis.Columns().Account, `%`+gconv.String(v)+`%`).WhereOrLike(tableThis+`.`+daoThis.Columns().Phone, `%`+gconv.String(v)+`%`))
-			case daoThis.Columns().IdCardName:
-				m = m.WhereLike(tableThis+`.`+k, `%`+gconv.String(v)+`%`)
-			case `timeRangeStart`:
-				m = m.WhereGTE(tableThis+`.`+daoThis.Columns().CreatedAt, v)
-			case `timeRangeEnd`:
-				m = m.WhereLTE(tableThis+`.`+daoThis.Columns().CreatedAt, v)
-			case `loginName`:
-				if g.Validator().Rules(`required|phone`).Data(v).Run(ctx) == nil {
-					m = m.Where(tableThis+`.`+daoThis.Columns().Phone, v)
-				} else {
-					m = m.Where(tableThis+`.`+daoThis.Columns().Account, v)
-				}
 			default:
 				if daoThis.ColumnArrG().Contains(k) {
 					m = m.Where(tableThis+`.`+k, v)
@@ -352,9 +296,6 @@ func (daoThis *userDao) ParseOrder(order []string, joinTableArr *[]string) gdb.M
 			switch k {
 			case `id`:
 				m = m.Order(tableThis + `.` + gstr.Replace(v, k, daoThis.PrimaryKey(), 1))
-			case daoThis.Columns().Birthday:
-				m = m.Order(tableThis + `.` + v)
-				m = m.OrderDesc(tableThis + `.` + daoThis.PrimaryKey())
 			default:
 				if daoThis.ColumnArrG().Contains(k) {
 					m = m.Order(tableThis + `.` + v)

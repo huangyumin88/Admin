@@ -110,6 +110,10 @@ saveForm.initData()
         <ElInput v-model="saveForm.data.smtpPwd"
                  :placeholder="t('platform.config.name.emailSMTPPwd')" :clearable="true" style="max-width: 500px;"/>
       </ElFormItem>
+      <ElFormItem :label="t('platform.config.name.emailSMTPTestEmail')" prop="emailSMTPTestEmail">
+        <ElInput v-model="saveForm.data.smtpTestEmail"
+                 :placeholder="t('platform.config.name.emailSMTPTestEmail')" :clearable="true" style="max-width: 500px;"/>
+      </ElFormItem>
     </template>
 
     <ElFormItem>

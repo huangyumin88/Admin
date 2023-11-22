@@ -6,11 +6,12 @@ import (
 
 /*--------获取 开始--------*/
 type ConfigSmtpTestReq struct {
-	g.Meta    `path:"/config/smtp/test" method:"post" tags:"平台后台/配置中心/平台配置" sm:"smtp测试"`
-	SmtpHost  *string `json:"smtpHost,omitempty" dc:"Smtp邮箱-域名"`
-	SmtpPort  *string `json:"smtpPort,omitempty" dc:"Smtp邮箱-端口"`
-	SmtpEmail *string `json:"smtpEmail,omitempty" dc:"Smtp邮箱-邮箱账号"`
-	SmtpPwd   *string `json:"smtpPwd,omitempty" dc:"Smtp邮箱-邮箱密码"`
+	g.Meta        `path:"/config/smtp/test" method:"post" tags:"平台后台/配置中心/平台配置" sm:"smtp测试"`
+	SmtpHost      *string `json:"smtpHost,omitempty" dc:"Smtp邮箱-域名"`
+	SmtpPort      *string `json:"smtpPort,omitempty" dc:"Smtp邮箱-端口"`
+	SmtpEmail     *string `json:"smtpEmail,omitempty" dc:"Smtp邮箱-邮箱账号"`
+	SmtpPwd       *string `json:"smtpPwd,omitempty" dc:"Smtp邮箱-邮箱密码"`
+	SmtpTestEmail *string `json:"smtpTestEmail,omitempty" dc:"Smtp邮箱-测试邮箱"`
 }
 
 type ConfigGetReq struct {
@@ -52,11 +53,12 @@ type Config struct {
 	AliyunIdCardPath    *string `json:"aliyunIdCardPath,omitempty" dc:"阿里云IdCard-请求路径"`
 	AliyunIdCardAppcode *string `json:"aliyunIdCardAppcode,omitempty" dc:"阿里云IdCard-Appcode"`
 
-	SmtpType  *string `json:"smtpType,omitempty" dc:"Smtp邮箱"`
-	SmtpHost  *string `json:"smtpHost,omitempty" dc:"Smtp邮箱-域名"`
-	SmtpPort  *string `json:"smtpPort,omitempty" dc:"Smtp邮箱-端口"`
-	SmtpEmail *string `json:"smtpEmail,omitempty" dc:"Smtp邮箱-邮箱账号"`
-	SmtpPwd   *string `json:"smtpPwd,omitempty" dc:"Smtp邮箱-邮箱密码"`
+	SmtpType      *string `json:"smtpType,omitempty" dc:"Smtp邮箱"`
+	SmtpHost      *string `json:"smtpHost,omitempty" dc:"Smtp邮箱-域名"`
+	SmtpPort      *string `json:"smtpPort,omitempty" dc:"Smtp邮箱-端口"`
+	SmtpEmail     *string `json:"smtpEmail,omitempty" dc:"Smtp邮箱-邮箱账号"`
+	SmtpPwd       *string `json:"smtpPwd,omitempty" dc:"Smtp邮箱-邮箱密码"`
+	SmtpTestEmail *string `json:"smtpTestEmail,omitempty" dc:"Smtp邮箱-测试邮箱"`
 }
 
 /*--------获取 结束--------*/
@@ -94,11 +96,12 @@ type ConfigSaveReq struct {
 	AliyunIdCardPath    *string `json:"aliyunIdCardPath,omitempty" v:"" dc:"阿里云IdCard-请求路径"`
 	AliyunIdCardAppcode *string `json:"aliyunIdCardAppcode,omitempty" v:"" dc:"阿里云IdCard-Appcode"`
 
-	SmtpType  *string `json:"smtpType,omitempty" v:"" dc:"Smtp邮箱"`
-	SmtpHost  *string `json:"smtpHost,omitempty" v:"" dc:"Smtp邮箱-域名"`
-	SmtpPort  *string `json:"smtpPort,omitempty" v:"" dc:"Smtp邮箱-端口"`
-	SmtpEmail *string `json:"smtpEmail,omitempty" v:"" dc:"Smtp邮箱-邮箱账号"`
-	SmtpPwd   *string `json:"smtpPwd,omitempty" v:"" dc:"Smtp邮箱-邮箱密码"`
+	SmtpType      *string `json:"smtpType,omitempty" v:"" dc:"Smtp邮箱"`
+	SmtpHost      *string `json:"smtpHost,omitempty" v:"" dc:"Smtp邮箱-域名"`
+	SmtpPort      *string `json:"smtpPort,omitempty" v:"" dc:"Smtp邮箱-端口"`
+	SmtpEmail     *string `json:"smtpEmail,omitempty" v:"" dc:"Smtp邮箱-邮箱账号"`
+	SmtpPwd       *string `json:"smtpPwd,omitempty" v:"" dc:"Smtp邮箱-邮箱密码"`
+	SmtpTestEmail *string `json:"smtpTestEmail,omitempty" dc:"Smtp邮箱-测试邮箱"`
 }
 
 /*--------保存 结束--------*/

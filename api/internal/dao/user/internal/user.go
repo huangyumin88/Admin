@@ -25,40 +25,46 @@ type UserDao struct {
 
 // UserColumns defines and stores column names for table user.
 type UserColumns struct {
-	UserId     string // 用户ID
-	Phone      string // 手机
-	Account    string // 账号
-	Password   string // 密码。md5保存
-	Salt       string // 加密盐
-	Nickname   string // 昵称
-	Avatar     string // 头像
-	Gender     string // 性别：0未设置 1男 2女
-	Birthday   string // 生日
-	Address    string // 详细地址
-	IdCardName string // 身份证姓名
-	IdCardNo   string // 身份证号码
-	IsStop     string // 停用：0否 1是
-	UpdatedAt  string // 更新时间
-	CreatedAt  string // 创建时间
+	UserId       string // 用户ID
+	Phone        string // 手机
+	Email        string // 邮箱
+	Account      string // 账号
+	Password     string // 密码。md5保存
+	Salt         string // 加密盐
+	Nickname     string // 昵称
+	Avatar       string // 头像
+	Gender       string // 性别：0未设置 1男 2女
+	Birthday     string // 生日
+	Address      string // 详细地址
+	IdCardName   string // 身份证姓名
+	IdCardNo     string // 身份证号码
+	ReferralCode string // 推荐码
+	IsStop       string // 停用：0否 1是
+	UpdatedAt    string // 更新时间
+	CreatedAt    string // 创建时间
+	Country      string // 国家
 }
 
 // userColumns holds the columns for table user.
 var userColumns = UserColumns{
-	UserId:     "userId",
-	Phone:      "phone",
-	Account:    "account",
-	Password:   "password",
-	Salt:       "salt",
-	Nickname:   "nickname",
-	Avatar:     "avatar",
-	Gender:     "gender",
-	Birthday:   "birthday",
-	Address:    "address",
-	IdCardName: "idCardName",
-	IdCardNo:   "idCardNo",
-	IsStop:     "isStop",
-	UpdatedAt:  "updatedAt",
-	CreatedAt:  "createdAt",
+	UserId:       "userId",
+	Phone:        "phone",
+	Email:        "email",
+	Account:      "account",
+	Password:     "password",
+	Salt:         "salt",
+	Nickname:     "nickname",
+	Avatar:       "avatar",
+	Gender:       "gender",
+	Birthday:     "birthday",
+	Address:      "address",
+	IdCardName:   "idCardName",
+	IdCardNo:     "idCardNo",
+	ReferralCode: "referralCode",
+	IsStop:       "isStop",
+	UpdatedAt:    "updatedAt",
+	CreatedAt:    "createdAt",
+	Country:      "country",
 }
 
 // NewUserDao creates and returns a new DAO object for table data access.

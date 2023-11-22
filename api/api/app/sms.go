@@ -12,3 +12,14 @@ type SmsSendReq struct {
 }
 
 /*--------发送验证码 结束--------*/
+
+/*--------发送邮箱验证码 开始--------*/
+
+type SmsEmailSendReq struct {
+	g.Meta   `path:"/email/send" method:"post" tags:"APP/短信" sm:"发送邮箱验证码"`
+	UseScene int `json:"useScene"  v:"required|in:0,1,2,3,4,5" dc:"使用场景：0登录 1注册 2密码找回 3密码修改 4绑定手机 5解绑手机"`
+	//Phone    string `json:"phone"  v:"required-unless:UseScene,3,UseScene,5|phone" dc:"手机。useScene=3或5时可不传"`
+	Email string `json:"email,omitempty" v:"required-without:email" dc:"邮箱"`
+}
+
+/*--------发送验证码 结束--------*/

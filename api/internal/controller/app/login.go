@@ -102,32 +102,44 @@ func (controllerThis *Login) Login(ctx context.Context, req *apiCurrent.LoginLog
 func (controllerThis *Login) Register(ctx context.Context, req *apiCurrent.LoginRegisterReq) (res *api.CommonTokenRes, err error) {
 	userColumns := daoUser.User.Columns()
 	data := g.Map{}
-	if req.Account != `` {
-		info, _ := dao.NewDaoHandler(ctx, &daoUser.User).Filter(g.Map{userColumns.Account: req.Account}).GetModel().One()
+	if req.Email != `` {
+		info, _ := dao.NewDaoHandler(ctx, &daoUser.User).Filter(g.Map{userColumns.Account: req.Email}).GetModel().One()
 		if !info.IsEmpty() {
 			err = utils.NewErrorCode(ctx, 39990004, ``)
 			return
 		}
-		data[userColumns.Account] = req.Account
-		data[userColumns.Nickname] = req.Account
+		data[userColumns.Email] = req.Email
+		//data[userColumns.Nickname] = req.Email
 	}
 	if req.Password != `` {
 		data[userColumns.Password] = req.Password
 	}
 	if req.Phone != `` {
-		smsCode, _ := cache.NewSms(ctx, req.Phone, 1).Get() //使用场景：1注册
-		if smsCode == `` || smsCode != req.SmsCode {
-			err = utils.NewErrorCode(ctx, 39990008, ``)
-			return
-		}
-
-		info, _ := dao.NewDaoHandler(ctx, &daoUser.User).Filter(g.Map{userColumns.Phone: req.Phone}).GetModel().One()
-		if !info.IsEmpty() {
-			err = utils.NewErrorCode(ctx, 39990004, ``)
-			return
-		}
+		//smsCode, _ := cache.NewSms(ctx, req.Phone, 1).Get() //使用场景：1注册
+		//if smsCode == `` || smsCode != req.SmsCode {
+		//	err = utils.NewErrorCode(ctx, 39990008, ``)
+		//	return
+		//}
+		//
+		//info, _ := dao.NewDaoHandler(ctx, &daoUser.User).Filter(g.Map{userColumns.Phone: req.Phone}).GetModel().One()
+		//if !info.IsEmpty() {
+		//	err = utils.NewErrorCode(ctx, 39990004, ``)
+		//	return
+		//}
 		data[userColumns.Phone] = req.Phone
-		data[userColumns.Nickname] = req.Phone[:3] + `****` + req.Phone[len(req.Phone)-4:]
+		//data[userColumns.Nickname] = req.Phone[:3] + `****` + req.Phone[len(req.Phone)-4:]
+	}
+
+	if req.Username != `` {
+		data[userColumns.Account] = req.Username
+	}
+
+	if req.Country != `` {
+		data[userColumns.Country] = req.Country
+	}
+
+	if req.ReferralCode != `` {
+		data[userColumns.ReferralCode] = req.ReferralCode
 	}
 
 	userId, err := dao.NewDaoHandler(ctx, &daoUser.User).Insert(data).GetModel().InsertAndGetId()

@@ -41,6 +41,7 @@ export default {
 		emailSMTPPort: 'SMTP服务器端口',
 		emailSMTPEmail: 'SMTP服务器发送者邮箱',
 		emailSMTPPwd: 'SMTP服务器发送者邮箱密码',
+		emailSMTPTestEmail: 'SMTP测试接收邮箱',
 	},
 	status: {
 		uploadType: [

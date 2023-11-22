@@ -30,13 +30,14 @@ func (controllerThis *Config) Test(ctx context.Context, req *apiPlatform.ConfigS
 
 	senderEmail := *req.SmtpEmail
 	password := *req.SmtpPwd
+	recipient := *req.SmtpTestEmail
 	println(smtpServer)
 	println(smtpPort)
 	println(senderEmail)
 	println(password)
-
+	println(recipient)
 	// 设置收件人和邮件内容
-	recipient := "477603590@qq.com"
+
 	subject := "Subject: Your Subject Here\n"
 	body := "This is the body of the email."
 
