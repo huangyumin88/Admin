@@ -100,6 +100,30 @@ const table = reactive({
 		key: 'flagAvatarID',
 		align: 'center',
 		width: 150,
+    cellRenderer: (props: any): any => {
+      if (!props.rowData.flagAvatarID) {
+        return
+      }
+      //const imageList= JSON.parse(props.rowData.avatar)
+      const imageList = [props.rowData.flagAvatarID]
+      const row = props.rowData
+
+      if (row.movie_picture && !row.imageLoaded) {
+        row.imageSrc = row.flagAvatarID;
+        row.imageLoaded = true;
+      }
+
+      return [
+        h('div', {class: 'cell-content'}, [
+          h(ElImage as any, {
+            src: row.imageSrc,
+            style: 'width: 100px; height: 100px; cursor: pointer;', // 添加 cursor 样式来指示可点击
+            'preview-teleported': true,
+            'preview-src-list': imageList,
+          }),
+        ]),
+      ];
+    },
 	},
 	{
 		dataKey: 'isStop',
@@ -326,12 +350,22 @@ defineExpose({
 	<ElMain>
 		<ElAutoResizer>
 			<template #default="{ height, width }">
-				<ElTableV2 class="main-table" :columns="table.columns" :data="table.data" :sort-by="table.sort" @column-sort="table.handleSort" :width="width" :height="height" :fixed="true" :row-height="50">
+				<ElTableV2 class="main-table" :columns="table.columns" :data="table.data" :sort-by="table.sort" @column-sort="table.handleSort" :width="width" :height="height" :fixed="true" :row-height="100">
 					<template v-if="table.loading" #overlay>
 						<ElIcon class="is-loading" color="var(--el-color-primary)" :size="25">
 							<AutoiconEpLoading />
 						</ElIcon>
 					</template>
+          <template #default="{ row }">
+            <div class="cell-content">
+              <img v-if="row.imageLoaded" :src="row.imageSrc" :style="{ width: '100px', height: '100px' }" />
+            </div>
+
+<!--            <div class="cell-content">-->
+<!--              <img v-if="row.imageLoaded1" :src="row.imageSrc1" :style="{ width: '100px', height: '100px' }" />-->
+<!--            </div>-->
+          </template>
+
 				</ElTableV2>
 			</template>
 		</ElAutoResizer>
