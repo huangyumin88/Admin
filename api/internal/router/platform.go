@@ -9,6 +9,7 @@ import (
 	controllerMy "api/internal/controller/platform/my"
 	controllerPlatform "api/internal/controller/platform/platform"
 	controllerUser "api/internal/controller/platform/user"
+	controllerApp "api/internal/controller/platform/app"
 	"api/internal/middleware"
 )
 
@@ -52,6 +53,10 @@ func InitRouterPlatform(s *ghttp.Server) {
 
 			group.Group(`/user`, func(group *ghttp.RouterGroup) {
 				group.Bind(controllerUser.NewUser())
+			})
+
+			group.Group(`/app`, func(group *ghttp.RouterGroup) {
+				group.Bind(controllerApp.NewCardCountries())
 			})
 
 			/*--------后端路由自动代码生成锚点（不允许修改和删除，否则将不能自动生成路由）--------*/

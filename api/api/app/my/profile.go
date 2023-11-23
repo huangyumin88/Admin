@@ -15,16 +15,18 @@ type ProfileInfoRes struct {
 }
 
 type ProfileInfo struct {
-	UserId     uint   `json:"userId" dc:"用户ID"`
-	Phone      string `json:"phone" dc:"手机"`
-	Account    string `json:"account" dc:"账号"`
-	Nickname   string `json:"nickname" dc:"昵称"`
-	Avatar     string `json:"avatar" dc:"头像"`
-	Gender     uint   `json:"gender" dc:"性别：0未设置 1男 2女"`
-	Birthday   string `json:"birthday" dc:"生日"`
-	Address    string `json:"address" dc:"详细地址"`
-	IdCardName string `json:"idCardName" dc:"身份证姓名"`
-	IdCardNo   string `json:"idCardNo" dc:"身份证号码"`
+	UserId   uint   `json:"userId" dc:"用户ID"`
+	Phone    string `json:"phone" dc:"手机"`
+	Account  string `json:"account" dc:"账号"`
+	Email    string `json:"email" dc:"邮箱"`
+	Country  string `json:"country" dc:"国家"`
+	Nickname string `json:"nickname" dc:"昵称"`
+	Avatar   string `json:"avatar" dc:"头像"`
+	Gender   uint   `json:"gender" dc:"性别：0未设置 1男 2女"`
+	Birthday string `json:"birthday" dc:"生日"`
+	//Address    string `json:"address" dc:"详细地址"`
+	//IdCardName string `json:"idCardName" dc:"身份证姓名"`
+	//IdCardNo   string `json:"idCardNo" dc:"身份证号码"`
 }
 
 /*--------个人信息 结束--------*/

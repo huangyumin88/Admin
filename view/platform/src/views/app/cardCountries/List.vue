@@ -53,125 +53,57 @@ const table = reactive({
 		},
 	},
 	{
-		dataKey: 'phone',
-		title: t('user.user.name.phone'),
-		key: 'phone',
+		dataKey: 'name',
+		title: t('app.cardCountries.name.name'),
+		key: 'name',
 		align: 'center',
 		width: 150,
 	},
 	{
-		dataKey: 'account',
-		title: t('user.user.name.account'),
-		key: 'account',
-		align: 'center',
-		width: 150,
-	},
-  {
-    dataKey: 'email',
-    title: t('user.user.name.email'),
-    key: 'email',
-    align: 'center',
-    width: 200,
-  },
-	{
-		dataKey: 'nickname',
-		title: t('user.user.name.nickname'),
-		key: 'nickname',
+		dataKey: 'isoName',
+		title: t('app.cardCountries.name.isoName'),
+		key: 'isoName',
 		align: 'center',
 		width: 150,
 	},
 	{
-		dataKey: 'avatar',
-		title: t('user.user.name.avatar'),
-		key: 'avatar',
-		align: 'center',
-		width: 100,
-		cellRenderer: (props: any): any => {
-			if (!props.rowData.avatar) {
-				return
-			}
-			const imageList = [props.rowData.avatar]
-			return [
-				h(ElScrollbar, {
-					'wrap-style': 'display: flex; align-items: center;',
-					'view-style': 'margin: auto;',
-				}, {
-					default: () => {
-						const content = imageList.map((item) => {
-							return h(ElImage as any, {
-								'style': 'width: 45px;',	//不想显示滚动条，需设置table属性row-height增加行高
-								'src': item,
-								'lazy': true,
-								'hide-on-click-modal': true,
-								'preview-teleported': true,
-								'preview-src-list': imageList
-							})
-						})
-						return content
-					}
-				})
-			]
-		},
-	},
-	{
-		dataKey: 'gender',
-		title: t('user.user.name.gender'),
-		key: 'gender',
-		align: 'center',
-		width: 100,
-		cellRenderer: (props: any): any => {
-			let typeObj: any = { '0': '', '1': 'success', '2': 'danger' }
-			return [
-				h(ElTag as any, {
-					type: typeObj[props.rowData.gender]
-				}, {
-					default: () => (tm('user.user.status.gender') as any).find((item: any) => { return item.value == props.rowData.gender })?.label
-				})
-			]
-		},
-	},
-  {
-    dataKey: 'birthday',
-    title: t('user.user.name.birthday'),
-    key: 'birthday',
-    align: 'center',
-    width: 100,
-    sortable: true,
-  },
-	{
-		dataKey: 'referralCode',
-		title: t('user.user.name.referralCode'),
-		key: 'referralCode',
+		dataKey: 'currencyCode',
+		title: t('app.cardCountries.name.currencyCode'),
+		key: 'currencyCode',
 		align: 'center',
 		width: 150,
-		sortable: true,
 	},
 	{
-		dataKey: 'address',
-		title: t('user.user.name.address'),
-		key: 'address',
+		dataKey: 'currencyName',
+		title: t('app.cardCountries.name.currencyName'),
+		key: 'currencyName',
 		align: 'center',
 		width: 150,
-		hidden: true,
 	},
 	{
-		dataKey: 'idCardName',
-		title: t('user.user.name.idCardName'),
-		key: 'idCardName',
+		dataKey: 'flagUrl',
+		title: t('app.cardCountries.name.flagUrl'),
+		key: 'flagUrl',
+		align: 'center',
+		width: 200,
+	},
+	{
+		dataKey: 'flagAvatar',
+		title: t('app.cardCountries.name.flagAvatar'),
+		key: 'flagAvatar',
 		align: 'center',
 		width: 150,
-		hidden: true,
 	},
 	{
-		dataKey: 'idCardNo',
-		title: t('user.user.name.idCardNo'),
-		key: 'idCardNo',
+		dataKey: 'flagAvatarID',
+		title: t('app.cardCountries.name.flagAvatarID'),
+		key: 'flagAvatarID',
 		align: 'center',
 		width: 150,
 	},
 	{
 		dataKey: 'isStop',
-		title: t('user.user.name.isStop'),
+		title: t('app.cardCountries.name.isStop'),
 		key: 'isStop',
 		align: 'center',
 		width: 100,
@@ -229,9 +161,23 @@ const table = reactive({
 				}, {
 					default: () => [h(AutoiconEpEdit), t('common.edit')]
 				}),
+				h(ElButton, {
+					type: 'danger',
+					size: 'small',
+					onClick: () => handleDelete([props.rowData.id])
+				}, {
+					default: () => [h(AutoiconEpDelete), t('common.delete')]
+				}),
+				h(ElButton, {
+					type: 'warning',
+					size: 'small',
+					onClick: () => handleEditCopy(props.rowData.id, 'copy')
+				}, {
+					default: () => [h(AutoiconEpDocumentCopy), t('common.copy')]
+				}),
 			]
 		},
-	} ] as any,
+	}] as any,
 	data: [],
 	loading: false,
 	sort: { key: 'id', order: 'desc' } as any,
@@ -243,9 +189,29 @@ const table = reactive({
 })
 
 const saveCommon = inject('saveCommon') as { visible: boolean, title: string, data: { [propName: string]: any } }
+//新增
+const handleAdd = () => {
+	saveCommon.data = {}
+	saveCommon.title = t('common.add')
+	saveCommon.visible = true
+}
+//批量删除
+const handleBatchDelete = () => {
+	const idArr: number[] = [];
+	table.data.forEach((item: any) => {
+		if (item.checked) {
+			idArr.push(item.id)
+		}
+	})
+	if (idArr.length) {
+		handleDelete(idArr)
+	} else {
+		ElMessage.error(t('common.tip.selectDelete'))
+	}
+}
 //编辑|复制
 const handleEditCopy = (id: number, type: string = 'edit') => {
-	request(t('config.VITE_HTTP_API_PREFIX') + '/user/user/info', { id: id }).then((res) => {
+	request(t('config.VITE_HTTP_API_PREFIX') + '/app/cardCountries/info', { id: id }).then((res) => {
 		saveCommon.data = { ...res.data.info }
 		switch (type) {
 			case 'edit':
@@ -261,9 +227,22 @@ const handleEditCopy = (id: number, type: string = 'edit') => {
 		saveCommon.visible = true
 	}).catch(() => { })
 }
+//删除
+const handleDelete = (idArr: number[]) => {
+	ElMessageBox.confirm('', {
+		type: 'warning',
+		title: t('common.tip.configDelete'),
+		center: true,
+		showClose: false,
+	}).then(() => {
+		request(t('config.VITE_HTTP_API_PREFIX') + '/app/cardCountries/del', { idArr: idArr }, true).then((res) => {
+			getList()
+		}).catch(() => { })
+	}).catch(() => { })
+}
 //更新
 const handleUpdate = async (param: { idArr: number[], [propName: string]: any }) => {
-	await request(t('config.VITE_HTTP_API_PREFIX') + '/user/user/update', param, true)
+	await request(t('config.VITE_HTTP_API_PREFIX') + '/app/cardCountries/update', param, true)
 }
 
 //分页
@@ -297,7 +276,7 @@ const getList = async (resetPage: boolean = false) => {
 	}
 	table.loading = true
 	try {
-		const res = await request(t('config.VITE_HTTP_API_PREFIX') + '/user/user/list', param)
+		const res = await request(t('config.VITE_HTTP_API_PREFIX') + '/app/cardCountries/list', param)
 		table.data = res.data.list?.length ? res.data.list : []
 		pagination.total = res.data.count
 	} catch (error) { }
@@ -315,11 +294,17 @@ defineExpose({
 	<ElRow class="main-table-tool">
 		<ElCol :span="16">
 			<ElSpace :size="10" style="height: 100%; margin-left: 10px;">
+				<ElButton type="primary" @click="handleAdd">
+					<AutoiconEpEditPen />{{ t('common.add') }}
+				</ElButton>
+				<ElButton type="danger" @click="handleBatchDelete">
+					<AutoiconEpDeleteFilled />{{ t('common.batchDelete') }}
+				</ElButton>
 			</ElSpace>
 		</ElCol>
 		<ElCol :span="8" style="text-align: right;">
 			<ElSpace :size="10" style="height: 100%;">
-				<MyExportButton :headerList="table.columns" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/user/user/list', param: { filter: queryCommon.data, sort: table.sort.key + ' ' + table.sort.order } }" />
+				<MyExportButton :headerList="table.columns" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/app/cardCountries/list', param: { filter: queryCommon.data, sort: table.sort.key + ' ' + table.sort.order } }" />
 				<ElDropdown max-height="300" :hide-on-click="false">
 					<ElButton type="info" :circle="true">
 						<AutoiconEpHide />

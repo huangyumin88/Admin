@@ -15,7 +15,6 @@ import (
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/gogf/gf/v2/util/grand"
-	"net/smtp"
 )
 
 type Sms struct{}
@@ -108,10 +107,10 @@ func (controllerThis *Sms) EmailSend(ctx context.Context, req *apiCurrent.SmsEma
 
 	value, err := cache.NewSms(ctx, email, req.UseScene).Get()
 
-	//if value != `` {
-	//	err = utils.NewErrorCode(ctx, 39990010, ``)
-	//	return
-	//}
+	if value != `` {
+		err = utils.NewErrorCode(ctx, 39990010, ``)
+		return
+	}
 
 	println("value", value)
 
@@ -136,60 +135,36 @@ func (controllerThis *Sms) EmailSend(ctx context.Context, req *apiCurrent.SmsEma
 	senderEmail := *configModel.SmtpEmail
 
 	password := *configModel.SmtpPwd
+
 	//
 	//senderEmail := config["smtpEmail"]
 	//password := config["smtpPwd"]
 	//
-	//fmt.Println("smtpHost", smtpServer)
-	//
-	//fmt.Println("smtpPort", smtpPort)
-	//
-	//fmt.Println("senderEmail", senderEmail)
-	//
-	//fmt.Println("password", password)
+	fmt.Println("smtpHost", smtpServer)
 
-	// Safely convert config values to strings
-	//smtpServer, ok := config["smtpHost"].(string)
-	//if !ok {
-	//	fmt.Println("smtpHost is not a string")
+	fmt.Println("smtpPort", smtpPort)
+
+	fmt.Println("senderEmail", senderEmail)
+
+	fmt.Println("password", password)
+
+	fmt.Println("email", email)
+
+	//subject := "SMTP 测试 \n"
+	////body := "Hello, thank you for registering, your verification code is " + smsCode
+	//body := "Hello, 测试一下随机代码 " + smsCode
+	//// 创建邮件内容
+	//message := []byte(subject + "\n" + body)
+
+	//// 设置身份验证信息
+	//auth := smtp.PlainAuth("", senderEmail, password, smtpServer)
+	//
+	//// 发送邮件
+	//err = smtp.SendMail(smtpServer+":"+smtpPort, auth, senderEmail, []string{email}, message)
+	//if err != nil {
+	//	fmt.Println("Failed to authenticate:", err)
 	//	return
 	//}
-	//
-	//smtpPort, ok := config["smtpPort"].(int)
-	//if !ok {
-	//	fmt.Println("smtpPort is not a string")
-	//	return
-	//}
-	//
-	//senderEmail, ok := config["smtpEmail"].(string)
-	//if !ok {
-	//	fmt.Println("smtpEmail is not a string")
-	//	return
-	//}
-	//
-	//password, ok := config["smtpPwd"].(string)
-	//if !ok {
-	//	fmt.Println("smtpPwd is not a string")
-	//	return
-	//}
-	//
-	//port := string(smtpPort)
-
-	subject := "Subject: Your Subject Here\n"
-	body := "Hello, thank you for registering, your verification code is " + smsCode
-
-	// 创建邮件内容
-	message := []byte(subject + "\n" + body)
-
-	// 设置身份验证信息
-	auth := smtp.PlainAuth("", senderEmail, password, smtpServer)
-
-	// 发送邮件
-	err = smtp.SendMail(smtpServer+":"+smtpPort, auth, senderEmail, []string{email}, message)
-	if err != nil {
-		fmt.Println("Failed to authenticate:", err)
-		return
-	}
 
 	if err != nil {
 		return

@@ -10,9 +10,7 @@ import (
 	"api/internal/utils"
 	"context"
 
-	"github.com/gogf/gf/v2/crypto/gmd5"
 	"github.com/gogf/gf/v2/frame/g"
-	"github.com/gogf/gf/v2/util/grand"
 )
 
 type Login struct{}
@@ -21,44 +19,44 @@ func NewLogin() *Login {
 	return &Login{}
 }
 
-// 获取加密盐
-func (controllerThis *Login) Salt(ctx context.Context, req *apiCurrent.LoginSaltReq) (res *api.CommonSaltRes, err error) {
-	if g.Validator().Rules(`phone`).Data(req.LoginName).Run(ctx) != nil && g.Validator().Rules(`passport`).Data(req.LoginName).Run(ctx) != nil {
-		err = utils.NewErrorCode(ctx, 89990000, ``)
-		return
-	}
-
-	userColumns := daoUser.User.Columns()
-	info, _ := dao.NewDaoHandler(ctx, &daoUser.User).Filter(g.Map{`loginName`: req.LoginName}).GetModel().One()
-	if info.IsEmpty() {
-		err = utils.NewErrorCode(ctx, 39990000, ``)
-		return
-	}
-	if info[userColumns.IsStop].Uint() == 1 {
-		err = utils.NewErrorCode(ctx, 39990002, ``)
-		return
-	}
-
-	saltDynamic := grand.S(8)
-	err = cache.NewSalt(ctx, req.LoginName).Set(saltDynamic, 5)
-	if err != nil {
-		return
-	}
-	res = &api.CommonSaltRes{SaltStatic: info[userColumns.Salt].String(), SaltDynamic: saltDynamic}
-	return
-}
+//// 获取加密盐
+//func (controllerThis *Login) Salt(ctx context.Context, req *apiCurrent.LoginSaltReq) (res *api.CommonSaltRes, err error) {
+//	if g.Validator().Rules(`phone`).Data(req.LoginName).Run(ctx) != nil && g.Validator().Rules(`passport`).Data(req.LoginName).Run(ctx) != nil {
+//		err = utils.NewErrorCode(ctx, 89990000, ``)
+//		return
+//	}
+//
+//	userColumns := daoUser.User.Columns()
+//	info, _ := dao.NewDaoHandler(ctx, &daoUser.User).Filter(g.Map{`loginName`: req.LoginName}).GetModel().One()
+//	if info.IsEmpty() {
+//		err = utils.NewErrorCode(ctx, 39990000, ``)
+//		return
+//	}
+//	if info[userColumns.IsStop].Uint() == 1 {
+//		err = utils.NewErrorCode(ctx, 39990002, ``)
+//		return
+//	}
+//
+//	saltDynamic := grand.S(8)
+//	err = cache.NewSalt(ctx, req.LoginName).Set(saltDynamic, 5)
+//	if err != nil {
+//		return
+//	}
+//	res = &api.CommonSaltRes{SaltStatic: info[userColumns.Salt].String(), SaltDynamic: saltDynamic}
+//	return
+//}
 
 // 登录
 func (controllerThis *Login) Login(ctx context.Context, req *apiCurrent.LoginLoginReq) (res *api.CommonTokenRes, err error) {
-	if g.Validator().Rules(`phone`).Data(req.LoginName).Run(ctx) != nil && g.Validator().Rules(`passport`).Data(req.LoginName).Run(ctx) != nil {
-		err = utils.NewErrorCode(ctx, 89990000, ``)
+	if g.Validator().Rules(`email`).Data(req.Email).Run(ctx) != nil {
+		err = utils.NewErrorCode(ctx, 89990001, ``)
 		return
 	}
 
 	userColumns := daoUser.User.Columns()
-	info, _ := dao.NewDaoHandler(ctx, &daoUser.User).Filter(g.Map{`loginName`: req.LoginName}).GetModel().One()
+	info, _ := dao.NewDaoHandler(ctx, &daoUser.User).Filter(g.Map{`email`: req.Email}).GetModel().One()
 	if info.IsEmpty() {
-		err = utils.NewErrorCode(ctx, 39990000, ``)
+		err = utils.NewErrorCode(ctx, 39990012, ``)
 		return
 	}
 	if info[userColumns.IsStop].Uint() == 1 {
@@ -67,24 +65,29 @@ func (controllerThis *Login) Login(ctx context.Context, req *apiCurrent.LoginLog
 	}
 
 	if req.Password != `` { //密码
-		salt, _ := cache.NewSalt(ctx, req.LoginName).Get()
-		if salt == `` || gmd5.MustEncrypt(info[userColumns.Password].String()+salt) != req.Password {
+		//salt, _ := cache.NewSalt(ctx, req.Email).Get()
+		//if salt == `` || gmd5.MustEncrypt(info[userColumns.Password].String()+salt) != req.Password {
+		//	err = utils.NewErrorCode(ctx, 39990001, ``)
+		//	return
+		//}
+		if info[userColumns.Password].String() != req.Password {
 			err = utils.NewErrorCode(ctx, 39990001, ``)
 			return
 		}
-	} else if req.SmsCode != `` { //短信验证码
-		phone := info[userColumns.Phone].String()
-		if phone == `` {
-			err = utils.NewErrorCode(ctx, 39990007, ``)
-			return
-		}
-
-		smsCode, _ := cache.NewSms(ctx, phone, 0).Get() //使用场景：0登录
-		if smsCode == `` || smsCode != req.SmsCode {
-			err = utils.NewErrorCode(ctx, 39990008, ``)
-			return
-		}
 	}
+	//} else if req.SmsCode != `` { //短信验证码
+	//	phone := info[userColumns.Phone].String()
+	//	if phone == `` {
+	//		err = utils.NewErrorCode(ctx, 39990007, ``)
+	//		return
+	//	}
+	//
+	//	smsCode, _ := cache.NewSms(ctx, phone, 0).Get() //使用场景：0登录
+	//	if smsCode == `` || smsCode != req.SmsCode {
+	//		err = utils.NewErrorCode(ctx, 39990008, ``)
+	//		return
+	//	}
+	//}
 
 	claims := utils.CustomClaims{LoginId: info[daoUser.User.PrimaryKey()].Uint()}
 	jwt := utils.NewJWT(ctx, utils.GetCtxSceneInfo(ctx)[daoAuth.Scene.Columns().SceneConfig].Map())
@@ -100,6 +103,12 @@ func (controllerThis *Login) Login(ctx context.Context, req *apiCurrent.LoginLog
 
 // 注册
 func (controllerThis *Login) Register(ctx context.Context, req *apiCurrent.LoginRegisterReq) (res *api.CommonTokenRes, err error) {
+
+	if g.Validator().Rules(`email`).Data(req.Email).Run(ctx) != nil {
+		err = utils.NewErrorCode(ctx, 89990001, ``)
+		return
+	}
+
 	userColumns := daoUser.User.Columns()
 	data := g.Map{}
 	if req.Email != `` {
@@ -109,8 +118,18 @@ func (controllerThis *Login) Register(ctx context.Context, req *apiCurrent.Login
 			return
 		}
 		data[userColumns.Email] = req.Email
-		//data[userColumns.Nickname] = req.Email
 	}
+
+	emailCode := req.EmailCode
+
+	value, err := cache.NewSms(ctx, req.Email, 1).Get()
+
+	if emailCode != value {
+
+		err = utils.NewErrorCode(ctx, 39990011, ``)
+		return
+	}
+
 	if req.Password != `` {
 		data[userColumns.Password] = req.Password
 	}
@@ -132,6 +151,7 @@ func (controllerThis *Login) Register(ctx context.Context, req *apiCurrent.Login
 
 	if req.Username != `` {
 		data[userColumns.Account] = req.Username
+		data[userColumns.Nickname] = req.Username
 	}
 
 	if req.Country != `` {
@@ -153,7 +173,7 @@ func (controllerThis *Login) Register(ctx context.Context, req *apiCurrent.Login
 	if err != nil {
 		return
 	}
-	// cache.NewToken(ctx, claims.LoginId).Set(token, int64(jwt.ExpireTime)) //缓存token（限制多地登录，多设备登录等情况下用）
+	cache.NewToken(ctx, claims.LoginId).Set(token, int64(jwt.ExpireTime)) //缓存token（限制多地登录，多设备登录等情况下用）
 
 	res = &api.CommonTokenRes{Token: token}
 	return
@@ -161,20 +181,24 @@ func (controllerThis *Login) Register(ctx context.Context, req *apiCurrent.Login
 
 // 密码找回
 func (controllerThis *Login) PasswordRecovery(ctx context.Context, req *apiCurrent.LoginPasswordRecoveryReq) (res *api.CommonNoDataRes, err error) {
-	userColumns := daoUser.User.Columns()
-	smsCode, _ := cache.NewSms(ctx, req.Phone, 2).Get() //使用场景：2密码找回
-	if smsCode == `` || smsCode != req.SmsCode {
-		err = utils.NewErrorCode(ctx, 39990008, ``)
+
+	if g.Validator().Rules(`email`).Data(req.Email).Run(ctx) != nil {
+		err = utils.NewErrorCode(ctx, 89990001, ``)
 		return
 	}
 
-	row, err := dao.NewDaoHandler(ctx, &daoUser.User).Filter(g.Map{userColumns.Phone: req.Phone}).Update(g.Map{userColumns.Password: req.Password}).GetModel().UpdateAndGetAffected()
-	if err != nil {
+	userColumns := daoUser.User.Columns()
+	info, _ := dao.NewDaoHandler(ctx, &daoUser.User).Filter(g.Map{`email`: req.Email}).GetModel().One()
+	if info.IsEmpty() {
+		err = utils.NewErrorCode(ctx, 39990012, ``)
 		return
 	}
-	if row == 0 {
-		err = utils.NewErrorCode(ctx, 39990000, ``)
+	if info[userColumns.IsStop].Uint() == 1 {
+		err = utils.NewErrorCode(ctx, 39990002, ``)
 		return
 	}
+	msg := "password reset link with instructions has been sent to your mail " + req.Email
+	utils.HttpWriteJson(ctx, nil, 0, msg)
 	return
+
 }

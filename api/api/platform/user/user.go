@@ -24,6 +24,7 @@ type UserListFilter struct {
 	UserId         *uint       `json:"userId,omitempty" v:"min:1" dc:"用户ID"`
 	Phone          string      `json:"phone,omitempty" v:"max-length:30|phone" dc:"手机"`
 	Account        string      `json:"account,omitempty" v:"max-length:30" dc:"账号"`
+	Email          string      `json:"email,omitempty" v:"" dc:"邮箱"`
 	Nickname       string      `json:"nickname,omitempty" v:"max-length:30" dc:"昵称"`
 	Gender         *uint       `json:"gender,omitempty" v:"in:0,1,2" dc:"性别：0未设置 1男 2女"`
 	Birthday       *gtime.Time `json:"birthday,omitempty" v:"date-format:Y-m-d" dc:"生日"`
@@ -40,21 +41,23 @@ type UserListRes struct {
 }
 
 type UserListItem struct {
-	Id         *uint       `json:"id,omitempty" dc:"ID"`
-	Label      *string     `json:"label,omitempty" dc:"标签。常用于前端组件"`
-	UserId     *uint       `json:"userId,omitempty" dc:"用户ID"`
-	Phone      *string     `json:"phone,omitempty" dc:"手机"`
-	Account    *string     `json:"account,omitempty" dc:"账号"`
-	Nickname   *string     `json:"nickname,omitempty" dc:"昵称"`
-	Avatar     *string     `json:"avatar,omitempty" dc:"头像"`
-	Gender     *uint       `json:"gender,omitempty" dc:"性别：0未设置 1男 2女"`
-	Birthday   *string     `json:"birthday,omitempty" dc:"生日"`
-	Address    *string     `json:"address,omitempty" dc:"详细地址"`
-	IdCardName *string     `json:"idCardName,omitempty" dc:"身份证姓名"`
-	IdCardNo   *string     `json:"idCardNo,omitempty" dc:"身份证号码"`
-	IsStop     *uint       `json:"isStop,omitempty" dc:"停用：0否 1是"`
-	UpdatedAt  *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
-	CreatedAt  *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
+	Id           *uint       `json:"id,omitempty" dc:"ID"`
+	Label        *string     `json:"label,omitempty" dc:"标签。常用于前端组件"`
+	UserId       *uint       `json:"userId,omitempty" dc:"用户ID"`
+	Phone        *string     `json:"phone,omitempty" dc:"手机"`
+	Account      *string     `json:"account,omitempty" dc:"账号"`
+	Nickname     *string     `json:"nickname,omitempty" dc:"昵称"`
+	ReferralCode *string     `json:"referralCode,omitempty" dc:"推荐码"`
+	Email        *string     `json:"email,omitempty" dc:"邮箱"`
+	Avatar       *string     `json:"avatar,omitempty" dc:"头像"`
+	Gender       *uint       `json:"gender,omitempty" dc:"性别：0未设置 1男 2女"`
+	Birthday     *string     `json:"birthday,omitempty" dc:"生日"`
+	Address      *string     `json:"address,omitempty" dc:"详细地址"`
+	IdCardName   *string     `json:"idCardName,omitempty" dc:"身份证姓名"`
+	IdCardNo     *string     `json:"idCardNo,omitempty" dc:"身份证号码"`
+	IsStop       *uint       `json:"isStop,omitempty" dc:"停用：0否 1是"`
+	UpdatedAt    *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
+	CreatedAt    *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
 }
 
 /*--------列表 结束--------*/
@@ -77,6 +80,7 @@ type UserInfo struct {
 	Phone      *string     `json:"phone,omitempty" dc:"手机"`
 	Account    *string     `json:"account,omitempty" dc:"账号"`
 	Nickname   *string     `json:"nickname,omitempty" dc:"昵称"`
+	Email      *string     `json:"email,omitempty" dc:"邮箱"`
 	Avatar     *string     `json:"avatar,omitempty" dc:"头像"`
 	Gender     *uint       `json:"gender,omitempty" dc:"性别：0未设置 1男 2女"`
 	Birthday   *string     `json:"birthday,omitempty" dc:"生日"`

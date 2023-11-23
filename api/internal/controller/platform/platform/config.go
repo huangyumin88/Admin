@@ -38,8 +38,8 @@ func (controllerThis *Config) Test(ctx context.Context, req *apiPlatform.ConfigS
 	println(recipient)
 	// 设置收件人和邮件内容
 
-	subject := "Subject: Your Subject Here\n"
-	body := "This is the body of the email."
+	subject := "hello 测试一下\n"
+	body := "SMTP 测试一下"
 
 	// 创建邮件内容
 	message := []byte(subject + "\n" + body)

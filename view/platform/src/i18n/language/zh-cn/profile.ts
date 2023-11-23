@@ -1,6 +1,7 @@
 export default {
     name: {
         account: '账号',
+        email: '邮箱',
         phone: '手机',
         nickname: '昵称',
         avatar: '头像',
