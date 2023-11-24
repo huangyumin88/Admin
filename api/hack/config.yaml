@@ -16,7 +16,7 @@ gfcli:
         daoPath: "dao/app"
         doPath: "model/do/app"
         entityPath: "model/entity/app"
-        tables: "app_card_countries"
+        tables: "app_card_categories"
         tplDaoIndexPath: "resource/gen/gen_dao_template_dao.txt"
         tplDaoInternalPath: "resource/gen/gen_dao_template_dao_internal.txt"
         overwriteDao: true

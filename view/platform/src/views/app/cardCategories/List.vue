@@ -52,83 +52,155 @@ const table = reactive({
 			]
 		},
 	},
-	{
-		dataKey: 'name',
-		title: t('app.cardCountries.name.name'),
-		key: 'name',
-		align: 'center',
-		width: 150,
-	},
-	{
-		dataKey: 'isoName',
-		title: t('app.cardCountries.name.isoName'),
-		key: 'isoName',
-		align: 'center',
-		width: 150,
-	},
-	{
-		dataKey: 'currencyCode',
-		title: t('app.cardCountries.name.currencyCode'),
-		key: 'currencyCode',
-		align: 'center',
-		width: 150,
-	},
-	{
-		dataKey: 'currencyName',
-		title: t('app.cardCountries.name.currencyName'),
-		key: 'currencyName',
-		align: 'center',
-		width: 150,
-	},
-	{
-		dataKey: 'flagAvatarID',
-		title: t('app.cardCountries.name.flagAvatarID'),
-		key: 'flagAvatarID',
-		align: 'center',
-		width: 150,
-    cellRenderer: (props: any): any => {
-      console.log(props.rowData.flagAvatarID)
-      if (!props.rowData.flagAvatarID) {
-        return
-      }
-      //const imageList= JSON.parse(props.rowData.avatar)
-      const imageList = [props.rowData.flagAvatarID]
-      const row = props.rowData
-
-      if (row.flagAvatarID && !row.imageLoaded) {
-        row.imageSrc = row.flagAvatarID;
-        row.imageLoaded = true;
-      }
-
-      return [
-        h('div', {class: 'cell-content'}, [
-          h(ElImage as any, {
-            src: row.imageSrc,
-            style: 'width: 90px; height: 60px; cursor: pointer;', // 添加 cursor 样式来指示可点击
-            'preview-teleported': true,
-            'preview-src-list': imageList,
-          }),
-        ]),
-      ];
-    },
-	},
-  // {
-  //   dataKey: 'flagUrl',
-  //   title: t('app.cardCountries.name.flagUrl'),
-  //   key: 'flagUrl',
-  //   align: 'center',
-  //   width: 200,
-  // },
   {
-    dataKey: 'flagAvatar',
-    title: t('app.cardCountries.name.flagAvatar'),
-    key: 'flagAvatar',
+    dataKey: 'name',
+    title: t('app.cardCategories.name.name'),
+    key: 'name',
     align: 'center',
-    width: 150,
+    width: 250,
   },
 	{
+		dataKey: 'avatar_url',
+		title: t('app.cardCategories.name.avatar_url'),
+		key: 'avatar_url',
+		align: 'center',
+		width: 100,
+    cellRenderer: (props: any): any => {
+      if (!props.rowData.avatar_url) {
+        return
+      }
+      const imageList = [props.rowData.avatar_url]
+      return [
+        h(ElScrollbar, {
+          'wrap-style': 'display: flex; align-items: center;',
+          'view-style': 'margin: auto;',
+        }, {
+          default: () => {
+            const content = imageList.map((item) => {
+              return h(ElImage as any, {
+                'style': 'width: 45px;',	//不想显示滚动条，需设置table属性row-height增加行高
+                'src': item,
+                'lazy': true,
+                'hide-on-click-modal': true,
+                'preview-teleported': true,
+                'preview-src-list': imageList
+              })
+            })
+            return content
+          }
+        })
+      ]
+    },
+	},
+  {
+    dataKey: 'avatar',
+    title: t('app.cardCategories.name.avatar'),
+    key: 'avatar',
+    align: 'center',
+    width: 200,
+  },
+  {
+    dataKey: 'sub_id',
+    title: t('app.cardCategories.name.sub_id'),
+    key: 'sub_id',
+    align: 'center',
+    width: 200,
+  },
+	{
+		dataKey: 'sort',
+		title: t('app.cardCategories.name.sort'),
+		key: 'sort',
+		align: 'center',
+		width: 100,
+		sortable: true,
+		cellRenderer: (props: any): any => {
+			if (props.rowData.editSort) {
+				let currentRef: any
+				let currentVal = props.rowData.sort
+				return [
+					h(ElInputNumber as any, {
+						'ref': (el: any) => { currentRef = el; el?.focus() },
+						'model-value': currentVal,
+						'placeholder': t('app.cardCategories.tip.sort'),
+						'precision': 0,
+						'min': 0,
+						'max': 100,
+						'step': 1,
+						'step-strictly': true,
+						'controls': false,	//控制按钮会导致诸多问题。如：焦点丢失；sort是0或100时，只一个按钮可点击
+						'controls-position': 'right',
+						onChange: (val: number) => {
+							currentVal = val
+						},
+						onBlur: () => {
+							props.rowData.editSort = false
+							if ((currentVal || currentVal === 0) && currentVal != props.rowData.sort) {
+								handleUpdate({
+									idArr: [props.rowData.id],
+									sort: currentVal
+								}).then((res) => {
+									props.rowData.sort = currentVal
+								}).catch((error) => {
+								})
+							}
+						},
+						onKeydown: (event: any) => {
+							switch (event.keyCode) {
+								// case 27:	//Esc键：Escape
+								// case 32:	//空格键：" "
+								case 13:	//Enter键：Enter
+									// props.rowData.editSort = false	//也会触发onBlur事件
+									currentRef?.blur()
+									break;
+							}
+						},
+					})
+				]
+			}
+			return [
+				h('div', {
+					class: 'inline-edit',
+					onClick: () => {
+						props.rowData.editSort = true
+					}
+				}, {
+					default: () => props.rowData.sort
+				})
+			]
+		},
+	},
+	{
+		dataKey: 'isActive',
+		title: t('app.cardCategories.name.isActive'),
+		key: 'isActive',
+		align: 'center',
+		width: 100,
+		cellRenderer: (props: any): any => {
+			return [
+				h(ElSwitch as any, {
+					'model-value': props.rowData.isActive,
+					// 'disabled': true,
+					'active-value': 1,
+					'inactive-value': 0,
+					'inline-prompt': true,
+					'active-text': t('common.yes'),
+					'inactive-text': t('common.no'),
+					style: '--el-switch-on-color: var(--el-color-danger); --el-switch-off-color: var(--el-color-success)',
+					onChange: (val: number) => {
+						handleUpdate({
+							idArr: [props.rowData.id],
+							isActive: val
+						}).then((res) => {
+							props.rowData.isActive = val
+						}).catch((error) => { })
+					},
+				})
+			]
+		},
+	},
+	{
 		dataKey: 'isStop',
-		title: t('app.cardCountries.name.isStop'),
+		title: t('app.cardCategories.name.isStop'),
 		key: 'isStop',
 		align: 'center',
 		width: 100,
@@ -236,7 +308,7 @@ const handleBatchDelete = () => {
 }
 //编辑|复制
 const handleEditCopy = (id: number, type: string = 'edit') => {
-	request(t('config.VITE_HTTP_API_PREFIX') + '/app/cardCountries/info', { id: id }).then((res) => {
+	request(t('config.VITE_HTTP_API_PREFIX') + '/app/cardCategories/info', { id: id }).then((res) => {
 		saveCommon.data = { ...res.data.info }
 		switch (type) {
 			case 'edit':
@@ -260,14 +332,14 @@ const handleDelete = (idArr: number[]) => {
 		center: true,
 		showClose: false,
 	}).then(() => {
-		request(t('config.VITE_HTTP_API_PREFIX') + '/app/cardCountries/del', { idArr: idArr }, true).then((res) => {
+		request(t('config.VITE_HTTP_API_PREFIX') + '/app/cardCategories/del', { idArr: idArr }, true).then((res) => {
 			getList()
 		}).catch(() => { })
 	}).catch(() => { })
 }
 //更新
 const handleUpdate = async (param: { idArr: number[], [propName: string]: any }) => {
-	await request(t('config.VITE_HTTP_API_PREFIX') + '/app/cardCountries/update', param, true)
+	await request(t('config.VITE_HTTP_API_PREFIX') + '/app/cardCategories/update', param, true)
 }
 
 //分页
@@ -301,7 +373,7 @@ const getList = async (resetPage: boolean = false) => {
 	}
 	table.loading = true
 	try {
-		const res = await request(t('config.VITE_HTTP_API_PREFIX') + '/app/cardCountries/list', param)
+		const res = await request(t('config.VITE_HTTP_API_PREFIX') + '/app/cardCategories/list', param)
 		table.data = res.data.list?.length ? res.data.list : []
 		pagination.total = res.data.count
 	} catch (error) { }
@@ -329,7 +401,7 @@ defineExpose({
 		</ElCol>
 		<ElCol :span="8" style="text-align: right;">
 			<ElSpace :size="10" style="height: 100%;">
-				<MyExportButton :headerList="table.columns" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/app/cardCountries/list', param: { filter: queryCommon.data, sort: table.sort.key + ' ' + table.sort.order } }" />
+				<MyExportButton :headerList="table.columns" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/app/cardCategories/list', param: { filter: queryCommon.data, sort: table.sort.key + ' ' + table.sort.order } }" />
 				<ElDropdown max-height="300" :hide-on-click="false">
 					<ElButton type="info" :circle="true">
 						<AutoiconEpHide />
@@ -351,22 +423,12 @@ defineExpose({
 	<ElMain>
 		<ElAutoResizer>
 			<template #default="{ height, width }">
-				<ElTableV2 class="main-table" :columns="table.columns" :data="table.data" :sort-by="table.sort" @column-sort="table.handleSort" :width="width" :height="height" :fixed="true" :row-height="100">
+				<ElTableV2 class="main-table" :columns="table.columns" :data="table.data" :sort-by="table.sort" @column-sort="table.handleSort" :width="width" :height="height" :fixed="true" :row-height="70">
 					<template v-if="table.loading" #overlay>
 						<ElIcon class="is-loading" color="var(--el-color-primary)" :size="25">
 							<AutoiconEpLoading />
 						</ElIcon>
 					</template>
-          <template #default="{ row }">
-            <div class="cell-content">
-              <img v-if="row.imageLoaded" :src="row.imageSrc" :style="{ width: '100px', height: '100px' }" />
-            </div>
-
-<!--            <div class="cell-content">-->
-<!--              <img v-if="row.imageLoaded1" :src="row.imageSrc1" :style="{ width: '100px', height: '100px' }" />-->
-<!--            </div>-->
-          </template>
-
 				</ElTableV2>
 			</template>
 		</ElAutoResizer>

@@ -10,6 +10,14 @@ import (
 )
 
 type (
+	IAppCardCategories interface {
+		// 新增
+		Create(ctx context.Context, data map[string]interface{}) (id int64, err error)
+		// 修改
+		Update(ctx context.Context, filter map[string]interface{}, data map[string]interface{}) (row int64, err error)
+		// 删除
+		Delete(ctx context.Context, filter map[string]interface{}) (row int64, err error)
+	}
 	IAppCardCountries interface {
 		// 新增
 		Create(ctx context.Context, data map[string]interface{}) (id int64, err error)
@@ -21,8 +29,20 @@ type (
 )
 
 var (
-	localAppCardCountries IAppCardCountries
+	localAppCardCategories IAppCardCategories
+	localAppCardCountries  IAppCardCountries
 )
+
+func AppCardCategories() IAppCardCategories {
+	if localAppCardCategories == nil {
+		panic("implement not found for interface IAppCardCategories, forgot register?")
+	}
+	return localAppCardCategories
+}
+
+func RegisterAppCardCategories(i IAppCardCategories) {
+	localAppCardCategories = i
+}
 
 func AppCardCountries() IAppCardCountries {
 	if localAppCardCountries == nil {

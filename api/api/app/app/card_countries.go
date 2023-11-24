@@ -11,7 +11,7 @@ type CardCountriesListReq struct {
 	Field  []string                `json:"field" v:"distinct|foreach|min-length:1" dc:"查询字段，传值参考返回的字段名，默认返回全部字段。注意：如前端页面所需字段较少，建议传指定字段，可大幅减轻服务器及数据库压力"`
 	Sort   string                  `json:"sort" default:"id DESC" dc:"排序"`
 	Page   int                     `json:"page" v:"min:1" default:"1" dc:"页码"`
-	Limit  int                     `json:"limit" v:"min:0" default:"10" dc:"每页数量。可传0取全部"`
+	Limit  int                     `json:"limit" v:"min:0" default:"0" dc:"每页数量。可传0取全部"`
 }
 
 type CardCountriesListFilter struct {
@@ -22,8 +22,8 @@ type CardCountriesListFilter struct {
 	//Label          string      `json:"label,omitempty" v:"max-length:30|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"标签。常用于前端组件"`
 	Name         string `json:"name,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:""`
 	IsoName      string `json:"isoName,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:""`
-	CurrencyCode string `json:"currencyCode,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家代码"`
-	CurrencyName string `json:"currencyName,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家名称"`
+	CurrencyCode string `json:"currencyCode,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"货币代码"`
+	CurrencyName string `json:"currencyName,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"货币名称"`
 	//FlagUrl        string      `json:"flagUrl,omitempty" v:"max-length:255|url" dc:""`
 	//FlagAvatar     string      `json:"flagAvatar,omitempty" v:"max-length:255" dc:"国家图片"`
 	FlagAvatarID string `json:"flagAvatarID,omitempty" v:"max-length:255" dc:"图片"`
@@ -40,10 +40,10 @@ type CardCountriesListRes struct {
 type CardCountriesListItem struct {
 	Id *uint `json:"id,omitempty" dc:"ID"`
 	//Label        *string     `json:"label,omitempty" dc:"标签。常用于前端组件"`
-	Name         *string `json:"name,omitempty" dc:""`
-	IsoName      *string `json:"isoName,omitempty" dc:""`
-	CurrencyCode *string `json:"currencyCode,omitempty" dc:"国家代码"`
-	CurrencyName *string `json:"currencyName,omitempty" dc:"国家名称"`
+	Name         *string `json:"name,omitempty" dc:"国家名称"`
+	IsoName      *string `json:"isoName,omitempty" dc:"国家代码"`
+	CurrencyCode *string `json:"currencyCode,omitempty" dc:"货币代码"`
+	CurrencyName *string `json:"currencyName,omitempty" dc:"货币名称"`
 	//FlagUrl      *string     `json:"flagUrl,omitempty" dc:""`
 	//FlagAvatar   *string     `json:"flagAvatar,omitempty" dc:"国家图片"`
 	FlagAvatarID *string `json:"flagAvatarID,omitempty" dc:"图片"`

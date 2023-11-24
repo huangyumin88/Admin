@@ -21,10 +21,10 @@ type CardCountriesListFilter struct {
 	ExcId          *uint       `json:"excId,omitempty" v:"min:1" dc:"排除ID"`
 	ExcIdArr       []uint      `json:"excIdArr,omitempty" v:"distinct|foreach|min:1" dc:"排除ID数组"`
 	Label          string      `json:"label,omitempty" v:"max-length:30|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"标签。常用于前端组件"`
-	Name           string      `json:"name,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:""`
-	IsoName        string      `json:"isoName,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:""`
-	CurrencyCode   string      `json:"currencyCode,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家代码"`
-	CurrencyName   string      `json:"currencyName,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家名称"`
+	Name           string      `json:"name,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家名称"`
+	IsoName        string      `json:"isoName,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家代码"`
+	CurrencyCode   string      `json:"currencyCode,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"货币代码"`
+	CurrencyName   string      `json:"currencyName,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"货币名称"`
 	FlagUrl        string      `json:"flagUrl,omitempty" v:"max-length:255|url" dc:""`
 	FlagAvatar     string      `json:"flagAvatar,omitempty" v:"max-length:255" dc:"国家图片"`
 	FlagAvatarID   string      `json:"flagAvatarID,omitempty" v:"max-length:255" dc:"图片"`
@@ -41,10 +41,10 @@ type CardCountriesListRes struct {
 type CardCountriesListItem struct {
 	Id           *uint       `json:"id,omitempty" dc:"ID"`
 	Label        *string     `json:"label,omitempty" dc:"标签。常用于前端组件"`
-	Name         *string     `json:"name,omitempty" dc:""`
-	IsoName      *string     `json:"isoName,omitempty" dc:""`
-	CurrencyCode *string     `json:"currencyCode,omitempty" dc:"国家代码"`
-	CurrencyName *string     `json:"currencyName,omitempty" dc:"国家名称"`
+	Name         *string     `json:"name,omitempty" dc:"国家名称"`
+	IsoName      *string     `json:"isoName,omitempty" dc:"国家代码"`
+	CurrencyCode *string     `json:"currencyCode,omitempty" dc:"货币代码"`
+	CurrencyName *string     `json:"currencyName,omitempty" dc:"货币名称"`
 	FlagUrl      *string     `json:"flagUrl,omitempty" dc:""`
 	FlagAvatar   *string     `json:"flagAvatar,omitempty" dc:"国家图片"`
 	FlagAvatarID *string     `json:"flagAvatarID,omitempty" dc:"图片"`
@@ -69,10 +69,10 @@ type CardCountriesInfoRes struct {
 type CardCountriesInfo struct {
 	Id           *uint       `json:"id,omitempty" dc:"ID"`
 	Label        *string     `json:"label,omitempty" dc:"标签。常用于前端组件"`
-	Name         *string     `json:"name,omitempty" dc:""`
-	IsoName      *string     `json:"isoName,omitempty" dc:""`
-	CurrencyCode *string     `json:"currencyCode,omitempty" dc:"国家代码"`
-	CurrencyName *string     `json:"currencyName,omitempty" dc:"国家名称"`
+	Name         *string     `json:"name,omitempty" dc:""国家名称`
+	IsoName      *string     `json:"isoName,omitempty" dc:"国家代码"`
+	CurrencyCode *string     `json:"currencyCode,omitempty" dc:"货币代码"`
+	CurrencyName *string     `json:"currencyName,omitempty" dc:"货币名称"`
 	FlagUrl      *string     `json:"flagUrl,omitempty" dc:""`
 	FlagAvatar   *string     `json:"flagAvatar,omitempty" dc:"国家图片"`
 	FlagAvatarID *string     `json:"flagAvatarID,omitempty" dc:"图片"`
@@ -86,10 +86,10 @@ type CardCountriesInfo struct {
 /*--------新增 开始--------*/
 type CardCountriesCreateReq struct {
 	g.Meta       `path:"/cardCountries/create" method:"post" tags:"平台后台/国家" sm:"创建"`
-	Name         *string `json:"name,omitempty" v:"required|max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:""`
-	IsoName      *string `json:"isoName,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:""`
-	CurrencyCode *string `json:"currencyCode,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家代码"`
-	CurrencyName *string `json:"currencyName,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家名称"`
+	Name         *string `json:"name,omitempty" v:"required|max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家代码"`
+	IsoName      *string `json:"isoName,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家名称"`
+	CurrencyCode *string `json:"currencyCode,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"货币代码"`
+	CurrencyName *string `json:"currencyName,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"货币名称"`
 	FlagUrl      *string `json:"flagUrl,omitempty" v:"max-length:255|url" dc:""`
 	FlagAvatar   *string `json:"flagAvatar,omitempty" v:"max-length:255" dc:"国家图片"`
 	FlagAvatarID *string `json:"flagAvatarID,omitempty" v:"max-length:255" dc:"图片"`
@@ -102,10 +102,10 @@ type CardCountriesCreateReq struct {
 type CardCountriesUpdateReq struct {
 	g.Meta       `path:"/cardCountries/update" method:"post" tags:"平台后台/国家" sm:"更新"`
 	IdArr        []uint  `json:"idArr,omitempty" v:"required|distinct|foreach|min:1" dc:"ID数组"`
-	Name         *string `json:"name,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:""`
-	IsoName      *string `json:"isoName,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:""`
-	CurrencyCode *string `json:"currencyCode,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家代码"`
-	CurrencyName *string `json:"currencyName,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家名称"`
+	Name         *string `json:"name,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家名称"`
+	IsoName      *string `json:"isoName,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"国家代码"`
+	CurrencyCode *string `json:"currencyCode,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"货币代码"`
+	CurrencyName *string `json:"currencyName,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"货币名称"`
 	FlagUrl      *string `json:"flagUrl,omitempty" v:"max-length:255|url" dc:""`
 	FlagAvatar   *string `json:"flagAvatar,omitempty" v:"max-length:255" dc:"国家图片"`
 	FlagAvatarID *string `json:"flagAvatarID,omitempty" v:"max-length:255" dc:"图片"`
