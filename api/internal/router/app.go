@@ -8,6 +8,7 @@ import (
 	controllerMy "api/internal/controller/app/my"
 	controllerPlatform "api/internal/controller/app/platform"
 	controllerApp "api/internal/controller/app/app"
+	controllerBanks "api/internal/controller/app/banks"
 	"api/internal/middleware"
 )
 
@@ -51,6 +52,11 @@ func InitRouterApp(s *ghttp.Server) {
 			group.Group(`/app`, func(group *ghttp.RouterGroup) {
 				group.Bind(controllerApp.NewCardCategories())
 				group.Bind(controllerApp.NewCardCountries())
+			})
+
+			group.Group(`/banks`, func(group *ghttp.RouterGroup) {
+				group.Bind(controllerBanks.NewBankCards())
+				group.Bind(controllerBanks.NewBanks())
 			})
 
 			/*--------后端路由自动代码生成锚点（不允许修改和删除，否则将不能自动生成路由）--------*/

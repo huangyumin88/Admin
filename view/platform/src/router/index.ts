@@ -131,6 +131,33 @@ const initRouteList = [
                 },
                 meta: { isAuth: true, keepAlive: true, componentName: '/app/cardCategories' }
             },
+            {
+                path: '/banks/banks',
+                component: async () => {
+                    const component = await import('@/views/banks/banks/Index.vue')
+                    component.default.name = '/banks/banks'
+                    return component
+                },
+                meta: { isAuth: true, keepAlive: true, componentName: '/banks/banks' }
+            },
+            {
+                path: '/banks/banksUser',
+                component: async () => {
+                    const component = await import('@/views/banks/banksUser/Index.vue')
+                    component.default.name = '/banks/banksUser'
+                    return component
+                },
+                meta: { isAuth: true, keepAlive: true, componentName: '/banks/banksUser' }
+            },
+            {
+                path: '/banks/bankCards',
+                component: async () => {
+                    const component = await import('@/views/banks/bankCards/Index.vue')
+                    component.default.name = '/banks/bankCards'
+                    return component
+                },
+                meta: { isAuth: true, keepAlive: true, componentName: '/banks/bankCards' }
+            },
             /*--------前端路由自动代码生成锚点（不允许修改和删除，否则将不能自动生成路由）--------*/
             {
                 path: '/profile',

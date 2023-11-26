@@ -42,7 +42,7 @@ const settingStore = useSettingStore()
     color: #fff;
     background-color: #545c64;
     transition-duration: 0.5s;
-    width: 200px;
+    width: 220px;
 }
 
 #layout-container .el-aside.is-fold {
