@@ -37,9 +37,9 @@ type (
 )
 
 var (
-	localBanksBanksUser IBanksBanksUser
 	localBanksBankCards IBanksBankCards
 	localBanks          IBanks
+	localBanksBanksUser IBanksBanksUser
 )
 
 func BanksBankCards() IBanksBankCards {

@@ -57,6 +57,7 @@ func InitRouterPlatform(s *ghttp.Server) {
 			})
 
 			group.Group(`/app`, func(group *ghttp.RouterGroup) {
+				group.Bind(controllerApp.NewCardCategoriesSub())
 				group.Bind(controllerApp.NewCardCategories())
 				group.Bind(controllerApp.NewCardCountries())
 			})

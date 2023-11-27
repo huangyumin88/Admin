@@ -1,0 +1,132 @@
+<script setup lang="ts">
+const { t, tm } = useI18n()
+
+const saveCommon = inject('saveCommon') as { visible: boolean, title: string, data: { [propName: string]: any } }
+const listCommon = inject('listCommon') as { ref: any }
+
+const saveForm = reactive({
+	ref: null as any,
+	loading: false,
+	data: {
+		sort: 50,
+		isActive: 1,
+		isStop: 0,
+		...saveCommon.data
+	} as { [propName: string]: any },
+	rules: {
+		cate_id: [
+			{ type: 'integer', min: 1, trigger: 'change', message: t('validation.select') },
+		],
+		name: [
+			{ type: 'string', required: true, max: 255, trigger: 'blur', message: t('validation.max.string', { max: 255 }) },
+			{ pattern: /^[\p{L}\p{M}\p{N}_-]+$/u, trigger: 'blur', message: t('validation.alpha_dash') },
+		],
+		rate: [
+			{ type: 'integer', trigger: 'change', message: t('validation.input') },
+		],
+		minAcceptableAmount: [
+			{ type: 'integer', trigger: 'change', message: t('validation.input') },
+		],
+		announcements: [],
+		sort: [
+			{ type: 'integer', min: 0, max: 100, trigger: 'change', message: t('validation.between.number', { min: 0, max: 100 }) },
+		],
+		isActive: [
+			{ type: 'enum', enum: (tm('common.status.whether') as any).map((item: any) => item.value), trigger: 'change', message: t('validation.select') },
+		],
+		isStop: [
+			{ type: 'enum', enum: (tm('common.status.whether') as any).map((item: any) => item.value), trigger: 'change', message: t('validation.select') },
+		],
+		sub_id: [
+			{ type: 'string', max: 30, trigger: 'blur', message: t('validation.max.string', { max: 30 }) },
+		],
+	} as any,
+	submit: () => {
+		saveForm.ref.validate(async (valid: boolean) => {
+			if (!valid) {
+				return false
+			}
+			saveForm.loading = true
+			const param = removeEmptyOfObj(saveForm.data, false)
+			try {
+				if (param?.idArr?.length > 0) {
+					await request(t('config.VITE_HTTP_API_PREFIX') + '/app/cardCategoriesSub/update', param, true)
+				} else {
+					await request(t('config.VITE_HTTP_API_PREFIX') + '/app/cardCategoriesSub/create', param, true)
+				}
+				listCommon.ref.getList(true)
+				saveCommon.visible = false
+			} catch (error) { }
+			saveForm.loading = false
+		})
+	}
+})
+
+const saveDrawer = reactive({
+	ref: null as any,
+	size: useSettingStore().saveDrawer.size,
+	beforeClose: (done: Function) => {
+		if (useSettingStore().saveDrawer.isTipClose) {
+			ElMessageBox.confirm('', {
+				type: 'info',
+				title: t('common.tip.configExit'),
+				center: true,
+				showClose: false,
+			}).then(() => {
+				done()
+			}).catch(() => { })
+		} else {
+			done()
+		}
+	},
+	buttonClose: () => {
+		//saveCommon.visible = false
+		saveDrawer.ref.handleClose()	//会触发beforeClose
+	}
+})
+</script>
+
+<template>
+	<ElDrawer class="save-drawer" :ref="(el: any) => { saveDrawer.ref = el }" v-model="saveCommon.visible" :title="saveCommon.title" :size="saveDrawer.size" :before-close="saveDrawer.beforeClose">
+		<ElScrollbar>
+			<ElForm :ref="(el: any) => { saveForm.ref = el }" :model="saveForm.data" :rules="saveForm.rules" label-width="auto" :status-icon="true" :scroll-to-error="true">
+				<ElFormItem :label="t('app.cardCategoriesSub.name.cate_id')" prop="cate_id">
+					<MySelect v-model="saveForm.data.cate_id" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/app/cate/list' }" />
+				</ElFormItem>
+				<ElFormItem :label="t('app.cardCategoriesSub.name.name')" prop="name">
+					<ElInput v-model="saveForm.data.name" :placeholder="t('app.cardCategoriesSub.name.name')" minlength="1" maxlength="255" :show-word-limit="true" :clearable="true" />
+				</ElFormItem>
+				<ElFormItem :label="t('app.cardCategoriesSub.name.rate')" prop="rate">
+					<ElInputNumber v-model="saveForm.data.rate" :placeholder="t('app.cardCategoriesSub.name.rate')" :controls="false"/>
+				</ElFormItem>
+				<ElFormItem :label="t('app.cardCategoriesSub.name.minAcceptableAmount')" prop="minAcceptableAmount">
+					<ElInputNumber v-model="saveForm.data.minAcceptableAmount" :placeholder="t('app.cardCategoriesSub.name.minAcceptableAmount')" :controls="false"/>
+				</ElFormItem>
+				<ElFormItem :label="t('app.cardCategoriesSub.name.announcements')" prop="announcements">
+					<MyEditor v-model="saveForm.data.announcements" />
+				</ElFormItem>
+				<ElFormItem :label="t('app.cardCategoriesSub.name.sort')" prop="sort">
+					<ElInputNumber v-model="saveForm.data.sort" :precision="0" :min="0" :max="100" :step="1" :step-strictly="true" controls-position="right" :value-on-clear="50" />
+					<label>
+						<ElAlert :title="t('app.cardCategoriesSub.tip.sort')" type="info" :show-icon="true" :closable="false" />
+					</label>
+				</ElFormItem>
+				<ElFormItem :label="t('app.cardCategoriesSub.name.isActive')" prop="isActive">
+					<ElSwitch v-model="saveForm.data.isActive" :active-value="1" :inactive-value="0" :inline-prompt="true" :active-text="t('common.yes')" :inactive-text="t('common.no')" style="--el-switch-on-color: var(--el-color-danger); --el-switch-off-color: var(--el-color-success);" />
+				</ElFormItem>
+				<ElFormItem :label="t('app.cardCategoriesSub.name.isStop')" prop="isStop">
+					<ElSwitch v-model="saveForm.data.isStop" :active-value="1" :inactive-value="0" :inline-prompt="true" :active-text="t('common.yes')" :inactive-text="t('common.no')" style="--el-switch-on-color: var(--el-color-danger); --el-switch-off-color: var(--el-color-success);" />
+				</ElFormItem>
+				<ElFormItem :label="t('app.cardCategoriesSub.name.sub_id')" prop="sub_id">
+					<ElInput v-model="saveForm.data.sub_id" :placeholder="t('app.cardCategoriesSub.name.sub_id')" minlength="1" maxlength="30" :show-word-limit="true" :clearable="true" />
+				</ElFormItem>
+			</ElForm>
+		</ElScrollbar>
+		<template #footer>
+			<ElButton @click="saveDrawer.buttonClose">{{ t('common.cancel') }}</ElButton>
+			<ElButton type="primary" @click="saveForm.submit" :loading="saveForm.loading">
+				{{ t('common.save') }}
+			</ElButton>
+		</template>
+	</ElDrawer>
+</template>

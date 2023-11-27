@@ -8,18 +8,19 @@ import (
 	"api/internal/service"
 	"api/internal/utils"
 	"context"
+
 	"github.com/gogf/gf/v2/container/gset"
 	"github.com/gogf/gf/v2/util/gconv"
 )
 
-type CardCategories struct{}
+type CardCategoriesSub struct{}
 
-func NewCardCategories() *CardCategories {
-	return &CardCategories{}
+func NewCardCategoriesSub() *CardCategoriesSub {
+	return &CardCategoriesSub{}
 }
 
 // 列表
-func (controllerThis *CardCategories) List(ctx context.Context, req *apiApp.CardCategoriesListReq) (res *apiApp.CardCategoriesListRes, err error) {
+func (controllerThis *CardCategoriesSub) List(ctx context.Context, req *apiApp.CardCategoriesSubListReq) (res *apiApp.CardCategoriesSubListRes, err error) {
 	/**--------参数处理 开始--------**/
 	filter := gconv.MapDeep(req.Filter)
 	if filter == nil {
@@ -29,9 +30,9 @@ func (controllerThis *CardCategories) List(ctx context.Context, req *apiApp.Card
 	page := req.Page
 	limit := req.Limit
 
-	columnsThis := daoApp.CardCategories.Columns()
-	allowField := daoApp.CardCategories.ColumnArr()
-	allowField = append(allowField, `id`, `label`)
+	columnsThis := daoApp.CardCategoriesSub.Columns()
+	allowField := daoApp.CardCategoriesSub.ColumnArr()
+	allowField = append(allowField, `id`)
 	field := allowField
 	if len(req.Field) > 0 {
 		field = gset.NewStrSetFrom(req.Field).Intersect(gset.NewStrSetFrom(allowField)).Slice()
@@ -42,15 +43,13 @@ func (controllerThis *CardCategories) List(ctx context.Context, req *apiApp.Card
 	/**--------参数处理 结束--------**/
 
 	/**--------权限验证 开始--------**/
-	isAuth, _ := service.AuthAction().CheckAuth(ctx, `appCardCategoriesLook`)
+	isAuth, _ := service.AuthAction().CheckAuth(ctx, `appCardCategoriesSubLook`)
 	if !isAuth {
 		field = []string{`id`, columnsThis.Name}
 	}
 	/**--------权限验证 结束--------**/
 
-	//fmt.Println("field", field)
-
-	daoHandlerThis := dao.NewDaoHandler(ctx, &daoApp.CardCategories)
+	daoHandlerThis := dao.NewDaoHandler(ctx, &daoApp.CardCategoriesSub)
 	daoHandlerThis.Filter(filter)
 	count, err := daoHandlerThis.Count()
 	if err != nil {
@@ -61,15 +60,15 @@ func (controllerThis *CardCategories) List(ctx context.Context, req *apiApp.Card
 		return
 	}
 
-	res = &apiApp.CardCategoriesListRes{Count: count, List: []apiApp.CardCategoriesListItem{}}
+	res = &apiApp.CardCategoriesSubListRes{Count: count, List: []apiApp.CardCategoriesSubListItem{}}
 	list.Structs(&res.List)
 	return
 }
 
 // 详情
-func (controllerThis *CardCategories) Info(ctx context.Context, req *apiApp.CardCategoriesInfoReq) (res *apiApp.CardCategoriesInfoRes, err error) {
+func (controllerThis *CardCategoriesSub) Info(ctx context.Context, req *apiApp.CardCategoriesSubInfoReq) (res *apiApp.CardCategoriesSubInfoRes, err error) {
 	/**--------参数处理 开始--------**/
-	allowField := daoApp.CardCategories.ColumnArr()
+	allowField := daoApp.CardCategoriesSub.ColumnArr()
 	allowField = append(allowField, `id`)
 	field := allowField
 	if len(req.Field) > 0 {
@@ -82,13 +81,13 @@ func (controllerThis *CardCategories) Info(ctx context.Context, req *apiApp.Card
 	/**--------参数处理 结束--------**/
 
 	/**--------权限验证 开始--------**/
-	_, err = service.AuthAction().CheckAuth(ctx, `appCardCategoriesLook`)
+	_, err = service.AuthAction().CheckAuth(ctx, `appCardCategoriesSubLook`)
 	if err != nil {
 		return
 	}
 	/**--------权限验证 结束--------**/
 
-	info, err := dao.NewDaoHandler(ctx, &daoApp.CardCategories).Filter(filter).Field(field).JoinGroupByPrimaryKey().GetModel().One()
+	info, err := dao.NewDaoHandler(ctx, &daoApp.CardCategoriesSub).Filter(filter).Field(field).JoinGroupByPrimaryKey().GetModel().One()
 	if err != nil {
 		return
 	}
@@ -97,25 +96,25 @@ func (controllerThis *CardCategories) Info(ctx context.Context, req *apiApp.Card
 		return
 	}
 
-	res = &apiApp.CardCategoriesInfoRes{}
+	res = &apiApp.CardCategoriesSubInfoRes{}
 	info.Struct(&res.Info)
 	return
 }
 
 // 新增
-func (controllerThis *CardCategories) Create(ctx context.Context, req *apiApp.CardCategoriesCreateReq) (res *api.CommonCreateRes, err error) {
+func (controllerThis *CardCategoriesSub) Create(ctx context.Context, req *apiApp.CardCategoriesSubCreateReq) (res *api.CommonCreateRes, err error) {
 	/**--------参数处理 开始--------**/
 	data := gconv.MapDeep(req)
 	/**--------参数处理 结束--------**/
 
 	/**--------权限验证 开始--------**/
-	_, err = service.AuthAction().CheckAuth(ctx, `appCardCategoriesCreate`)
+	_, err = service.AuthAction().CheckAuth(ctx, `appCardCategoriesSubCreate`)
 	if err != nil {
 		return
 	}
 	/**--------权限验证 结束--------**/
 
-	id, err := service.AppCardCategories().Create(ctx, data)
+	id, err := service.AppCardCategoriesSub().Create(ctx, data)
 	if err != nil {
 		return
 	}
@@ -124,7 +123,7 @@ func (controllerThis *CardCategories) Create(ctx context.Context, req *apiApp.Ca
 }
 
 // 修改
-func (controllerThis *CardCategories) Update(ctx context.Context, req *apiApp.CardCategoriesUpdateReq) (res *api.CommonNoDataRes, err error) {
+func (controllerThis *CardCategoriesSub) Update(ctx context.Context, req *apiApp.CardCategoriesSubUpdateReq) (res *api.CommonNoDataRes, err error) {
 	/**--------参数处理 开始--------**/
 	data := gconv.MapDeep(req)
 	delete(data, `idArr`)
@@ -136,29 +135,29 @@ func (controllerThis *CardCategories) Update(ctx context.Context, req *apiApp.Ca
 	/**--------参数处理 结束--------**/
 
 	/**--------权限验证 开始--------**/
-	_, err = service.AuthAction().CheckAuth(ctx, `appCardCategoriesUpdate`)
+	_, err = service.AuthAction().CheckAuth(ctx, `appCardCategoriesSubUpdate`)
 	if err != nil {
 		return
 	}
 	/**--------权限验证 结束--------**/
 
-	_, err = service.AppCardCategories().Update(ctx, filter, data)
+	_, err = service.AppCardCategoriesSub().Update(ctx, filter, data)
 	return
 }
 
 // 删除
-func (controllerThis *CardCategories) Delete(ctx context.Context, req *apiApp.CardCategoriesDeleteReq) (res *api.CommonNoDataRes, err error) {
+func (controllerThis *CardCategoriesSub) Delete(ctx context.Context, req *apiApp.CardCategoriesSubDeleteReq) (res *api.CommonNoDataRes, err error) {
 	/**--------参数处理 开始--------**/
 	filter := map[string]interface{}{`id`: req.IdArr}
 	/**--------参数处理 结束--------**/
 
 	/**--------权限验证 开始--------**/
-	_, err = service.AuthAction().CheckAuth(ctx, `appCardCategoriesDelete`)
+	_, err = service.AuthAction().CheckAuth(ctx, `appCardCategoriesSubDelete`)
 	if err != nil {
 		return
 	}
 	/**--------权限验证 结束--------**/
 
-	_, err = service.AppCardCategories().Delete(ctx, filter)
+	_, err = service.AppCardCategoriesSub().Delete(ctx, filter)
 	return
 }

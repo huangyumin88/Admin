@@ -17,24 +17,24 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 )
 
-// internalCardCategoriesDao is internal type for wrapping internal DAO implements.
-type internalCardCategoriesDao = *internal.CardCategoriesDao
+// internalCardCategoriesSubDao is internal type for wrapping internal DAO implements.
+type internalCardCategoriesSubDao = *internal.CardCategoriesSubDao
 
-// cardCategoriesDao is the data access object for table app_card_categories.
+// cardCategoriesSubDao is the data access object for table app_card_categories_sub.
 // You can define custom methods on it to extend its functionality as you wish.
-type cardCategoriesDao struct {
-	internalCardCategoriesDao
+type cardCategoriesSubDao struct {
+	internalCardCategoriesSubDao
 }
 
 var (
-	// CardCategories is globally public accessible object for table app_card_categories operations.
-	CardCategories = cardCategoriesDao{
-		internal.NewCardCategoriesDao(),
+	// CardCategoriesSub is globally public accessible object for table app_card_categories_sub operations.
+	CardCategoriesSub = cardCategoriesSubDao{
+		internal.NewCardCategoriesSubDao(),
 	}
 )
 
 // 解析分库
-func (daoThis *cardCategoriesDao) ParseDbGroup(ctx context.Context, dbGroupSelData ...map[string]interface{}) string {
+func (daoThis *cardCategoriesSubDao) ParseDbGroup(ctx context.Context, dbGroupSelData ...map[string]interface{}) string {
 	group := daoThis.Group()
 	// 分库逻辑
 	/* if len(dbGroupSelData) > 0 {
@@ -43,7 +43,7 @@ func (daoThis *cardCategoriesDao) ParseDbGroup(ctx context.Context, dbGroupSelDa
 }
 
 // 解析分表
-func (daoThis *cardCategoriesDao) ParseDbTable(ctx context.Context, dbTableSelData ...map[string]interface{}) string {
+func (daoThis *cardCategoriesSubDao) ParseDbTable(ctx context.Context, dbTableSelData ...map[string]interface{}) string {
 	table := daoThis.Table()
 	// 分表逻辑
 	/* if len(dbTableSelData) > 0 {
@@ -52,7 +52,7 @@ func (daoThis *cardCategoriesDao) ParseDbTable(ctx context.Context, dbTableSelDa
 }
 
 // 解析分库分表（对外暴露使用）
-func (daoThis *cardCategoriesDao) ParseDbCtx(ctx context.Context, dbSelDataList ...map[string]interface{}) *gdb.Model {
+func (daoThis *cardCategoriesSubDao) ParseDbCtx(ctx context.Context, dbSelDataList ...map[string]interface{}) *gdb.Model {
 	switch len(dbSelDataList) {
 	case 1:
 		return g.DB(daoThis.ParseDbGroup(ctx, dbSelDataList[0])).Model(daoThis.ParseDbTable(ctx)).Ctx(ctx)
@@ -64,7 +64,7 @@ func (daoThis *cardCategoriesDao) ParseDbCtx(ctx context.Context, dbSelDataList 
 }
 
 // 解析insert
-func (daoThis *cardCategoriesDao) ParseInsert(insert map[string]interface{}) gdb.ModelHandler {
+func (daoThis *cardCategoriesSubDao) ParseInsert(insert map[string]interface{}) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		insertData := map[string]interface{}{}
 		hookData := map[string]interface{}{}
@@ -87,7 +87,7 @@ func (daoThis *cardCategoriesDao) ParseInsert(insert map[string]interface{}) gdb
 }
 
 // hook insert
-func (daoThis *cardCategoriesDao) HookInsert(data map[string]interface{}) gdb.HookHandler {
+func (daoThis *cardCategoriesSubDao) HookInsert(data map[string]interface{}) gdb.HookHandler {
 	return gdb.HookHandler{
 		Insert: func(ctx context.Context, in *gdb.HookInsertInput) (result sql.Result, err error) {
 			result, err = in.Next(ctx)
@@ -101,7 +101,7 @@ func (daoThis *cardCategoriesDao) HookInsert(data map[string]interface{}) gdb.Ho
 }
 
 // 解析update
-func (daoThis *cardCategoriesDao) ParseUpdate(update map[string]interface{}) gdb.ModelHandler {
+func (daoThis *cardCategoriesSubDao) ParseUpdate(update map[string]interface{}) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -137,7 +137,7 @@ func (daoThis *cardCategoriesDao) ParseUpdate(update map[string]interface{}) gdb
 }
 
 // hook update
-func (daoThis *cardCategoriesDao) HookUpdate(data map[string]interface{}, idArr ...uint) gdb.HookHandler {
+func (daoThis *cardCategoriesSubDao) HookUpdate(data map[string]interface{}, idArr ...uint) gdb.HookHandler {
 	return gdb.HookHandler{
 		Update: func(ctx context.Context, in *gdb.HookUpdateInput) (result sql.Result, err error) {
 			/* //不能这样拿idArr，联表时会有bug
@@ -160,7 +160,7 @@ func (daoThis *cardCategoriesDao) HookUpdate(data map[string]interface{}, idArr 
 }
 
 // hook delete
-func (daoThis *cardCategoriesDao) HookDelete(idArr ...uint) gdb.HookHandler {
+func (daoThis *cardCategoriesSubDao) HookDelete(idArr ...uint) gdb.HookHandler {
 	return gdb.HookHandler{
 		Delete: func(ctx context.Context, in *gdb.HookDeleteInput) (result sql.Result, err error) {
 			result, err = in.Next(ctx)
@@ -177,7 +177,7 @@ func (daoThis *cardCategoriesDao) HookDelete(idArr ...uint) gdb.HookHandler {
 }
 
 // 解析field
-func (daoThis *cardCategoriesDao) ParseField(field []string, fieldWithParam map[string]interface{}, afterField *[]string, afterFieldWithParam map[string]interface{}, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *cardCategoriesSubDao) ParseField(field []string, fieldWithParam map[string]interface{}, afterField *[]string, afterFieldWithParam map[string]interface{}, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -186,10 +186,10 @@ func (daoThis *cardCategoriesDao) ParseField(field []string, fieldWithParam map[
 			/* case `xxxx`:
 			m = m.Handler(daoThis.ParseJoin(Xxxx.ParseDbTable(ctx), joinTableArr))
 			*afterField = append(*afterField, v) */
-			case `label`:
-				m = m.Fields(tableThis + `.` + daoThis.Columns().Name + ` AS ` + v)
 			case `id`:
 				m = m.Fields(tableThis + `.` + daoThis.PrimaryKey() + ` AS ` + v)
+			case `label`:
+				m = m.Fields(tableThis + `.` + daoThis.Columns().Name + ` AS ` + v)
 			default:
 				if daoThis.ColumnArrG().Contains(v) {
 					m = m.Fields(tableThis + `.` + v)
@@ -209,7 +209,7 @@ func (daoThis *cardCategoriesDao) ParseField(field []string, fieldWithParam map[
 }
 
 // hook select
-func (daoThis *cardCategoriesDao) HookSelect(afterField *[]string, afterFieldWithParam map[string]interface{}) gdb.HookHandler {
+func (daoThis *cardCategoriesSubDao) HookSelect(afterField *[]string, afterFieldWithParam map[string]interface{}) gdb.HookHandler {
 	return gdb.HookHandler{
 		Select: func(ctx context.Context, in *gdb.HookSelectInput) (result gdb.Result, err error) {
 			result, err = in.Next(ctx)
@@ -236,7 +236,7 @@ func (daoThis *cardCategoriesDao) HookSelect(afterField *[]string, afterFieldWit
 }
 
 // 解析filter
-func (daoThis *cardCategoriesDao) ParseFilter(filter map[string]interface{}, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *cardCategoriesSubDao) ParseFilter(filter map[string]interface{}, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -254,6 +254,14 @@ func (daoThis *cardCategoriesDao) ParseFilter(filter map[string]interface{}, joi
 				}
 			case `id`, `idArr`:
 				m = m.Where(tableThis+`.`+daoThis.PrimaryKey(), v)
+			case `label`:
+				m = m.WhereLike(tableThis+`.`+daoThis.Columns().Name, `%`+gconv.String(v)+`%`)
+			case daoThis.Columns().Name:
+				m = m.WhereLike(tableThis+`.`+k, `%`+gconv.String(v)+`%`)
+			case `timeRangeStart`:
+				m = m.WhereGTE(tableThis+`.`+daoThis.Columns().CreatedAt, v)
+			case `timeRangeEnd`:
+				m = m.WhereLTE(tableThis+`.`+daoThis.Columns().CreatedAt, v)
 			default:
 				if daoThis.ColumnArrG().Contains(k) {
 					m = m.Where(tableThis+`.`+k, v)
@@ -267,7 +275,7 @@ func (daoThis *cardCategoriesDao) ParseFilter(filter map[string]interface{}, joi
 }
 
 // 解析group
-func (daoThis *cardCategoriesDao) ParseGroup(group []string, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *cardCategoriesSubDao) ParseGroup(group []string, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -288,7 +296,7 @@ func (daoThis *cardCategoriesDao) ParseGroup(group []string, joinTableArr *[]str
 }
 
 // 解析order
-func (daoThis *cardCategoriesDao) ParseOrder(order []string, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *cardCategoriesSubDao) ParseOrder(order []string, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -298,6 +306,9 @@ func (daoThis *cardCategoriesDao) ParseOrder(order []string, joinTableArr *[]str
 			switch k {
 			case `id`:
 				m = m.Order(tableThis + `.` + gstr.Replace(v, k, daoThis.PrimaryKey(), 1))
+			case daoThis.Columns().Sort:
+				m = m.Order(tableThis + `.` + v)
+				m = m.OrderDesc(tableThis + `.` + daoThis.PrimaryKey())
 			default:
 				if daoThis.ColumnArrG().Contains(k) {
 					m = m.Order(tableThis + `.` + v)
@@ -311,7 +322,7 @@ func (daoThis *cardCategoriesDao) ParseOrder(order []string, joinTableArr *[]str
 }
 
 // 解析join
-func (daoThis *cardCategoriesDao) ParseJoin(joinCode string, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *cardCategoriesSubDao) ParseJoin(joinCode string, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		if garray.NewStrArrayFrom(*joinTableArr).Contains(joinCode) {
 			return m
