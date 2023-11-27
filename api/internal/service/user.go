@@ -18,10 +18,19 @@ type (
 		// 删除
 		Delete(ctx context.Context, filter map[string]interface{}) (row int64, err error)
 	}
+	IUserWallets interface {
+		// 新增
+		Create(ctx context.Context, data map[string]interface{}) (id int64, err error)
+		// 修改
+		Update(ctx context.Context, filter map[string]interface{}, data map[string]interface{}) (row int64, err error)
+		// 删除
+		Delete(ctx context.Context, filter map[string]interface{}) (row int64, err error)
+	}
 )
 
 var (
-	localUser IUser
+	localUser        IUser
+	localUserWallets IUserWallets
 )
 
 func User() IUser {
@@ -33,4 +42,15 @@ func User() IUser {
 
 func RegisterUser(i IUser) {
 	localUser = i
+}
+
+func UserWallets() IUserWallets {
+	if localUserWallets == nil {
+		panic("implement not found for interface IUserWallets, forgot register?")
+	}
+	return localUserWallets
+}
+
+func RegisterUserWallets(i IUserWallets) {
+	localUserWallets = i
 }

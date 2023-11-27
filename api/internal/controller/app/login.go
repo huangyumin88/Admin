@@ -7,8 +7,10 @@ import (
 	"api/internal/dao"
 	daoAuth "api/internal/dao/auth"
 	daoUser "api/internal/dao/user"
+	"api/internal/service"
 	"api/internal/utils"
 	"context"
+	"fmt"
 
 	"github.com/gogf/gf/v2/frame/g"
 )
@@ -164,6 +166,36 @@ func (controllerThis *Login) Register(ctx context.Context, req *apiCurrent.Login
 
 	userId, err := dao.NewDaoHandler(ctx, &daoUser.User).Insert(data).GetModel().InsertAndGetId()
 	if err != nil {
+		return
+	}
+
+	data1 := make(map[string]interface{})
+	data1["user_id"] = userId
+
+	// 创建钱包
+	walletId, err := service.UserWallets().Create(ctx, data1)
+	daoThis := daoUser.User
+	daoUserWallets := daoUser.Wallets
+	if err != nil {
+
+		service.User().Delete(ctx, g.Map{daoThis.PrimaryKey(): userId})
+		return
+	}
+
+	data2 := make(map[string]interface{})
+	data2["wallet_id"] = walletId
+
+	fmt.Println("wallet_id", walletId)
+
+	filter := map[string]interface{}{`userId`: userId}
+	/**--------参数处理 结束--------**/
+
+	_, err = service.User().Update(ctx, filter, data2)
+
+	if err != nil {
+
+		service.User().Delete(ctx, g.Map{daoThis.PrimaryKey(): userId})
+		service.UserWallets().Delete(ctx, g.Map{daoUserWallets.PrimaryKey(): walletId})
 		return
 	}
 

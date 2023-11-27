@@ -42,6 +42,17 @@ var (
 	localAppCardCountries     IAppCardCountries
 )
 
+func AppCardCountries() IAppCardCountries {
+	if localAppCardCountries == nil {
+		panic("implement not found for interface IAppCardCountries, forgot register?")
+	}
+	return localAppCardCountries
+}
+
+func RegisterAppCardCountries(i IAppCardCountries) {
+	localAppCardCountries = i
+}
+
 func AppCardCategories() IAppCardCategories {
 	if localAppCardCategories == nil {
 		panic("implement not found for interface IAppCardCategories, forgot register?")
@@ -62,15 +73,4 @@ func AppCardCategoriesSub() IAppCardCategoriesSub {
 
 func RegisterAppCardCategoriesSub(i IAppCardCategoriesSub) {
 	localAppCardCategoriesSub = i
-}
-
-func AppCardCountries() IAppCardCountries {
-	if localAppCardCountries == nil {
-		panic("implement not found for interface IAppCardCountries, forgot register?")
-	}
-	return localAppCardCountries
-}
-
-func RegisterAppCardCountries(i IAppCardCountries) {
-	localAppCardCountries = i
 }

@@ -53,6 +53,7 @@ func InitRouterPlatform(s *ghttp.Server) {
 			})
 
 			group.Group(`/user`, func(group *ghttp.RouterGroup) {
+				group.Bind(controllerUser.NewWallets())
 				group.Bind(controllerUser.NewUser())
 			})
 

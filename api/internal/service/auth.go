@@ -10,6 +10,14 @@ import (
 )
 
 type (
+	IAuthScene interface {
+		// 新增
+		Create(ctx context.Context, data map[string]interface{}) (id int64, err error)
+		// 修改
+		Update(ctx context.Context, filter map[string]interface{}, data map[string]interface{}) (row int64, err error)
+		// 删除
+		Delete(ctx context.Context, filter map[string]interface{}) (row int64, err error)
+	}
 	IAuthAction interface {
 		// 新增
 		Create(ctx context.Context, data map[string]interface{}) (id int64, err error)
@@ -36,21 +44,13 @@ type (
 		// 删除
 		Delete(ctx context.Context, filter map[string]interface{}) (row int64, err error)
 	}
-	IAuthScene interface {
-		// 新增
-		Create(ctx context.Context, data map[string]interface{}) (id int64, err error)
-		// 修改
-		Update(ctx context.Context, filter map[string]interface{}, data map[string]interface{}) (row int64, err error)
-		// 删除
-		Delete(ctx context.Context, filter map[string]interface{}) (row int64, err error)
-	}
 )
 
 var (
-	localAuthRole   IAuthRole
 	localAuthScene  IAuthScene
 	localAuthAction IAuthAction
 	localAuthMenu   IAuthMenu
+	localAuthRole   IAuthRole
 )
 
 func AuthAction() IAuthAction {

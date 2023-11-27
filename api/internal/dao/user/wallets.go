@@ -8,6 +8,7 @@ import (
 	"api/internal/dao/user/internal"
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/container/gvar"
@@ -17,24 +18,24 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 )
 
-// internalUserDao is internal type for wrapping internal DAO implements.
-type internalUserDao = *internal.UserDao
+// internalWalletsDao is internal type for wrapping internal DAO implements.
+type internalWalletsDao = *internal.WalletsDao
 
-// userDao is the data access object for table user.
+// walletsDao is the data access object for table app_card_wallets.
 // You can define custom methods on it to extend its functionality as you wish.
-type userDao struct {
-	internalUserDao
+type walletsDao struct {
+	internalWalletsDao
 }
 
 var (
-	// User is globally public accessible object for table user operations.
-	User = userDao{
-		internal.NewUserDao(),
+	// Wallets is globally public accessible object for table app_card_wallets operations.
+	Wallets = walletsDao{
+		internal.NewWalletsDao(),
 	}
 )
 
 // 解析分库
-func (daoThis *userDao) ParseDbGroup(ctx context.Context, dbGroupSelData ...map[string]interface{}) string {
+func (daoThis *walletsDao) ParseDbGroup(ctx context.Context, dbGroupSelData ...map[string]interface{}) string {
 	group := daoThis.Group()
 	// 分库逻辑
 	/* if len(dbGroupSelData) > 0 {
@@ -43,7 +44,7 @@ func (daoThis *userDao) ParseDbGroup(ctx context.Context, dbGroupSelData ...map[
 }
 
 // 解析分表
-func (daoThis *userDao) ParseDbTable(ctx context.Context, dbTableSelData ...map[string]interface{}) string {
+func (daoThis *walletsDao) ParseDbTable(ctx context.Context, dbTableSelData ...map[string]interface{}) string {
 	table := daoThis.Table()
 	// 分表逻辑
 	/* if len(dbTableSelData) > 0 {
@@ -52,7 +53,7 @@ func (daoThis *userDao) ParseDbTable(ctx context.Context, dbTableSelData ...map[
 }
 
 // 解析分库分表（对外暴露使用）
-func (daoThis *userDao) ParseDbCtx(ctx context.Context, dbSelDataList ...map[string]interface{}) *gdb.Model {
+func (daoThis *walletsDao) ParseDbCtx(ctx context.Context, dbSelDataList ...map[string]interface{}) *gdb.Model {
 	switch len(dbSelDataList) {
 	case 1:
 		return g.DB(daoThis.ParseDbGroup(ctx, dbSelDataList[0])).Model(daoThis.ParseDbTable(ctx)).Ctx(ctx)
@@ -64,7 +65,7 @@ func (daoThis *userDao) ParseDbCtx(ctx context.Context, dbSelDataList ...map[str
 }
 
 // 解析insert
-func (daoThis *userDao) ParseInsert(insert map[string]interface{}) gdb.ModelHandler {
+func (daoThis *walletsDao) ParseInsert(insert map[string]interface{}) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		insertData := map[string]interface{}{}
 		hookData := map[string]interface{}{}
@@ -87,7 +88,7 @@ func (daoThis *userDao) ParseInsert(insert map[string]interface{}) gdb.ModelHand
 }
 
 // hook insert
-func (daoThis *userDao) HookInsert(data map[string]interface{}) gdb.HookHandler {
+func (daoThis *walletsDao) HookInsert(data map[string]interface{}) gdb.HookHandler {
 	return gdb.HookHandler{
 		Insert: func(ctx context.Context, in *gdb.HookInsertInput) (result sql.Result, err error) {
 			result, err = in.Next(ctx)
@@ -101,7 +102,7 @@ func (daoThis *userDao) HookInsert(data map[string]interface{}) gdb.HookHandler 
 }
 
 // 解析update
-func (daoThis *userDao) ParseUpdate(update map[string]interface{}) gdb.ModelHandler {
+func (daoThis *walletsDao) ParseUpdate(update map[string]interface{}) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -137,7 +138,7 @@ func (daoThis *userDao) ParseUpdate(update map[string]interface{}) gdb.ModelHand
 }
 
 // hook update
-func (daoThis *userDao) HookUpdate(data map[string]interface{}, idArr ...uint) gdb.HookHandler {
+func (daoThis *walletsDao) HookUpdate(data map[string]interface{}, idArr ...uint) gdb.HookHandler {
 	return gdb.HookHandler{
 		Update: func(ctx context.Context, in *gdb.HookUpdateInput) (result sql.Result, err error) {
 			/* //不能这样拿idArr，联表时会有bug
@@ -160,7 +161,7 @@ func (daoThis *userDao) HookUpdate(data map[string]interface{}, idArr ...uint) g
 }
 
 // hook delete
-func (daoThis *userDao) HookDelete(idArr ...uint) gdb.HookHandler {
+func (daoThis *walletsDao) HookDelete(idArr ...uint) gdb.HookHandler {
 	return gdb.HookHandler{
 		Delete: func(ctx context.Context, in *gdb.HookDeleteInput) (result sql.Result, err error) {
 			result, err = in.Next(ctx)
@@ -177,7 +178,7 @@ func (daoThis *userDao) HookDelete(idArr ...uint) gdb.HookHandler {
 }
 
 // 解析field
-func (daoThis *userDao) ParseField(field []string, fieldWithParam map[string]interface{}, afterField *[]string, afterFieldWithParam map[string]interface{}, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *walletsDao) ParseField(field []string, fieldWithParam map[string]interface{}, afterField *[]string, afterFieldWithParam map[string]interface{}, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -186,9 +187,8 @@ func (daoThis *userDao) ParseField(field []string, fieldWithParam map[string]int
 			/* case `xxxx`:
 			m = m.Handler(daoThis.ParseJoin(Xxxx.ParseDbTable(ctx), joinTableArr))
 			*afterField = append(*afterField, v) */
-			case `label`:
-				m = m.Fields(tableThis + `.` + daoThis.Columns().Account + ` AS ` + v)
-
+			//case `label`:
+			//	m = m.Fields(tableThis + `.` + daoThis.Columns().Name + ` AS ` + v)
 			case `id`:
 				m = m.Fields(tableThis + `.` + daoThis.PrimaryKey() + ` AS ` + v)
 			default:
@@ -210,7 +210,7 @@ func (daoThis *userDao) ParseField(field []string, fieldWithParam map[string]int
 }
 
 // hook select
-func (daoThis *userDao) HookSelect(afterField *[]string, afterFieldWithParam map[string]interface{}) gdb.HookHandler {
+func (daoThis *walletsDao) HookSelect(afterField *[]string, afterFieldWithParam map[string]interface{}) gdb.HookHandler {
 	return gdb.HookHandler{
 		Select: func(ctx context.Context, in *gdb.HookSelectInput) (result gdb.Result, err error) {
 			result, err = in.Next(ctx)
@@ -237,7 +237,7 @@ func (daoThis *userDao) HookSelect(afterField *[]string, afterFieldWithParam map
 }
 
 // 解析filter
-func (daoThis *userDao) ParseFilter(filter map[string]interface{}, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *walletsDao) ParseFilter(filter map[string]interface{}, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -268,7 +268,7 @@ func (daoThis *userDao) ParseFilter(filter map[string]interface{}, joinTableArr 
 }
 
 // 解析group
-func (daoThis *userDao) ParseGroup(group []string, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *walletsDao) ParseGroup(group []string, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -289,7 +289,7 @@ func (daoThis *userDao) ParseGroup(group []string, joinTableArr *[]string) gdb.M
 }
 
 // 解析order
-func (daoThis *userDao) ParseOrder(order []string, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *walletsDao) ParseOrder(order []string, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -312,7 +312,7 @@ func (daoThis *userDao) ParseOrder(order []string, joinTableArr *[]string) gdb.M
 }
 
 // 解析join
-func (daoThis *userDao) ParseJoin(joinCode string, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *walletsDao) ParseJoin(joinCode string, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		if garray.NewStrArrayFrom(*joinTableArr).Contains(joinCode) {
 			return m
@@ -320,10 +320,12 @@ func (daoThis *userDao) ParseJoin(joinCode string, joinTableArr *[]string) gdb.M
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
 		*joinTableArr = append(*joinTableArr, joinCode)
+		fmt.Println("Join: ", joinCode)
 		switch joinCode {
-		/* case Xxxx.ParseDbTable(ctx):
-		m = m.LeftJoin(joinCode, joinCode+`.`+Xxxx.Columns().XxxxId+` = `+tableThis+`.`+daoThis.PrimaryKey())
-		// m = m.LeftJoin(Xxxx.ParseDbTable(ctx)+` AS `+joinCode, joinCode+`.`+Xxxx.Columns().XxxxId+` = `+tableThis+`.`+daoThis.PrimaryKey()) */
+		//case User.ParseDbTable(ctx):
+		//	m = m.LeftJoin(joinCode, joinCode+`.`+User.Columns().UserId+` = `+tableThis+`.`+daoThis.PrimaryKey())
+		//	fmt.Println("Join: ", joinCode)
+		// m = m.LeftJoin(Xxxx.ParseDbTable(ctx)+` AS `+joinCode, joinCode+`.`+Xxxx.Columns().XxxxId+` = `+tableThis+`.`+daoThis.PrimaryKey())
 		default:
 			m = m.LeftJoin(joinCode, joinCode+`.`+daoThis.PrimaryKey()+` = `+tableThis+`.`+daoThis.PrimaryKey())
 		}

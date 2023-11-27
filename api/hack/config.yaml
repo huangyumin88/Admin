@@ -12,11 +12,11 @@ gfcli:
     dao:
       - link: "mysql:web_card_db:5ZKejwsiwhnT8sRG@tcp(47.111.166.24:3306)/web_card_db"
         group: "default"
-        removePrefix: "app_"
-        daoPath: "dao/app"
-        doPath: "model/do/app"
-        entityPath: "model/entity/app"
-        tables: "app_card_categories_sub"
+        removePrefix: "app_card_"
+        daoPath: "dao/user"
+        doPath: "model/do/user"
+        entityPath: "model/entity/user"
+        tables: "app_card_wallets"
         tplDaoIndexPath: "resource/gen/gen_dao_template_dao.txt"
         tplDaoInternalPath: "resource/gen/gen_dao_template_dao_internal.txt"
         overwriteDao: true

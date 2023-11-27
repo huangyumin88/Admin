@@ -13,14 +13,14 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 )
 
-type User struct{}
+type Wallets struct{}
 
-func NewUser() *User {
-	return &User{}
+func NewWallets() *Wallets {
+	return &Wallets{}
 }
 
 // 列表
-func (controllerThis *User) List(ctx context.Context, req *apiUser.UserListReq) (res *apiUser.UserListRes, err error) {
+func (controllerThis *Wallets) List(ctx context.Context, req *apiUser.WalletsListReq) (res *apiUser.WalletsListRes, err error) {
 	/**--------参数处理 开始--------**/
 	filter := gconv.MapDeep(req.Filter)
 	if filter == nil {
@@ -30,10 +30,9 @@ func (controllerThis *User) List(ctx context.Context, req *apiUser.UserListReq) 
 	page := req.Page
 	limit := req.Limit
 
-	columnsThis := daoUser.User.Columns()
-	allowField := daoUser.User.ColumnArr()
-	allowField = append(allowField, `id`, `label`)
-	allowField = gset.NewStrSetFrom(allowField).Diff(gset.NewStrSetFrom([]string{columnsThis.Password, columnsThis.Salt})).Slice() //移除敏感字段
+	columnsThis := daoUser.Wallets.Columns()
+	allowField := daoUser.Wallets.ColumnArr()
+	allowField = append(allowField, `id`)
 	field := allowField
 	if len(req.Field) > 0 {
 		field = gset.NewStrSetFrom(req.Field).Intersect(gset.NewStrSetFrom(allowField)).Slice()
@@ -44,35 +43,33 @@ func (controllerThis *User) List(ctx context.Context, req *apiUser.UserListReq) 
 	/**--------参数处理 结束--------**/
 
 	/**--------权限验证 开始--------**/
-	isAuth, _ := service.AuthAction().CheckAuth(ctx, `userLook`)
+	isAuth, _ := service.AuthAction().CheckAuth(ctx, `userWalletsLook`)
 	if !isAuth {
-		field = []string{`id`, columnsThis.Phone, columnsThis.Account, columnsThis.UserId}
+		field = []string{`id`, columnsThis.WalletId}
 	}
 	/**--------权限验证 结束--------**/
 
-	daoHandlerThis := dao.NewDaoHandler(ctx, &daoUser.User)
+	daoHandlerThis := dao.NewDaoHandler(ctx, &daoUser.Wallets)
 	daoHandlerThis.Filter(filter)
 	count, err := daoHandlerThis.Count()
 	if err != nil {
 		return
 	}
-	list, err := daoHandlerThis.Field(field).Order(order).JoinGroupByPrimaryKey().GetModel().Page(page, limit).All()
+	list, err := daoHandlerThis.Field(field).Order(order).JoinGroupByPrimaryKey().GetModel().LeftJoin("user", "user.userId = app_card_wallets.user_id").Page(page, limit).All()
 	if err != nil {
 		return
 	}
 
-	res = &apiUser.UserListRes{Count: count, List: []apiUser.UserListItem{}}
+	res = &apiUser.WalletsListRes{Count: count, List: []apiUser.WalletsListItem{}}
 	list.Structs(&res.List)
 	return
 }
 
 // 详情
-func (controllerThis *User) Info(ctx context.Context, req *apiUser.UserInfoReq) (res *apiUser.UserInfoRes, err error) {
+func (controllerThis *Wallets) Info(ctx context.Context, req *apiUser.WalletsInfoReq) (res *apiUser.WalletsInfoRes, err error) {
 	/**--------参数处理 开始--------**/
-	allowField := daoUser.User.ColumnArr()
+	allowField := daoUser.Wallets.ColumnArr()
 	allowField = append(allowField, `id`)
-	columnsThis := daoUser.User.Columns()
-	allowField = gset.NewStrSetFrom(allowField).Diff(gset.NewStrSetFrom([]string{columnsThis.Password, columnsThis.Salt})).Slice() //移除敏感字段
 	field := allowField
 	if len(req.Field) > 0 {
 		field = gset.NewStrSetFrom(req.Field).Intersect(gset.NewStrSetFrom(allowField)).Slice()
@@ -84,13 +81,13 @@ func (controllerThis *User) Info(ctx context.Context, req *apiUser.UserInfoReq) 
 	/**--------参数处理 结束--------**/
 
 	/**--------权限验证 开始--------**/
-	_, err = service.AuthAction().CheckAuth(ctx, `userLook`)
+	_, err = service.AuthAction().CheckAuth(ctx, `userWalletsLook`)
 	if err != nil {
 		return
 	}
 	/**--------权限验证 结束--------**/
 
-	info, err := dao.NewDaoHandler(ctx, &daoUser.User).Filter(filter).Field(field).JoinGroupByPrimaryKey().GetModel().One()
+	info, err := dao.NewDaoHandler(ctx, &daoUser.Wallets).Filter(filter).Field(field).JoinGroupByPrimaryKey().GetModel().One()
 	if err != nil {
 		return
 	}
@@ -99,13 +96,13 @@ func (controllerThis *User) Info(ctx context.Context, req *apiUser.UserInfoReq) 
 		return
 	}
 
-	res = &apiUser.UserInfoRes{}
+	res = &apiUser.WalletsInfoRes{}
 	info.Struct(&res.Info)
 	return
 }
 
 // 修改
-func (controllerThis *User) Update(ctx context.Context, req *apiUser.UserUpdateReq) (res *api.CommonNoDataRes, err error) {
+func (controllerThis *Wallets) Update(ctx context.Context, req *apiUser.WalletsUpdateReq) (res *api.CommonNoDataRes, err error) {
 	/**--------参数处理 开始--------**/
 	data := gconv.MapDeep(req)
 	delete(data, `idArr`)
@@ -117,12 +114,12 @@ func (controllerThis *User) Update(ctx context.Context, req *apiUser.UserUpdateR
 	/**--------参数处理 结束--------**/
 
 	/**--------权限验证 开始--------**/
-	_, err = service.AuthAction().CheckAuth(ctx, `userUpdate`)
+	_, err = service.AuthAction().CheckAuth(ctx, `userWalletsUpdate`)
 	if err != nil {
 		return
 	}
 	/**--------权限验证 结束--------**/
 
-	_, err = service.User().Update(ctx, filter, data)
+	_, err = service.UserWallets().Update(ctx, filter, data)
 	return
 }

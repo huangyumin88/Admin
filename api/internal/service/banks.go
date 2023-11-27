@@ -42,6 +42,17 @@ var (
 	localBanksBanksUser IBanksBanksUser
 )
 
+func BanksBanksUser() IBanksBanksUser {
+	if localBanksBanksUser == nil {
+		panic("implement not found for interface IBanksBanksUser, forgot register?")
+	}
+	return localBanksBanksUser
+}
+
+func RegisterBanksBanksUser(i IBanksBanksUser) {
+	localBanksBanksUser = i
+}
+
 func BanksBankCards() IBanksBankCards {
 	if localBanksBankCards == nil {
 		panic("implement not found for interface IBanksBankCards, forgot register?")
@@ -62,15 +73,4 @@ func Banks() IBanks {
 
 func RegisterBanks(i IBanks) {
 	localBanks = i
-}
-
-func BanksBanksUser() IBanksBanksUser {
-	if localBanksBanksUser == nil {
-		panic("implement not found for interface IBanksBanksUser, forgot register?")
-	}
-	return localBanksBanksUser
-}
-
-func RegisterBanksBanksUser(i IBanksBanksUser) {
-	localBanksBanksUser = i
 }
