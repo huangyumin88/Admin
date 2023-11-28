@@ -5,7 +5,7 @@ gfcli:
     packSrc: "resource/i18n,manifest" # 需要打包资源目录。打包前manifest目录下的配置文件需改成正式环境
     arch: "amd64"
     system: "linux"
-    version: "v1.0.0"
+    version: "v1.0.1"
     output: "./bin"
     # output: "../main"
   gen:
@@ -13,10 +13,10 @@ gfcli:
       - link: "mysql:web_card_db:5ZKejwsiwhnT8sRG@tcp(47.111.166.24:3306)/web_card_db"
         group: "default"
         removePrefix: "app_card_"
-        daoPath: "dao/user"
-        doPath: "model/do/user"
-        entityPath: "model/entity/user"
-        tables: "app_card_wallets"
+        daoPath: "dao/orders"
+        doPath: "model/do/orders"
+        entityPath: "model/entity/orders"
+        tables: "app_card_orders"
         tplDaoIndexPath: "resource/gen/gen_dao_template_dao.txt"
         tplDaoInternalPath: "resource/gen/gen_dao_template_dao_internal.txt"
         overwriteDao: true

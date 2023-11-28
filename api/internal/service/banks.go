@@ -10,6 +10,14 @@ import (
 )
 
 type (
+	IBanksBanksUser interface {
+		// 新增
+		Create(ctx context.Context, data map[string]interface{}) (id int64, err error)
+		// 修改
+		Update(ctx context.Context, filter map[string]interface{}, data map[string]interface{}) (row int64, err error)
+		// 删除
+		Delete(ctx context.Context, filter map[string]interface{}) (row int64, err error)
+	}
 	IBanksBankCards interface {
 		// 新增
 		Create(ctx context.Context, data map[string]interface{}) (id int64, err error)
@@ -26,21 +34,24 @@ type (
 		// 删除
 		Delete(ctx context.Context, filter map[string]interface{}) (row int64, err error)
 	}
-	IBanksBanksUser interface {
-		// 新增
-		Create(ctx context.Context, data map[string]interface{}) (id int64, err error)
-		// 修改
-		Update(ctx context.Context, filter map[string]interface{}, data map[string]interface{}) (row int64, err error)
-		// 删除
-		Delete(ctx context.Context, filter map[string]interface{}) (row int64, err error)
-	}
 )
 
 var (
+	localBanksBanksUser IBanksBanksUser
 	localBanksBankCards IBanksBankCards
 	localBanks          IBanks
-	localBanksBanksUser IBanksBanksUser
 )
+
+func Banks() IBanks {
+	if localBanks == nil {
+		panic("implement not found for interface IBanks, forgot register?")
+	}
+	return localBanks
+}
+
+func RegisterBanks(i IBanks) {
+	localBanks = i
+}
 
 func BanksBanksUser() IBanksBanksUser {
 	if localBanksBanksUser == nil {
@@ -62,15 +73,4 @@ func BanksBankCards() IBanksBankCards {
 
 func RegisterBanksBankCards(i IBanksBankCards) {
 	localBanksBankCards = i
-}
-
-func Banks() IBanks {
-	if localBanks == nil {
-		panic("implement not found for interface IBanks, forgot register?")
-	}
-	return localBanks
-}
-
-func RegisterBanks(i IBanks) {
-	localBanks = i
 }

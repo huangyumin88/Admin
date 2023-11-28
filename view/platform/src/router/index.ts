@@ -176,6 +176,15 @@ const initRouteList = [
                 },
                 meta: { isAuth: true, keepAlive: true, componentName: '/user/wallets' }
             },
+            {
+                path: '/orders/orders',
+                component: async () => {
+                    const component = await import('@/views/orders/orders/Index.vue')
+                    component.default.name = '/orders/orders'
+                    return component
+                },
+                meta: { isAuth: true, keepAlive: true, componentName: '/orders/orders' }
+            },
             /*--------前端路由自动代码生成锚点（不允许修改和删除，否则将不能自动生成路由）--------*/
             {
                 path: '/profile',

@@ -8,6 +8,7 @@ import (
 	_ "api/internal/logic/app"
 	_ "api/internal/logic/auth"
 	_ "api/internal/logic/banks"
+	_ "api/internal/logic/orders"
 	_ "api/internal/logic/platform"
 	_ "api/internal/logic/user"
 )
