@@ -331,4 +331,9 @@ func (daoThis *userDao) ParseJoin(joinCode string, joinTableArr *[]string) gdb.M
 	}
 }
 
+func (daoThis *userDao) GetInfo(ctx context.Context, userInfo gdb.Record) (info gdb.Record) {
+	info, _ = daoThis.ParseDbCtx(ctx).Where(daoThis.Columns().UserId, userInfo[User.PrimaryKey()]).One()
+	return
+}
+
 // Fill with you ideas below.

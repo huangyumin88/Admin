@@ -32,7 +32,8 @@ func (controllerThis *Wallets) List(ctx context.Context, req *apiUser.WalletsLis
 
 	columnsThis := daoUser.Wallets.Columns()
 	allowField := daoUser.Wallets.ColumnArr()
-	allowField = append(allowField, `id`)
+	//allowField = append(allowField, `id`, `user_name`, `info`)
+	allowField = append(allowField, `id`, `user_name`)
 	field := allowField
 	if len(req.Field) > 0 {
 		field = gset.NewStrSetFrom(req.Field).Intersect(gset.NewStrSetFrom(allowField)).Slice()
@@ -55,7 +56,7 @@ func (controllerThis *Wallets) List(ctx context.Context, req *apiUser.WalletsLis
 	if err != nil {
 		return
 	}
-	list, err := daoHandlerThis.Field(field).Order(order).JoinGroupByPrimaryKey().GetModel().LeftJoin("user", "user.userId = app_card_wallets.user_id").Page(page, limit).All()
+	list, err := daoHandlerThis.Field(field).Order(order).JoinGroupByPrimaryKey().GetModel().Page(page, limit).All()
 	if err != nil {
 		return
 	}

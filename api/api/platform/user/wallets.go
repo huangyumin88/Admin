@@ -44,7 +44,7 @@ type WalletsListItem struct {
 	UpdatedAt    *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
 	CreatedAt    *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
 	UserName     *string     `json:"user_name,omitempty" dc:"用户"`
-	Info         *UserInfo   `json:"info" dc:"详情"`
+	Info         UserInfo    `json:"info,omitempty" dc:"详情"`
 }
 
 /*--------列表 结束--------*/

@@ -5,6 +5,8 @@
 package dao
 
 import (
+	userApi "api/api/platform/user"
+	"api/internal/dao"
 	"api/internal/dao/user/internal"
 	"context"
 	"database/sql"
@@ -191,6 +193,15 @@ func (daoThis *walletsDao) ParseField(field []string, fieldWithParam map[string]
 			//	m = m.Fields(tableThis + `.` + daoThis.Columns().Name + ` AS ` + v)
 			case `id`:
 				m = m.Fields(tableThis + `.` + daoThis.PrimaryKey() + ` AS ` + v)
+			case `user_name`:
+				m = m.Fields(User.Table() + `.` + User.Columns().Account + ` AS ` + v)
+				m = daoThis.ParseJoin(User.Table(), joinTableArr)(m)
+			case `info`:
+				//m = m.Fields(User.Table() + ` AS ` + v)
+				//m = daoThis.ParseJoin(User.Table(), joinTableArr)(m)
+				//fmt.Println("info1")
+				m = m.Fields(daoThis.Table() + `.` + daoThis.Columns().UserId)
+				*afterField = append(*afterField, v)
 			default:
 				if daoThis.ColumnArrG().Contains(v) {
 					m = m.Fields(tableThis + `.` + v)
@@ -220,6 +231,18 @@ func (daoThis *walletsDao) HookSelect(afterField *[]string, afterFieldWithParam 
 			for _, record := range result {
 				for _, v := range *afterField {
 					switch v {
+					case `info`:
+						userInfo := userApi.UserInfo{}
+						filter := map[string]interface{}{`id`: record[daoThis.Columns().UserId]}
+						info, err := dao.NewDaoHandler(ctx, &User).Filter(filter).JoinGroupByPrimaryKey().GetModel().One()
+
+						if err == nil {
+							info.Struct(userInfo)
+							fmt.Println("UserId", info["userId"])
+							record[v] = gvar.New(info)
+						} else {
+							record[v] = gvar.New(nil)
+						}
 					default:
 						record[v] = gvar.New(nil)
 					}

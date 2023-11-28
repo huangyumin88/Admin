@@ -32,9 +32,13 @@ func (controllerThis *BankCards) List(ctx context.Context, req *apiBanks.BankCar
 	page := req.Page
 	limit := req.Limit
 
+	loginInfo := utils.GetCtxLoginInfo(ctx)
+
+	filter["user_id"] = loginInfo["loginId"]
+
 	//columnsThis := daoBanks.BankCards.Columns()
 	allowField := daoBanks.BankCards.ColumnArr()
-	allowField = append(allowField, `id`, daoUser.User.Columns().UserId)
+	allowField = append(allowField, `id`, daoUser.User.Columns().UserId, `bank_name`)
 	field := allowField
 	if len(req.Field) > 0 {
 		field = gset.NewStrSetFrom(req.Field).Intersect(gset.NewStrSetFrom(allowField)).Slice()
@@ -45,10 +49,10 @@ func (controllerThis *BankCards) List(ctx context.Context, req *apiBanks.BankCar
 	/**--------参数处理 结束--------**/
 
 	/**--------权限验证 开始--------**/
-	isAuth, _ := service.AuthAction().CheckAuth(ctx, `banksBankCardsLook`)
-	if !isAuth {
-		field = []string{`id`}
-	}
+	//isAuth, _ := service.AuthAction().CheckAuth(ctx, `banksBankCardsLook`)
+	//if !isAuth {
+	//	field = []string{`id`}
+	//}
 	/**--------权限验证 结束--------**/
 
 	daoHandlerThis := dao.NewDaoHandler(ctx, &daoBanks.BankCards)

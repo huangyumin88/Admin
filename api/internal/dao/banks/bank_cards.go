@@ -186,6 +186,9 @@ func (daoThis *bankCardsDao) ParseField(field []string, fieldWithParam map[strin
 			/* case `xxxx`:
 			m = m.Handler(daoThis.ParseJoin(Xxxx.ParseDbTable(ctx), joinTableArr))
 			*afterField = append(*afterField, v) */
+			case `bank_name`:
+				m = m.Fields(Banks.Table() + `.` + Banks.Columns().Name + ` AS ` + v)
+				m = daoThis.ParseJoin(Banks.Table(), joinTableArr)(m)
 			case `id`:
 				m = m.Fields(tableThis + `.` + daoThis.PrimaryKey() + ` AS ` + v)
 			default:

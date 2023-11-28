@@ -36,16 +36,17 @@ type BankCardsListRes struct {
 }
 
 type BankCardsListItem struct {
-	Id             *uint       `json:"id,omitempty" dc:"ID"`
-	UserId         *uint       `json:"user_id,omitempty" dc:"用户id"`
-	BankId         *int        `json:"bank_id,omitempty" dc:"银行id"`
-	CardNumber     *string     `json:"card_number,omitempty" dc:"银行卡号"`
-	CardHolderName *string     `json:"card_holder_name,omitempty" dc:"持卡人姓名"`
-	ExpirationDate *string     `json:"expiration_date,omitempty" dc:"银行卡的有效期"`
-	Cvv            *string     `json:"cvv,omitempty" dc:"CVV 安全码"`
-	UpdatedAt      *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
-	CreatedAt      *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
-	UserName       *string     `json:"user_name,omitempty" dc:"用户"`
+	Id *uint `json:"id,omitempty" dc:"ID"`
+	//UserId         *uint   `json:"user_id,omitempty" dc:"用户id"`
+	BankId         *int    `json:"bank_id,omitempty" dc:"银行id"`
+	BankName       *string `json:"bank_name,omitempty" dc:"银行"`
+	CardNumber     *string `json:"card_number,omitempty" dc:"银行卡号"`
+	CardHolderName *string `json:"card_holder_name,omitempty" dc:"持卡人姓名"`
+	ExpirationDate *string `json:"expiration_date,omitempty" dc:"银行卡的有效期"`
+	Cvv            *string `json:"cvv,omitempty" dc:"CVV 安全码"`
+	//UpdatedAt      *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
+	//CreatedAt      *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
+	UserName *string `json:"user_name,omitempty" dc:"用户"`
 }
 
 /*--------列表 结束--------*/
@@ -62,15 +63,15 @@ type BankCardsInfoRes struct {
 }
 
 type BankCardsInfo struct {
-	Id             *uint       `json:"id,omitempty" dc:"ID"`
-	UserId         *uint       `json:"user_id,omitempty" dc:"用户id"`
-	BankId         *int        `json:"bank_id,omitempty" dc:"银行id"`
-	CardNumber     *string     `json:"card_number,omitempty" dc:"银行卡号"`
-	CardHolderName *string     `json:"card_holder_name,omitempty" dc:"持卡人姓名"`
-	ExpirationDate *string     `json:"expiration_date,omitempty" dc:"银行卡的有效期"`
-	Cvv            *string     `json:"cvv,omitempty" dc:"CVV 安全码"`
-	UpdatedAt      *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
-	CreatedAt      *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
+	Id             *uint   `json:"id,omitempty" dc:"ID"`
+	UserId         *uint   `json:"user_id,omitempty" dc:"用户id"`
+	BankId         *int    `json:"bank_id,omitempty" dc:"银行id"`
+	CardNumber     *string `json:"card_number,omitempty" dc:"银行卡号"`
+	CardHolderName *string `json:"card_holder_name,omitempty" dc:"持卡人姓名"`
+	ExpirationDate *string `json:"expiration_date,omitempty" dc:"银行卡的有效期"`
+	Cvv            *string `json:"cvv,omitempty" dc:"CVV 安全码"`
+	//UpdatedAt      *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
+	//CreatedAt      *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
 }
 
 /*--------详情 结束--------*/
