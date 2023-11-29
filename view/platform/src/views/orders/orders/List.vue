@@ -68,24 +68,53 @@ const table = reactive({
 	},
 	{
 		dataKey: 'salesperson_name',
-		title: t('orders.orders.name.salesperson_id'),
+		title: t('orders.orders.name.salesperson_name'),
 		key: 'salesperson_name',
 		align: 'center',
 		width: 150,
 	},
 	{
-		dataKey: 'client_status',
+		dataKey: 'client_status_name',
 		title: t('orders.orders.name.client_status'),
-		key: 'client_status',
+		key: 'client_status_name',
 		align: 'center',
 		width: 150,
+    cellRenderer: (props: any): any => {
+      // 用户订单状态：Pending - 交易中; Failed - 交易失败; Completed - 交易完成; Closed - 关闭;
+      let typeObj: any = { 'Pending': 'warning', 'Completed': 'success', 'Failed': 'danger', 'Closed': 'info' }
+
+      return [
+        h(ElButton, {
+          type: typeObj[props.rowData.client_status],
+          link: true,
+          // onClick: () => handleEditCopy(props.rowData.id)
+        }, {
+          default: () => [ props.rowData.client_status_name]
+        }),
+      ]
+    },
+
 	},
 	{
-		dataKey: 'backend_status',
+		dataKey: 'backend_status_name',
 		title: t('orders.orders.name.backend_status'),
-		key: 'backend_status',
+		key: 'backend_status_name',
 		align: 'center',
 		width: 150,
+    cellRenderer: (props: any): any => {
+      // 后台订单状态：Pending - 等待审核; Loading - 加载中;  Failed - 加载失败; Pledging - 质押中; Completed - 交易完成;
+      let typeObj: any = { 'Pending': 'primary', 'Completed': 'success', 'Failed': 'danger', 'Loading': 'info' ,'Pledging': 'warning'}
+
+      return [
+        h(ElButton, {
+          type: typeObj[props.rowData.backend_status],
+          link: true,
+          onClick: () => handleEditCopy(props.rowData.id)
+        }, {
+          default: () => [ props.rowData.backend_status_name]
+        }),
+      ]
+    },
 	},
 	{
 		dataKey: 'failed_reason',

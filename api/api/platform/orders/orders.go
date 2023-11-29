@@ -27,6 +27,7 @@ type OrdersListFilter struct {
 	ClientStatus   string      `json:"client_status,omitempty" v:"" dc:"用户订单状态：Pending - 交易中; Failed - 交易失败; Completed - 交易完成; Closed - 关闭;"`
 	BackendStatus  string      `json:"backend_status,omitempty" v:"" dc:"后台订单状态：Pending - 等待审核; Loading - 加载中;  Failed - 加载失败; Pledging - 质押中; Completed - 交易完成;"`
 	CardCateSubId  *uint       `json:"card_cate_sub_id,omitempty" v:"min:1" dc:"子分类ID"`
+	CardCateId     *uint       `json:"card_cate_id,omitempty" v:"min:1" dc:"分类ID"`
 	Device         string      `json:"device,omitempty" v:"max-length:30" dc:"使用设备"`
 	Wallet         string      `json:"wallet,omitempty" v:"max-length:10" dc:"结算货币"`
 	TimeRangeStart *gtime.Time `json:"timeRangeStart,omitempty" v:"date-format:Y-m-d H:i:s" dc:"开始时间：YYYY-mm-dd HH:ii:ss"`
@@ -39,24 +40,26 @@ type OrdersListRes struct {
 }
 
 type OrdersListItem struct {
-	Id              *uint       `json:"id,omitempty" dc:"ID"`
-	OrderId         *uint       `json:"order_id,omitempty" dc:"订单ID"`
-	OrderNo         *string     `json:"order_no,omitempty" dc:"订单单号"`
-	UserId          *uint       `json:"user_id,omitempty" dc:"用户ID"`
-	SalespersonId   *uint       `json:"salesperson_id,omitempty" dc:"业务员ID"`
-	ClientStatus    *string     `json:"client_status,omitempty" dc:"用户订单状态：Pending - 交易中; Failed - 交易失败; Completed - 交易完成; Closed - 关闭;"`
-	BackendStatus   *string     `json:"backend_status,omitempty" dc:"后台订单状态：Pending - 等待审核; Loading - 加载中;  Failed - 加载失败; Pledging - 质押中; Completed - 交易完成;"`
-	FailedReason    *string     `json:"failed_reason,omitempty" dc:"拒绝原因"`
-	FailedFiles     *string     `json:"failed_files,omitempty" dc:"拒绝图片"`
-	TradeAmount     *float64    `json:"trade_amount,omitempty" dc:"交易金额（AUD）"`
-	PayableAmount   *uint       `json:"payable_amount,omitempty" dc:"需要支付金额"`
-	CardCateSubId   *uint       `json:"card_cate_sub_id,omitempty" dc:"子分类ID"`
-	Device          *string     `json:"device,omitempty" dc:"使用设备"`
-	Wallet          *string     `json:"wallet,omitempty" dc:"结算货币"`
-	UpdatedAt       *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
-	CreatedAt       *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
-	UserName        *string     `json:"user_name,omitempty" dc:"用户"`
-	SalespersonName *string     `json:"salesperson_name,omitempty" dc:"业务员"`
+	Id                *uint       `json:"id,omitempty" dc:"ID"`
+	OrderId           *uint       `json:"order_id,omitempty" dc:"订单ID"`
+	OrderNo           *string     `json:"order_no,omitempty" dc:"订单单号"`
+	UserId            *uint       `json:"user_id,omitempty" dc:"用户ID"`
+	SalespersonId     *uint       `json:"salesperson_id,omitempty" dc:"业务员ID"`
+	ClientStatus      *string     `json:"client_status,omitempty" dc:"用户订单状态：Pending - 交易中; Failed - 交易失败; Completed - 交易完成; Closed - 关闭;"`
+	BackendStatus     *string     `json:"backend_status,omitempty" dc:"后台订单状态：Pending - 等待审核; Loading - 加载中;  Failed - 加载失败; Pledging - 质押中; Completed - 交易完成;"`
+	FailedReason      *string     `json:"failed_reason,omitempty" dc:"拒绝原因"`
+	FailedFiles       *string     `json:"failed_files,omitempty" dc:"拒绝图片"`
+	TradeAmount       *float64    `json:"trade_amount,omitempty" dc:"交易金额（AUD）"`
+	PayableAmount     *uint       `json:"payable_amount,omitempty" dc:"需要支付金额"`
+	CardCateSubId     *uint       `json:"card_cate_sub_id,omitempty" dc:"子分类ID"`
+	Device            *string     `json:"device,omitempty" dc:"使用设备"`
+	Wallet            *string     `json:"wallet,omitempty" dc:"结算货币"`
+	UpdatedAt         *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
+	CreatedAt         *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
+	UserName          *string     `json:"user_name,omitempty" dc:"用户"`
+	SalespersonName   *string     `json:"salesperson_name,omitempty" dc:"业务员"`
+	ClientStatusName  *string     `json:"client_status_name,omitempty" dc:"用户订单状态"`
+	BackendStatusName *string     `json:"backend_status_name,omitempty" dc:"后台订单状态"`
 }
 
 /*--------列表 结束--------*/
@@ -84,7 +87,9 @@ type OrdersInfo struct {
 	FailedFiles   *string     `json:"failed_files,omitempty" dc:"拒绝图片"`
 	TradeAmount   *float64    `json:"trade_amount,omitempty" dc:"交易金额（AUD）"`
 	PayableAmount *uint       `json:"payable_amount,omitempty" dc:"需要支付金额"`
+	CardCateId    *uint       `json:"card_cate_id,omitempty"  dc:"分类ID"`
 	CardCateSubId *uint       `json:"card_cate_sub_id,omitempty" dc:"子分类ID"`
+	TradeFiles    *string     `json:"trade_files,omitempty" dc:"交易图片"`
 	Device        *string     `json:"device,omitempty" dc:"使用设备"`
 	Wallet        *string     `json:"wallet,omitempty" dc:"结算货币"`
 	UpdatedAt     *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
@@ -96,10 +101,9 @@ type OrdersInfo struct {
 /*--------新增 开始--------*/
 type OrdersCreateReq struct {
 	g.Meta `path:"/orders/create" method:"post" tags:"平台后台/订单" sm:"创建"`
-	//OrderNo       *string  `json:"order_no,omitempty" v:"max-length:255" dc:"订单单号"`
+
 	UserId *uint `json:"user_id,omitempty" v:"required|min:1" dc:"用户ID"`
-	//SalespersonId *uint    `json:"salesperson_id,omitempty" v:"min:1" dc:"业务员ID"`
-	//ClientStatus  *string  `json:"client_status,omitempty" v:"" dc:"用户订单状态：Pending - 交易中; Failed - 交易失败; Completed - 交易完成; Closed - 关闭;"`
+
 	BackendStatus *string `json:"backend_status,omitempty" v:"" dc:"后台订单状态：Pending - 等待审核; Loading - 加载中;  Failed - 加载失败; Pledging - 质押中; Completed - 交易完成;"`
 	//FailedReason  *string  `json:"failed_reason,omitempty" v:"" dc:"拒绝原因"`
 	//FailedFiles   *string  `json:"failed_files,omitempty" v:"" dc:"拒绝图片"`
@@ -108,28 +112,24 @@ type OrdersCreateReq struct {
 	PayableAmount *uint    `json:"payable_amount,omitempty" v:"" dc:"需要支付金额"`
 	CardCateId    *uint    `json:"card_cate_id,omitempty" v:"required|min:1" dc:"分类ID"`
 	CardCateSubId *uint    `json:"card_cate_sub_id,omitempty" v:"required|min:1" dc:"子分类ID"`
-	Device        *string  `json:"device,omitempty" v:"max-length:30" dc:"使用设备"`
-	//Wallet        *string  `json:"wallet,omitempty" v:"max-length:10" dc:"结算货币"`
+	//Device        *string  `json:"device,omitempty" v:"max-length:30" dc:"使用设备"`
+
 }
 
 /*--------新增 结束--------*/
 
 /*--------修改 开始--------*/
 type OrdersUpdateReq struct {
-	g.Meta `path:"/orders/update" method:"post" tags:"平台后台/订单" sm:"更新"`
-	IdArr  []uint `json:"idArr,omitempty" v:"required|distinct|foreach|min:1" dc:"ID数组"`
-	//OrderNo       *string  `json:"order_no,omitempty" v:"max-length:255" dc:"订单单号"`
-	//UserId        *uint    `json:"user_id,omitempty" v:"min:1" dc:"用户ID"`
-	//SalespersonId *uint    `json:"salesperson_id,omitempty" v:"min:1" dc:"业务员ID"`
-	//ClientStatus  *string  `json:"client_status,omitempty" v:"" dc:"用户订单状态：Pending - 交易中; Failed - 交易失败; Completed - 交易完成; Closed - 关闭;"`
-	BackendStatus *string  `json:"backend_status,omitempty" v:"" dc:"后台订单状态：Pending - 等待审核; Loading - 加载中;  Failed - 加载失败; Pledging - 质押中; Completed - 交易完成;"`
-	FailedReason  *string  `json:"failed_reason,omitempty" v:"" dc:"拒绝原因"`
-	FailedFiles   *string  `json:"failed_files,omitempty" v:"" dc:"拒绝图片"`
-	TradeAmount   *float64 `json:"trade_amount,omitempty" v:"min:0" dc:"交易金额（AUD）"`
-	PayableAmount *uint    `json:"payable_amount,omitempty" v:"" dc:"需要支付金额"`
-	//CardCateSubId *uint    `json:"card_cate_sub_id,omitempty" v:"min:1" dc:"子分类ID"`
-	//Device        *string  `json:"device,omitempty" v:"max-length:30" dc:"使用设备"`
-	//Wallet        *string  `json:"wallet,omitempty" v:"max-length:10" dc:"结算货币"`
+	g.Meta        `path:"/orders/update" method:"post" tags:"平台后台/订单" sm:"更新"`
+	IdArr         []uint  `json:"idArr,omitempty" v:"required|distinct|foreach|min:1" dc:"ID数组"`
+	OrderId       *uint   `json:"order_id,omitempty" dc:"订单ID"`
+	BackendStatus string  `json:"backend_status,omitempty" v:"" dc:"后台订单状态：Pending - 等待审核; Loading - 加载中;  Failed - 加载失败; Pledging - 质押中; Completed - 交易完成;"`
+	FailedReason  string  `json:"failed_reason,omitempty" v:"" dc:"拒绝原因"`
+	FailedFiles   string  `json:"failed_files,omitempty" v:"" dc:"拒绝图片"`
+	TradeAmount   float64 `json:"trade_amount,omitempty" v:"min:0" dc:"交易金额（AUD）"`
+	PayableAmount uint    `json:"payable_amount,omitempty" v:"" dc:"需要支付金额"`
+	CardCateId    uint    `json:"card_cate_id,omitempty" v:"required|min:1" dc:"分类ID"`
+	CardCateSubId uint    `json:"card_cate_sub_id,omitempty" v:"required|min:1" dc:"子分类ID"`
 }
 
 /*--------修改 结束--------*/

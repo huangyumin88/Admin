@@ -5,7 +5,7 @@ gfcli:
     packSrc: "resource/i18n,manifest" # 需要打包资源目录。打包前manifest目录下的配置文件需改成正式环境
     arch: "amd64"
     system: "linux"
-    version: "v1.0.1"
+    version: "v1.0.2"
     output: "./bin"
     # output: "../main"
   gen:

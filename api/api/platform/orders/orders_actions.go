@@ -34,13 +34,15 @@ type OrdersActionsListRes struct {
 }
 
 type OrdersActionsListItem struct {
-	Id            *uint       `json:"id,omitempty" dc:"ID"`
-	ActionsUserId *uint       `json:"actions_user_id,omitempty" dc:"操作人员"`
-	OrderId       *uint       `json:"order_id,omitempty" dc:"订单ID"`
-	BackendStatus *string     `json:"backend_status,omitempty" dc:"操作状态"`
-	Remarks       *string     `json:"remarks,omitempty" dc:"备注"`
-	UpdatedAt     *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
-	CreatedAt     *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
+	Id                *uint       `json:"id,omitempty" dc:"ID"`
+	ActionsUserId     *uint       `json:"actions_user_id,omitempty" dc:"操作人员"`
+	OrderId           *uint       `json:"order_id,omitempty" dc:"订单ID"`
+	BackendStatus     *string     `json:"backend_status,omitempty" dc:"操作状态"`
+	Remarks           *string     `json:"remarks,omitempty" dc:"备注"`
+	UpdatedAt         *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
+	CreatedAt         *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
+	SalespersonName   *string     `json:"salesperson_name,omitempty" dc:"业务员"`
+	BackendStatusName *string     `json:"backend_status_name,omitempty" dc:"后台订单状态"`
 }
 
 /*--------列表 结束--------*/

@@ -32,7 +32,7 @@ func (controllerThis *OrdersActions) List(ctx context.Context, req *apiOrders.Or
 
 	//columnsThis := daoOrders.OrdersActions.Columns()
 	allowField := daoOrders.OrdersActions.ColumnArr()
-	allowField = append(allowField, `id`)
+	allowField = append(allowField, `id`, `salesperson_name`, `backend_status_name`)
 	field := allowField
 	if len(req.Field) > 0 {
 		field = gset.NewStrSetFrom(req.Field).Intersect(gset.NewStrSetFrom(allowField)).Slice()

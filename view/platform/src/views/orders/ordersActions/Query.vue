@@ -45,9 +45,9 @@ const queryForm = reactive({
 
 <template>
 	<ElForm class="query-form" :ref="(el: any) => { queryForm.ref = el }" :model="queryCommon.data" :inline="true" @keyup.enter="queryForm.submit">
-		<ElFormItem prop="id">
-			<ElInputNumber v-model="queryCommon.data.id" :placeholder="t('common.name.id')" :min="1" :controls="false" />
-		</ElFormItem>
+<!--		<ElFormItem prop="id">-->
+<!--			<ElInputNumber v-model="queryCommon.data.id" :placeholder="t('common.name.id')" :min="1" :controls="false" />-->
+<!--		</ElFormItem>-->
 		<ElFormItem prop="actions_user_id">
 			<MySelect v-model="queryCommon.data.actions_user_id" :placeholder="t('orders.ordersActions.name.actions_user_id')" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/platform/admin/list' }" />
 		</ElFormItem>

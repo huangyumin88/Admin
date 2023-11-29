@@ -196,6 +196,11 @@ func (daoThis *ordersDao) ParseField(field []string, fieldWithParam map[string]i
 			case `salesperson_name`:
 				m = m.Fields(daoPlatform.Admin.Table() + `.` + daoPlatform.Admin.Columns().Nickname + ` AS ` + v)
 				m = daoPlatform.Admin.ParseJoin(daoPlatform.Admin.Table(), joinTableArr)(m)
+			case `client_status_name`:
+				*afterField = append(*afterField, v)
+			case `backend_status_name`:
+				*afterField = append(*afterField, v)
+
 			default:
 				if daoThis.ColumnArrG().Contains(v) {
 					m = m.Fields(tableThis + `.` + v)
@@ -225,6 +230,37 @@ func (daoThis *ordersDao) HookSelect(afterField *[]string, afterFieldWithParam m
 			for _, record := range result {
 				for _, v := range *afterField {
 					switch v {
+					case `client_status_name`:
+						//Pending - 交易中; Failed - 交易失败; Completed - 交易完成; Closed - 关闭;
+						client_status := record[daoThis.Columns().ClientStatus].String()
+						if client_status == "Pending" {
+							record[v] = gvar.New("交易中")
+						} else if client_status == "Failed" {
+							record[v] = gvar.New("交易失败")
+						} else if client_status == "Completed" {
+							record[v] = gvar.New("交易完成")
+						} else if client_status == "Closed" {
+							record[v] = gvar.New("关闭")
+						} else {
+							record[v] = gvar.New(nil)
+						}
+
+					case `backend_status_name`:
+						//后台订单状态：Pending - 等待审核; Loading - 加载中;  Failed - 加载失败; Pledging - 质押中; Completed - 交易完成;
+						backend_status := record[daoThis.Columns().BackendStatus].String()
+						if backend_status == "Pending" {
+							record[v] = gvar.New("等待审核")
+						} else if backend_status == "Failed" {
+							record[v] = gvar.New("加载失败")
+						} else if backend_status == "Completed" {
+							record[v] = gvar.New("交易完成")
+						} else if backend_status == "Loading" {
+							record[v] = gvar.New("加载中")
+						} else if backend_status == "Pledging" {
+							record[v] = gvar.New("质押中")
+						} else {
+							record[v] = gvar.New(nil)
+						}
 					default:
 						record[v] = gvar.New(nil)
 					}

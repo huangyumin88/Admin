@@ -34,7 +34,7 @@ func (controllerThis *Orders) List(ctx context.Context, req *apiOrders.OrdersLis
 
 	columnsThis := daoOrders.Orders.Columns()
 	allowField := daoOrders.Orders.ColumnArr()
-	allowField = append(allowField, `id`, `user_name`, `salesperson_name`)
+	allowField = append(allowField, `id`, `user_name`, `salesperson_name`, `client_status_name`, `backend_status_name`)
 	field := allowField
 	if len(req.Field) > 0 {
 		field = gset.NewStrSetFrom(req.Field).Intersect(gset.NewStrSetFrom(allowField)).Slice()
@@ -138,8 +138,22 @@ func (controllerThis *Orders) Create(ctx context.Context, req *apiOrders.OrdersC
 	}
 
 	// 创建操作记录
+	data1 := make(map[string]interface{})
+	data1["order_id"] = id
+	data1["actions_user_id"] = loginInfo[`loginId`]
+	data1["backend_status"] = data["backend_status"]
+	insertRecord(ctx, data1)
 
 	res = &api.CommonCreateRes{Id: id}
+	return
+}
+
+func insertRecord(ctx context.Context, data map[string]interface{}) (ids int64, err error) {
+
+	ids, err = service.OrdersOrdersActions().Create(ctx, data)
+	if err != nil {
+		fmt.Println(err)
+	}
 	return
 }
 
@@ -162,7 +176,28 @@ func (controllerThis *Orders) Update(ctx context.Context, req *apiOrders.OrdersU
 	}
 	/**--------权限验证 结束--------**/
 
+	backend_status := data["backend_status"]
+	if backend_status == "Failed" {
+		data["client_status"] = "Failed"
+	} else if backend_status == "Completed" {
+		data["client_status"] = "Completed"
+	} else {
+		data["client_status"] = "Pending"
+	}
+
+	fmt.Println(backend_status)
+	fmt.Println(data["client_status"])
+
 	_, err = service.Orders().Update(ctx, filter, data)
+
+	loginInfo := utils.GetCtxLoginInfo(ctx)
+
+	// 创建操作记录
+	data1 := make(map[string]interface{})
+	data1["order_id"] = data["order_id"]
+	data1["actions_user_id"] = loginInfo[`loginId`]
+	data1["backend_status"] = data["backend_status"]
+	insertRecord(ctx, data1)
 	return
 }
 
@@ -187,7 +222,7 @@ func (controllerThis *Orders) Delete(ctx context.Context, req *apiOrders.OrdersD
 func (controllerThis *Orders) CheckOrderStatus(ctx context.Context, req *apiOrders.OrdersQueryOrderStatusReq) (res *apiOrders.OrdersQueryOrderStatusRes, err error) {
 	orderId := req.OrderId
 
-	fmt.Println("CheckOrderStatus")
+	//fmt.Println("CheckOrderStatus")
 	//_, err = service.AuthAction().CheckAuth(ctx, `ordersLook`)
 	//if err != nil {
 	//	return
@@ -235,11 +270,11 @@ func (controllerThis *Orders) CheckOrderStatus(ctx context.Context, req *apiOrde
 			} else if status == "Loading" {
 				res = &apiOrders.OrdersQueryOrderStatusRes{List: []apiOrders.OrdersQueryOrderStatusItem{item3, item4, item5}}
 			} else if status == "Failed" {
-				res = &apiOrders.OrdersQueryOrderStatusRes{List: []apiOrders.OrdersQueryOrderStatusItem{item5}}
+				res = &apiOrders.OrdersQueryOrderStatusRes{List: []apiOrders.OrdersQueryOrderStatusItem{item3}}
 			} else if status == "Pledging" {
 				res = &apiOrders.OrdersQueryOrderStatusRes{List: []apiOrders.OrdersQueryOrderStatusItem{item3, item5}}
 			} else {
-				res = &apiOrders.OrdersQueryOrderStatusRes{List: []apiOrders.OrdersQueryOrderStatusItem{}}
+				res = &apiOrders.OrdersQueryOrderStatusRes{List: []apiOrders.OrdersQueryOrderStatusItem{item5}}
 			}
 
 			return

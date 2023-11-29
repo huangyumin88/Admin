@@ -60,9 +60,9 @@ const table = reactive({
 	// 	width: 150,
 	// },
 	{
-		dataKey: 'actions_user_id',
+		dataKey: 'salesperson_name',
 		title: t('orders.ordersActions.name.actions_user_id'),
-		key: 'actions_user_id',
+		key: 'salesperson_name',
 		align: 'center',
 		width: 150,
 	},
@@ -73,13 +73,34 @@ const table = reactive({
 		align: 'center',
 		width: 150,
 	},
-	{
-		dataKey: 'backend_status',
-		title: t('orders.ordersActions.name.backend_status'),
-		key: 'backend_status',
-		align: 'center',
-		width: 150,
-	},
+	// {
+	// 	dataKey: 'backend_status_name',
+	// 	title: t('orders.ordersActions.name.backend_status'),
+	// 	key: 'backend_status_name',
+	// 	align: 'center',
+	// 	width: 150,
+	// },
+    {
+      dataKey: 'backend_status_name',
+      title: t('orders.ordersActions.name.backend_status'),
+      key: 'backend_status_name',
+      align: 'center',
+      width: 150,
+      cellRenderer: (props: any): any => {
+        // 后台订单状态：Pending - 等待审核; Loading - 加载中;  Failed - 加载失败; Pledging - 质押中; Completed - 交易完成;
+        let typeObj: any = { 'Pending': 'primary', 'Completed': 'success', 'Failed': 'danger', 'Loading': 'info' ,'Pledging': 'warning'}
+
+        return [
+          h(ElButton, {
+            type: typeObj[props.rowData.backend_status],
+            link: true,
+            // onClick: () => handleEditCopy(props.rowData.id)
+          }, {
+            default: () => [ props.rowData.backend_status_name]
+          }),
+        ]
+      },
+    },
 	{
 		dataKey: 'remarks',
 		title: t('orders.ordersActions.name.remarks'),
@@ -111,13 +132,13 @@ const table = reactive({
 		fixed: 'right',
 		cellRenderer: (props: any): any => {
 			return [
-				h(ElButton, {
-					type: 'primary',
-					size: 'small',
-					onClick: () => handleEditCopy(props.rowData.id)
-				}, {
-					default: () => [h(AutoiconEpEdit), t('common.edit')]
-				}),
+				// h(ElButton, {
+				// 	type: 'primary',
+				// 	size: 'small',
+				// 	onClick: () => handleEditCopy(props.rowData.id)
+				// }, {
+				// 	default: () => [h(AutoiconEpEdit), t('common.edit')]
+				// }),
 				h(ElButton, {
 					type: 'danger',
 					size: 'small',
@@ -125,13 +146,13 @@ const table = reactive({
 				}, {
 					default: () => [h(AutoiconEpDelete), t('common.delete')]
 				}),
-				h(ElButton, {
-					type: 'warning',
-					size: 'small',
-					onClick: () => handleEditCopy(props.rowData.id, 'copy')
-				}, {
-					default: () => [h(AutoiconEpDocumentCopy), t('common.copy')]
-				}),
+				// h(ElButton, {
+				// 	type: 'warning',
+				// 	size: 'small',
+				// 	onClick: () => handleEditCopy(props.rowData.id, 'copy')
+				// }, {
+				// 	default: () => [h(AutoiconEpDocumentCopy), t('common.copy')]
+				// }),
 			]
 		},
 	}] as any,

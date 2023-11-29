@@ -2,7 +2,8 @@ export default {
 	name: {
 		order_no: '订单单号',
 		user_id: '用户',
-		salesperson_id: '业务员',
+		salesperson_id: '业务员账号',
+		salesperson_name: '业务员',
 		client_status: '用户订单状态',
 		backend_status: '后台订单状态',
 		trade_files: '交易图片',
