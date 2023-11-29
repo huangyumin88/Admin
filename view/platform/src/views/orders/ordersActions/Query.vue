@@ -2,20 +2,8 @@
 import dayjs from 'dayjs'
 
 const { t, tm } = useI18n()
-// const showCate = 1
+
 const queryCommon = inject('queryCommon') as { data: { [propName: string]: any } }
-
-// 检查 queryCommon 是否存在并且是响应式的
-if (queryCommon && queryCommon.data) {
-  // 使用 watch 监听 card_cate_id 的变化
-  watch(() => queryCommon.data.card_cate_id, (newVal, oldVal) => {
-    // console.log(`card_cate_id changed from ${oldVal} to ${newVal}`);
-    // 在这里可以执行对应的逻辑
-    queryCommon.data.card_cate_sub_id = null;
-  });
-}
-
-
 queryCommon.data = {
 	...queryCommon.data,
 	timeRange: (() => {
@@ -38,9 +26,6 @@ queryCommon.data = {
 		return ''
 	}),
 }
-
-
-
 const listCommon = inject('listCommon') as { ref: any }
 const queryForm = reactive({
 	ref: null as any,
@@ -63,28 +48,16 @@ const queryForm = reactive({
 		<ElFormItem prop="id">
 			<ElInputNumber v-model="queryCommon.data.id" :placeholder="t('common.name.id')" :min="1" :controls="false" />
 		</ElFormItem>
-		<ElFormItem prop="order_no">
-			<ElInput v-model="queryCommon.data.order_no" :placeholder="t('orders.orders.name.order_no')" minlength="1" maxlength="255" :clearable="true" />
+		<ElFormItem prop="actions_user_id">
+			<MySelect v-model="queryCommon.data.actions_user_id" :placeholder="t('orders.ordersActions.name.actions_user_id')" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/platform/admin/list' }" />
 		</ElFormItem>
-		<ElFormItem prop="user_id">
-			<MySelect v-model="queryCommon.data.user_id" :placeholder="t('orders.orders.name.user_id')" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/user/user/list' }" />
-		</ElFormItem>
-		<ElFormItem prop="salesperson_id">
-			<MySelect v-model="queryCommon.data.salesperson_id" :placeholder="t('orders.orders.name.salesperson_id')" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/platform/admin/list' }" />
-		</ElFormItem>
-		<ElFormItem prop="client_status">
-      <MySelect v-model="queryCommon.data.client_status" :placeholder="t('orders.orders.name.client_status')" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/orders/orders/checkorderstatus',param: { order_type: 1} }" />
+		<ElFormItem prop="order_id">
+      <ElInput v-model="queryCommon.data.order_id" :placeholder="t('orders.ordersActions.name.order_id')" minlength="1" maxlength="10" :clearable="true" />
 		</ElFormItem>
 		<ElFormItem prop="backend_status">
+<!--			<ElInput v-model="queryCommon.data.backend_status" :placeholder="t('orders.ordersActions.name.backend_status')" minlength="1" maxlength="10" :clearable="true" />-->
       <MySelect v-model="queryCommon.data.backend_status" :placeholder="t('orders.orders.name.backend_status')" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/orders/orders/checkorderstatus' }" />
     </ElFormItem>
-
-    <ElFormItem prop="card_cate_id">
-      <MySelect v-model="queryCommon.data.card_cate_id" :placeholder="t('orders.orders.name.card_cate_id')" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/app/cardCategories/list' }" style="width: 250px" />
-    </ElFormItem>
-		<ElFormItem prop="card_cate_sub_id">
-			<MySelect v-if="queryCommon.data.card_cate_id > 0" v-model="queryCommon.data.card_cate_sub_id" :placeholder="t('orders.orders.name.card_cate_sub_id')" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/app/cardCategoriesSub/list',param: { filter: {cate_id:queryCommon.data.card_cate_id}, field:['id','label']} }" style="width: 300px"/>
-		</ElFormItem>
 		<ElFormItem prop="timeRange">
 			<ElDatePicker v-model="queryCommon.data.timeRange" type="datetimerange" range-separator="-" :default-time="[new Date(2000, 0, 1, 0, 0, 0), new Date(2000, 0, 1, 23, 59, 59)]" :start-placeholder="t('common.name.timeRangeStart')" :end-placeholder="t('common.name.timeRangeEnd')" />
 		</ElFormItem>

@@ -16,7 +16,7 @@ gfcli:
         daoPath: "dao/orders"
         doPath: "model/do/orders"
         entityPath: "model/entity/orders"
-        tables: "app_card_orders"
+        tables: "app_card_orders_actions"
         tplDaoIndexPath: "resource/gen/gen_dao_template_dao.txt"
         tplDaoInternalPath: "resource/gen/gen_dao_template_dao_internal.txt"
         overwriteDao: true

@@ -31,6 +31,7 @@ type OrdersColumns struct {
 	SalespersonId string // 业务员ID
 	ClientStatus  string // 用户订单状态：Pending - 交易中; Failed - 交易失败; Completed - 交易完成; Closed - 关闭;
 	BackendStatus string // 后台订单状态：Pending - 等待审核; Loading - 加载中;  Failed - 加载失败; Pledging - 质押中; Completed - 交易完成;
+	TradeFiles	  string // 交易图片
 	FailedReason  string // 拒绝原因
 	FailedFiles   string // 拒绝图片
 	TradeAmount   string // 交易金额（AUD）
@@ -50,6 +51,7 @@ var ordersColumns = OrdersColumns{
 	SalespersonId: "salesperson_id",
 	ClientStatus:  "client_status",
 	BackendStatus: "backend_status",
+	TradeFiles:	   "trade_files",
 	FailedReason:  "failed_reason",
 	FailedFiles:   "failed_files",
 	TradeAmount:   "trade_amount",

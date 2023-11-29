@@ -52,89 +52,38 @@ const table = reactive({
 			]
 		},
 	},
+	// {
+	// 	dataKey: 'id',
+	// 	title: t('orders.ordersActions.name.id'),
+	// 	key: 'id',
+	// 	align: 'center',
+	// 	width: 150,
+	// },
 	{
-		dataKey: 'order_no',
-		title: t('orders.orders.name.order_no'),
-		key: 'order_no',
-		align: 'center',
-		width: 220,
-	},
-	{
-		dataKey: 'user_name',
-		title: t('orders.orders.name.user_id'),
-		key: 'user_id',
-		align: 'center',
-		width: 150,
-	},
-	{
-		dataKey: 'salesperson_name',
-		title: t('orders.orders.name.salesperson_id'),
-		key: 'salesperson_name',
+		dataKey: 'actions_user_id',
+		title: t('orders.ordersActions.name.actions_user_id'),
+		key: 'actions_user_id',
 		align: 'center',
 		width: 150,
 	},
 	{
-		dataKey: 'client_status',
-		title: t('orders.orders.name.client_status'),
-		key: 'client_status',
+		dataKey: 'order_id',
+		title: t('orders.ordersActions.name.order_id'),
+		key: 'order_id',
 		align: 'center',
 		width: 150,
 	},
 	{
 		dataKey: 'backend_status',
-		title: t('orders.orders.name.backend_status'),
+		title: t('orders.ordersActions.name.backend_status'),
 		key: 'backend_status',
 		align: 'center',
 		width: 150,
 	},
 	{
-		dataKey: 'failed_reason',
-		title: t('orders.orders.name.failed_reason'),
-		key: 'failed_reason',
-		align: 'center',
-		width: 200,
-		hidden: true,
-	},
-	{
-		dataKey: 'failed_files',
-		title: t('orders.orders.name.failed_files'),
-		key: 'failed_files',
-		align: 'center',
-		width: 200,
-		hidden: true,
-	},
-	{
-		dataKey: 'trade_amount',
-		title: t('orders.orders.name.trade_amount'),
-		key: 'trade_amount',
-		align: 'center',
-		width: 150,
-	},
-	{
-		dataKey: 'payable_amount',
-		title: t('orders.orders.name.payable_amount'),
-		key: 'payable_amount',
-		align: 'center',
-		width: 150,
-	},
-	{
-		dataKey: 'card_cate_sub_id',
-		title: t('orders.orders.name.card_cate_sub_id'),
-		key: 'card_cate_sub_id',
-		align: 'center',
-		width: 150,
-	},
-	{
-		dataKey: 'device',
-		title: t('orders.orders.name.device'),
-		key: 'device',
-		align: 'center',
-		width: 150,
-	},
-	{
-		dataKey: 'wallet',
-		title: t('orders.orders.name.wallet'),
-		key: 'wallet',
+		dataKey: 'remarks',
+		title: t('orders.ordersActions.name.remarks'),
+		key: 'remarks',
 		align: 'center',
 		width: 150,
 	},
@@ -199,7 +148,7 @@ const table = reactive({
 const saveCommon = inject('saveCommon') as { visible: boolean, title: string, data: { [propName: string]: any } }
 //新增
 const handleAdd = () => {
-	saveCommon.data = {backend_status:"Pending"}
+	saveCommon.data = {}
 	saveCommon.title = t('common.add')
 	saveCommon.visible = true
 }
@@ -219,7 +168,7 @@ const handleBatchDelete = () => {
 }
 //编辑|复制
 const handleEditCopy = (id: number, type: string = 'edit') => {
-	request(t('config.VITE_HTTP_API_PREFIX') + '/orders/orders/info', { id: id }).then((res) => {
+	request(t('config.VITE_HTTP_API_PREFIX') + '/orders/ordersActions/info', { id: id }).then((res) => {
 		saveCommon.data = { ...res.data.info }
 		switch (type) {
 			case 'edit':
@@ -243,14 +192,14 @@ const handleDelete = (idArr: number[]) => {
 		center: true,
 		showClose: false,
 	}).then(() => {
-		request(t('config.VITE_HTTP_API_PREFIX') + '/orders/orders/del', { idArr: idArr }, true).then((res) => {
+		request(t('config.VITE_HTTP_API_PREFIX') + '/orders/ordersActions/del', { idArr: idArr }, true).then((res) => {
 			getList()
 		}).catch(() => { })
 	}).catch(() => { })
 }
 //更新
 const handleUpdate = async (param: { idArr: number[], [propName: string]: any }) => {
-	await request(t('config.VITE_HTTP_API_PREFIX') + '/orders/orders/update', param, true)
+	await request(t('config.VITE_HTTP_API_PREFIX') + '/orders/ordersActions/update', param, true)
 }
 
 //分页
@@ -284,7 +233,7 @@ const getList = async (resetPage: boolean = false) => {
 	}
 	table.loading = true
 	try {
-		const res = await request(t('config.VITE_HTTP_API_PREFIX') + '/orders/orders/list', param)
+		const res = await request(t('config.VITE_HTTP_API_PREFIX') + '/orders/ordersActions/list', param)
 		table.data = res.data.list?.length ? res.data.list : []
 		pagination.total = res.data.count
 	} catch (error) { }
@@ -312,7 +261,7 @@ defineExpose({
 		</ElCol>
 		<ElCol :span="8" style="text-align: right;">
 			<ElSpace :size="10" style="height: 100%;">
-				<MyExportButton :headerList="table.columns" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/orders/orders/list', param: { filter: queryCommon.data, sort: table.sort.key + ' ' + table.sort.order } }" />
+				<MyExportButton :headerList="table.columns" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/orders/ordersActions/list', param: { filter: queryCommon.data, sort: table.sort.key + ' ' + table.sort.order } }" />
 				<ElDropdown max-height="300" :hide-on-click="false">
 					<ElButton type="info" :circle="true">
 						<AutoiconEpHide />

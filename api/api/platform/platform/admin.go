@@ -84,7 +84,7 @@ type AdminCreateReq struct {
 	Phone     *string `json:"phone,omitempty" v:"required-without:Account|max-length:30|phone" dc:"手机"`
 	Account   *string `json:"account,omitempty" v:"required-without:Phone|max-length:30|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"账号"`
 	Password  *string `json:"password,omitempty" v:"required|size:32" dc:"密码。md5保存"`
-	Nickname  *string `json:"nickname,omitempty" v:"max-length:30" dc:"昵称"`
+	Nickname  *string `json:"nickname,omitempty" v:"required|min-length:1|max-length:30" dc:"昵称"`
 	Avatar    *string `json:"avatar,omitempty" v:"max-length:200|url" dc:"头像"`
 	IsStop    *uint   `json:"isStop,omitempty" v:"in:0,1" dc:"停用：0否 1是"`
 	RoleIdArr *[]uint `json:"roleIdArr,omitempty" v:"required|distinct|foreach|min:1" dc:"角色ID列表"`

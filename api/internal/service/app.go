@@ -37,9 +37,9 @@ type (
 )
 
 var (
+	localAppCardCountries     IAppCardCountries
 	localAppCardCategories    IAppCardCategories
 	localAppCardCategoriesSub IAppCardCategoriesSub
-	localAppCardCountries     IAppCardCountries
 )
 
 func AppCardCountries() IAppCardCountries {

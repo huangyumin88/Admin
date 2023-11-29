@@ -194,7 +194,7 @@ func (daoThis *walletsDao) ParseField(field []string, fieldWithParam map[string]
 			case `id`:
 				m = m.Fields(tableThis + `.` + daoThis.PrimaryKey() + ` AS ` + v)
 			case `user_name`:
-				m = m.Fields(User.Table() + `.` + User.Columns().Account + ` AS ` + v)
+				m = m.Fields(User.Table() + `.` + User.Columns().Nickname + ` AS ` + v)
 				m = daoThis.ParseJoin(User.Table(), joinTableArr)(m)
 			case `info`:
 				//m = m.Fields(User.Table() + ` AS ` + v)

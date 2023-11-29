@@ -71,6 +71,7 @@ func InitRouterPlatform(s *ghttp.Server) {
 			})
 
 			group.Group(`/orders`, func(group *ghttp.RouterGroup) {
+				group.Bind(controllerOrders.NewOrdersActions())
 				group.Bind(controllerOrders.NewOrders())
 			})
 

@@ -6,8 +6,6 @@ package dao
 
 import (
 	"api/internal/dao/orders/internal"
-	daoPlatform "api/internal/dao/platform"
-	daoUser "api/internal/dao/user"
 	"context"
 	"database/sql"
 
@@ -19,24 +17,24 @@ import (
 	"github.com/gogf/gf/v2/util/gconv"
 )
 
-// internalOrdersDao is internal type for wrapping internal DAO implements.
-type internalOrdersDao = *internal.OrdersDao
+// internalOrdersActionsDao is internal type for wrapping internal DAO implements.
+type internalOrdersActionsDao = *internal.OrdersActionsDao
 
-// ordersDao is the data access object for table app_card_orders.
+// ordersActionsDao is the data access object for table app_card_orders_actions.
 // You can define custom methods on it to extend its functionality as you wish.
-type ordersDao struct {
-	internalOrdersDao
+type ordersActionsDao struct {
+	internalOrdersActionsDao
 }
 
 var (
-	// Orders is globally public accessible object for table app_card_orders operations.
-	Orders = ordersDao{
-		internal.NewOrdersDao(),
+	// OrdersActions is globally public accessible object for table app_card_orders_actions operations.
+	OrdersActions = ordersActionsDao{
+		internal.NewOrdersActionsDao(),
 	}
 )
 
 // 解析分库
-func (daoThis *ordersDao) ParseDbGroup(ctx context.Context, dbGroupSelData ...map[string]interface{}) string {
+func (daoThis *ordersActionsDao) ParseDbGroup(ctx context.Context, dbGroupSelData ...map[string]interface{}) string {
 	group := daoThis.Group()
 	// 分库逻辑
 	/* if len(dbGroupSelData) > 0 {
@@ -45,7 +43,7 @@ func (daoThis *ordersDao) ParseDbGroup(ctx context.Context, dbGroupSelData ...ma
 }
 
 // 解析分表
-func (daoThis *ordersDao) ParseDbTable(ctx context.Context, dbTableSelData ...map[string]interface{}) string {
+func (daoThis *ordersActionsDao) ParseDbTable(ctx context.Context, dbTableSelData ...map[string]interface{}) string {
 	table := daoThis.Table()
 	// 分表逻辑
 	/* if len(dbTableSelData) > 0 {
@@ -54,7 +52,7 @@ func (daoThis *ordersDao) ParseDbTable(ctx context.Context, dbTableSelData ...ma
 }
 
 // 解析分库分表（对外暴露使用）
-func (daoThis *ordersDao) ParseDbCtx(ctx context.Context, dbSelDataList ...map[string]interface{}) *gdb.Model {
+func (daoThis *ordersActionsDao) ParseDbCtx(ctx context.Context, dbSelDataList ...map[string]interface{}) *gdb.Model {
 	switch len(dbSelDataList) {
 	case 1:
 		return g.DB(daoThis.ParseDbGroup(ctx, dbSelDataList[0])).Model(daoThis.ParseDbTable(ctx)).Ctx(ctx)
@@ -66,7 +64,7 @@ func (daoThis *ordersDao) ParseDbCtx(ctx context.Context, dbSelDataList ...map[s
 }
 
 // 解析insert
-func (daoThis *ordersDao) ParseInsert(insert map[string]interface{}) gdb.ModelHandler {
+func (daoThis *ordersActionsDao) ParseInsert(insert map[string]interface{}) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		insertData := map[string]interface{}{}
 		hookData := map[string]interface{}{}
@@ -89,7 +87,7 @@ func (daoThis *ordersDao) ParseInsert(insert map[string]interface{}) gdb.ModelHa
 }
 
 // hook insert
-func (daoThis *ordersDao) HookInsert(data map[string]interface{}) gdb.HookHandler {
+func (daoThis *ordersActionsDao) HookInsert(data map[string]interface{}) gdb.HookHandler {
 	return gdb.HookHandler{
 		Insert: func(ctx context.Context, in *gdb.HookInsertInput) (result sql.Result, err error) {
 			result, err = in.Next(ctx)
@@ -103,7 +101,7 @@ func (daoThis *ordersDao) HookInsert(data map[string]interface{}) gdb.HookHandle
 }
 
 // 解析update
-func (daoThis *ordersDao) ParseUpdate(update map[string]interface{}) gdb.ModelHandler {
+func (daoThis *ordersActionsDao) ParseUpdate(update map[string]interface{}) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -139,7 +137,7 @@ func (daoThis *ordersDao) ParseUpdate(update map[string]interface{}) gdb.ModelHa
 }
 
 // hook update
-func (daoThis *ordersDao) HookUpdate(data map[string]interface{}, idArr ...uint) gdb.HookHandler {
+func (daoThis *ordersActionsDao) HookUpdate(data map[string]interface{}, idArr ...uint) gdb.HookHandler {
 	return gdb.HookHandler{
 		Update: func(ctx context.Context, in *gdb.HookUpdateInput) (result sql.Result, err error) {
 			/* //不能这样拿idArr，联表时会有bug
@@ -162,7 +160,7 @@ func (daoThis *ordersDao) HookUpdate(data map[string]interface{}, idArr ...uint)
 }
 
 // hook delete
-func (daoThis *ordersDao) HookDelete(idArr ...uint) gdb.HookHandler {
+func (daoThis *ordersActionsDao) HookDelete(idArr ...uint) gdb.HookHandler {
 	return gdb.HookHandler{
 		Delete: func(ctx context.Context, in *gdb.HookDeleteInput) (result sql.Result, err error) {
 			result, err = in.Next(ctx)
@@ -179,7 +177,7 @@ func (daoThis *ordersDao) HookDelete(idArr ...uint) gdb.HookHandler {
 }
 
 // 解析field
-func (daoThis *ordersDao) ParseField(field []string, fieldWithParam map[string]interface{}, afterField *[]string, afterFieldWithParam map[string]interface{}, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *ordersActionsDao) ParseField(field []string, fieldWithParam map[string]interface{}, afterField *[]string, afterFieldWithParam map[string]interface{}, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -190,12 +188,6 @@ func (daoThis *ordersDao) ParseField(field []string, fieldWithParam map[string]i
 			*afterField = append(*afterField, v) */
 			case `id`:
 				m = m.Fields(tableThis + `.` + daoThis.PrimaryKey() + ` AS ` + v)
-			case `user_name`:
-				m = m.Fields(daoUser.User.Table() + `.` + daoUser.User.Columns().Nickname + ` AS ` + v)
-				m = daoUser.User.ParseJoin(daoUser.User.Table(), joinTableArr)(m)
-			case `salesperson_name`:
-				m = m.Fields(daoPlatform.Admin.Table() + `.` + daoPlatform.Admin.Columns().Nickname + ` AS ` + v)
-				m = daoPlatform.Admin.ParseJoin(daoPlatform.Admin.Table(), joinTableArr)(m)
 			default:
 				if daoThis.ColumnArrG().Contains(v) {
 					m = m.Fields(tableThis + `.` + v)
@@ -215,7 +207,7 @@ func (daoThis *ordersDao) ParseField(field []string, fieldWithParam map[string]i
 }
 
 // hook select
-func (daoThis *ordersDao) HookSelect(afterField *[]string, afterFieldWithParam map[string]interface{}) gdb.HookHandler {
+func (daoThis *ordersActionsDao) HookSelect(afterField *[]string, afterFieldWithParam map[string]interface{}) gdb.HookHandler {
 	return gdb.HookHandler{
 		Select: func(ctx context.Context, in *gdb.HookSelectInput) (result gdb.Result, err error) {
 			result, err = in.Next(ctx)
@@ -242,7 +234,7 @@ func (daoThis *ordersDao) HookSelect(afterField *[]string, afterFieldWithParam m
 }
 
 // 解析filter
-func (daoThis *ordersDao) ParseFilter(filter map[string]interface{}, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *ordersActionsDao) ParseFilter(filter map[string]interface{}, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -273,7 +265,7 @@ func (daoThis *ordersDao) ParseFilter(filter map[string]interface{}, joinTableAr
 }
 
 // 解析group
-func (daoThis *ordersDao) ParseGroup(group []string, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *ordersActionsDao) ParseGroup(group []string, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -294,7 +286,7 @@ func (daoThis *ordersDao) ParseGroup(group []string, joinTableArr *[]string) gdb
 }
 
 // 解析order
-func (daoThis *ordersDao) ParseOrder(order []string, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *ordersActionsDao) ParseOrder(order []string, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		ctx := m.GetCtx()
 		tableThis := daoThis.ParseDbTable(ctx)
@@ -317,7 +309,7 @@ func (daoThis *ordersDao) ParseOrder(order []string, joinTableArr *[]string) gdb
 }
 
 // 解析join
-func (daoThis *ordersDao) ParseJoin(joinCode string, joinTableArr *[]string) gdb.ModelHandler {
+func (daoThis *ordersActionsDao) ParseJoin(joinCode string, joinTableArr *[]string) gdb.ModelHandler {
 	return func(m *gdb.Model) *gdb.Model {
 		if garray.NewStrArrayFrom(*joinTableArr).Contains(joinCode) {
 			return m
