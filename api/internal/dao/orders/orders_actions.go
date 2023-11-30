@@ -236,6 +236,8 @@ func (daoThis *ordersActionsDao) HookSelect(afterField *[]string, afterFieldWith
 							record[v] = gvar.New("加载中")
 						} else if backend_status == "Pledging" {
 							record[v] = gvar.New("质押中")
+						} else if backend_status == "Delete" {
+							record[v] = gvar.New("删除")
 						} else {
 							record[v] = gvar.New(nil)
 						}

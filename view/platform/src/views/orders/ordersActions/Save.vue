@@ -11,21 +11,21 @@ const saveForm = reactive({
 		...saveCommon.data
 	} as { [propName: string]: any },
 	rules: {
-		id: [
-			{ type: 'integer', min: 1, trigger: 'change', message: t('validation.select') },
-		],
-		actions_user_id: [
-			{ type: 'integer', min: 1, trigger: 'change', message: t('validation.select') },
-		],
-		order_id: [
-			{ type: 'integer', min: 1, trigger: 'change', message: t('validation.select') },
-		],
-		backend_status: [
-			{ type: 'string', max: 10, trigger: 'blur', message: t('validation.max.string', { max: 10 }) },
-		],
-		remarks: [
-			{ type: 'string', max: 255, trigger: 'blur', message: t('validation.max.string', { max: 255 }) },
-		],
+		// id: [
+		// 	{ type: 'integer', min: 1, trigger: 'change', message: t('validation.select') },
+		// ],
+		// actions_user_id: [
+		// 	{ type: 'integer', min: 1, trigger: 'change', message: t('validation.select') },
+		// ],
+		// order_id: [
+		// 	{ type: 'integer', min: 1, trigger: 'change', message: t('validation.select') },
+		// ],
+		// backend_status: [
+		// 	{ type: 'string', max: 10, trigger: 'blur', message: t('validation.max.string', { max: 10 }) },
+		// ],
+		// remarks: [
+		// 	{ type: 'string', max: 255, trigger: 'blur', message: t('validation.max.string', { max: 255 }) },
+		// ],
 	} as any,
 	submit: () => {
 		saveForm.ref.validate(async (valid: boolean) => {
@@ -76,28 +76,30 @@ const saveDrawer = reactive({
 	<ElDrawer class="save-drawer" :ref="(el: any) => { saveDrawer.ref = el }" v-model="saveCommon.visible" :title="saveCommon.title" :size="saveDrawer.size" :before-close="saveDrawer.beforeClose">
 		<ElScrollbar>
 			<ElForm :ref="(el: any) => { saveForm.ref = el }" :model="saveForm.data" :rules="saveForm.rules" label-width="auto" :status-icon="true" :scroll-to-error="true">
-				<ElFormItem :label="t('orders.ordersActions.name.id')" prop="id">
-					<MySelect v-model="saveForm.data.id" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/orders//list' }" />
-				</ElFormItem>
-				<ElFormItem :label="t('orders.ordersActions.name.actions_user_id')" prop="actions_user_id">
-					<MySelect v-model="saveForm.data.actions_user_id" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/orders/actionsUser/list' }" />
-				</ElFormItem>
+<!--				<ElFormItem :label="t('orders.ordersActions.name.id')" prop="id">-->
+<!--					<MySelect v-model="saveForm.data.id" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/orders//list' }" />-->
+<!--				</ElFormItem>-->
+<!--				<ElFormItem :label="t('orders.ordersActions.name.actions_user_id')" prop="actions_user_id">-->
+<!--					<MySelect v-model="saveForm.data.actions_user_id" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/orders/actionsUser/list' }" />-->
+<!--				</ElFormItem>-->
 				<ElFormItem :label="t('orders.ordersActions.name.order_id')" prop="order_id">
-					<MySelect v-model="saveForm.data.order_id" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/orders/order/list' }" />
+          <ElInput v-model="saveForm.data.order_id" :placeholder="t('orders.ordersActions.name.order_id')" disabled :clearable="true" />
+<!--					<MySelect v-model="saveForm.data.order_id" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/orders/order/list' }" />-->
 				</ElFormItem>
 				<ElFormItem :label="t('orders.ordersActions.name.backend_status')" prop="backend_status">
-					<ElInput v-model="saveForm.data.backend_status" :placeholder="t('orders.ordersActions.name.backend_status')" minlength="1" maxlength="10" :show-word-limit="true" :clearable="true" />
+					<ElInput v-model="saveForm.data.backend_status" :placeholder="t('orders.ordersActions.name.backend_status')" disabled :clearable="true" />
 				</ElFormItem>
 				<ElFormItem :label="t('orders.ordersActions.name.remarks')" prop="remarks">
-					<ElInput v-model="saveForm.data.remarks" :placeholder="t('orders.ordersActions.name.remarks')" minlength="1" maxlength="255" :show-word-limit="true" :clearable="true" />
+					<ElInput v-model="saveForm.data.remarks" :placeholder="t('orders.ordersActions.name.remarks')"  :clearable="true" :rows="10"
+                   type="textarea"/>
 				</ElFormItem>
 			</ElForm>
 		</ElScrollbar>
 		<template #footer>
 			<ElButton @click="saveDrawer.buttonClose">{{ t('common.cancel') }}</ElButton>
-			<ElButton type="primary" @click="saveForm.submit" :loading="saveForm.loading">
-				{{ t('common.save') }}
-			</ElButton>
+<!--			<ElButton type="primary" @click="saveForm.submit" :loading="saveForm.loading">-->
+<!--				{{ t('common.save') }}-->
+<!--			</ElButton>-->
 		</template>
 	</ElDrawer>
 </template>

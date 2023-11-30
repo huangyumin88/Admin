@@ -132,13 +132,13 @@ const table = reactive({
 		fixed: 'right',
 		cellRenderer: (props: any): any => {
 			return [
-				// h(ElButton, {
-				// 	type: 'primary',
-				// 	size: 'small',
-				// 	onClick: () => handleEditCopy(props.rowData.id)
-				// }, {
-				// 	default: () => [h(AutoiconEpEdit), t('common.edit')]
-				// }),
+				h(ElButton, {
+					type: 'primary',
+					size: 'small',
+					onClick: () => handleEditCopy(props.rowData.id)
+				}, {
+					default: () => [h(AutoiconEpEdit), t('common.check')]
+				}),
 				h(ElButton, {
 					type: 'danger',
 					size: 'small',

@@ -3,6 +3,7 @@ export default {
     no: '否',
     ok: '确定',
     add: '新增',
+    check:'查看',
     edit: '编辑',
     delete: '删除',
     copy: '复制',

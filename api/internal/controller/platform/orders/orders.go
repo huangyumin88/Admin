@@ -12,6 +12,7 @@ import (
 	"github.com/gogf/gf/v2/container/gset"
 	"github.com/gogf/gf/v2/util/gconv"
 	"github.com/google/uuid"
+	"strings"
 	"time"
 )
 
@@ -213,6 +214,41 @@ func (controllerThis *Orders) Delete(ctx context.Context, req *apiOrders.OrdersD
 		return
 	}
 	/**--------权限验证 结束--------**/
+	// 创建操作记录
+
+	//if len(req.IdArr) >0 {
+	//	loginInfo := utils.GetCtxLoginInfo(ctx)
+	//
+	//}
+	loginInfo := utils.GetCtxLoginInfo(ctx)
+	actions_user_id := loginInfo[`loginId`]
+
+	for _, orderID := range req.IdArr {
+		data := make(map[string]interface{})
+		filter := map[string]interface{}{`id`: req.IdArr}
+		data["actions_user_id"] = actions_user_id
+		data["order_id"] = orderID
+		data["backend_status"] = "Delete"
+		info, err1 := dao.NewDaoHandler(ctx, &daoOrders.Orders).Filter(filter).JoinGroupByPrimaryKey().GetModel().One()
+		if err1 != nil {
+			break
+		}
+		var builder strings.Builder
+		builder.WriteString("user_id：" + info["user_id"].String() + "\n")
+		builder.WriteString("salesperson_id：" + info["salesperson_id"].String() + "\n")
+		builder.WriteString("client_status：" + info["client_status"].String() + "\n")
+		builder.WriteString("backend_status：" + info["backend_status"].String() + "\n")
+		builder.WriteString("trade_files：" + info["trade_files"].String() + "\n")
+		builder.WriteString("failed_reason：" + info["failed_reason"].String() + "\n")
+		builder.WriteString("failed_files：" + info["failed_files"].String() + "\n")
+		builder.WriteString("trade_amount：" + info["trade_amount"].String() + "\n")
+		builder.WriteString("payable_amount：" + info["payable_amount"].String() + "\n")
+		builder.WriteString("card_cate_id：" + info["card_cate_id"].String() + "\n")
+		builder.WriteString("card_cate_sub_id：" + info["card_cate_sub_id"].String() + "\n")
+		result := builder.String()
+		data["remarks"] = result
+		insertRecord(ctx, data)
+	}
 
 	_, err = service.Orders().Delete(ctx, filter)
 	return
