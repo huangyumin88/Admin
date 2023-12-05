@@ -5,10 +5,10 @@ import (
 
 	"api/internal/controller"
 	controllerCurrent "api/internal/controller/app"
-	controllerMy "api/internal/controller/app/my"
-	controllerPlatform "api/internal/controller/app/platform"
 	controllerApp "api/internal/controller/app/app"
 	controllerBanks "api/internal/controller/app/banks"
+	controllerMy "api/internal/controller/app/my"
+	controllerPlatform "api/internal/controller/app/platform"
 	"api/internal/middleware"
 )
 
@@ -20,6 +20,12 @@ func InitRouterApp(s *ghttp.Server) {
 		group.Group(``, func(group *ghttp.RouterGroup) {
 			group.Group(`/login`, func(group *ghttp.RouterGroup) {
 				group.Bind(controllerCurrent.NewLogin())
+			})
+
+			group.Group(`/app`, func(group *ghttp.RouterGroup) {
+				group.Bind(controllerApp.NewCardCategoriesSub())
+				group.Bind(controllerApp.NewCardCategories())
+				group.Bind(controllerApp.NewCardCountries())
 			})
 		})
 
@@ -47,12 +53,6 @@ func InitRouterApp(s *ghttp.Server) {
 
 			group.Group(`/my`, func(group *ghttp.RouterGroup) {
 				group.Bind(controllerMy.NewProfile())
-			})
-
-			group.Group(`/app`, func(group *ghttp.RouterGroup) {
-				group.Bind(controllerApp.NewCardCategoriesSub())
-				group.Bind(controllerApp.NewCardCategories())
-				group.Bind(controllerApp.NewCardCountries())
 			})
 
 			group.Group(`/banks`, func(group *ghttp.RouterGroup) {
