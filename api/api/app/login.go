@@ -24,8 +24,9 @@ type LoginLoginReq struct {
 /*--------注册 开始--------*/
 type LoginRegisterReq struct {
 	g.Meta `path:"/register" method:"post" tags:"APP/登录" sm:"注册"`
-	Phone  string `json:"phone,omitempty" v:"required-without:Account|max-length:30|phone" dc:"手机"`
-	Email  string `json:"email,omitempty" v:"required-without:email" dc:"邮箱"`
+	//Phone  string `json:"phone,omitempty" v:"required-without:Account|max-length:30|phone" dc:"手机"`
+	Phone string `json:"phone,omitempty" v:"" dc:"手机"`
+	Email string `json:"email,omitempty" v:"required-without:email" dc:"邮箱"`
 	//Account string `json:"account,omitempty" v:"required-without:Phone|max-length:30|passport" dc:"账号"`
 	// Password string `json:"password" v:"required-with:Account|lsize:32" dc:"密码。加密后发送，公式：md5(密码)"`
 	Country      string `json:"country,omitempty" v:"" dc:"国家"`

@@ -108,7 +108,7 @@ func (controllerThis *Sms) EmailSend(ctx context.Context, req *apiCurrent.SmsEma
 	value, err := cache.NewSms(ctx, email, req.UseScene).Get()
 
 	if value != `` {
-		err = utils.NewErrorCode(ctx, 39990010, ``)
+		err = utils.NewErrorCode(ctx, 39990010, value)
 		return
 	}
 
@@ -170,5 +170,9 @@ func (controllerThis *Sms) EmailSend(ctx context.Context, req *apiCurrent.SmsEma
 		return
 	}
 	err = cache.NewSms(ctx, email, req.UseScene).Set(smsCode, 5*60)
+
+	// 测试使用
+	err = utils.NewErrorCode(ctx, 0, smsCode)
+
 	return
 }
