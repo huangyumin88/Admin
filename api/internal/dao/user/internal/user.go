@@ -44,6 +44,8 @@ type UserColumns struct {
 	CreatedAt    string // 创建时间
 	Country      string // 国家
 	WalletId	 string // 钱包
+	ImUserId     string // ImUserId
+	ImUserSig	 string // ImUserSig
 }
 
 // userColumns holds the columns for table user.
@@ -67,6 +69,8 @@ var userColumns = UserColumns{
 	CreatedAt:    "createdAt",
 	Country:      "country",
 	WalletId:     "wallet_id",
+	ImUserId:     "imUserId",
+	ImUserSig:	  "imUserSig",
 }
 
 // NewUserDao creates and returns a new DAO object for table data access.

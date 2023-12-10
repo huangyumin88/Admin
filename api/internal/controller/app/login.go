@@ -9,16 +9,33 @@ import (
 	daoUser "api/internal/dao/user"
 	"api/internal/service"
 	"api/internal/utils"
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
-
 	"github.com/gogf/gf/v2/frame/g"
+	"github.com/tencentyun/tls-sig-api-v2-golang/tencentyun"
+	"io/ioutil"
+	"math/rand"
+	"net/http"
+	"time"
 )
 
 type Login struct{}
 
 func NewLogin() *Login {
 	return &Login{}
+}
+
+const (
+	sdkappid = 1600014653
+	key      = "cb21e11dbc877362238d4e27bffeee7c3a02da4c8d86b4f0f1e2591fd5c583b2"
+)
+
+type Response struct {
+	ActionStatus string `json:"ActionStatus"`
+	ErrorInfo    string `json:"ErrorInfo"`
+	ErrorCode    int    `json:"ErrorCode"`
 }
 
 //// 获取加密盐
@@ -98,8 +115,16 @@ func (controllerThis *Login) Login(ctx context.Context, req *apiCurrent.LoginLog
 		return
 	}
 	// cache.NewToken(ctx, claims.LoginId).Set(token, int64(jwt.ExpireTime)) //缓存token（限制多地登录，多设备登录等情况下用）
+	imUserId := info[userColumns.ImUserId].String()
+	sig, err := tencentyun.GenUserSig(sdkappid, key, imUserId, 86400*180)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	} else {
+		fmt.Println(sig)
+	}
 
-	res = &api.CommonTokenRes{Token: token}
+	res = &api.CommonTokenRes{Token: token, IMUserId: imUserId, IMUserSig: sig}
 	return
 }
 
@@ -169,12 +194,73 @@ func (controllerThis *Login) Register(ctx context.Context, req *apiCurrent.Login
 		return
 	}
 
+	// 创建IMUSerID
+	// https://cloud.tencent.com/document/product/269/1608
+
+	// 初始化随机数生成器
+	rand.Seed(time.Now().UnixNano())
+
+	// 生成随机的 32 位无符号整数
+	randomNum := rand.Uint32()
+
+	sig, err := tencentyun.GenUserSig(sdkappid, key, "admin124", 86400*180)
+	if err != nil {
+		return
+	}
+	url := fmt.Sprintf("https://console.tim.qq.com/v4/im_open_login_svc/account_import?sdkappid=%d&identifier=admin124&usersig=%s&random=%d&contenttype=json", sdkappid, sig, randomNum)
+
+	contentType := "application/json" // 内容类型
+	jsonStr := fmt.Sprintf(`{"UserID":"%d", "Nick":"%s"}`, 1000+userId, req.Username)
+	data3 := []byte(jsonStr)
+	// 要发送的数据
+
+	// 创建一个 HTTP POST 请求
+	resp, err := http.Post(url, contentType, bytes.NewBuffer(data3))
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	defer resp.Body.Close()
+
+	// 读取响应体
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println("Error reading response:", err)
+		return
+	}
+
+	// 解析 JSON 数据
+	var responseObj Response
+	if err1 := json.Unmarshal(body, &responseObj); err1 != nil {
+		fmt.Println("Error parsing JSON:", err1)
+		return
+	}
+
+	filter := map[string]interface{}{`userId`: userId}
+	daoThis := daoUser.User
+
+	// 输出 ActionStatus 字段
+	fmt.Println("ActionStatus:", responseObj.ActionStatus)
+	if responseObj.ActionStatus == "OK" {
+		data5 := make(map[string]interface{})
+		data5["imUserId"] = 1000 + userId
+		_, err = service.User().Update(ctx, filter, data5)
+		if err != nil {
+			service.User().Delete(ctx, g.Map{daoThis.PrimaryKey(): userId})
+			return
+		}
+	} else {
+		service.User().Delete(ctx, g.Map{daoThis.PrimaryKey(): userId})
+		err = utils.NewErrorCode(ctx, 29999999, responseObj.ErrorInfo)
+		return
+	}
+
 	data1 := make(map[string]interface{})
 	data1["user_id"] = userId
 
 	// 创建钱包
 	walletId, err := service.UserWallets().Create(ctx, data1)
-	daoThis := daoUser.User
+
 	daoUserWallets := daoUser.Wallets
 	if err != nil {
 
@@ -187,7 +273,6 @@ func (controllerThis *Login) Register(ctx context.Context, req *apiCurrent.Login
 
 	fmt.Println("wallet_id", walletId)
 
-	filter := map[string]interface{}{`userId`: userId}
 	/**--------参数处理 结束--------**/
 
 	_, err = service.User().Update(ctx, filter, data2)

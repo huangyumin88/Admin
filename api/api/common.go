@@ -13,5 +13,7 @@ type CommonSaltRes struct {
 }
 
 type CommonTokenRes struct {
-	Token string `json:"token" dc:"登录授权token"`
+	Token     string `json:"token" dc:"登录授权token"`
+	IMUserId  string `json:"imUserId" dc:"im登录ID"`
+	IMUserSig string `json:"imUserSig" dc:"im登录ID"`
 }

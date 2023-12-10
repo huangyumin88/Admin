@@ -15,11 +15,13 @@ require (
 	github.com/gogf/gf/contrib/nosql/redis/v2 v2.5.6
 	github.com/gogf/gf/v2 v2.5.6
 	github.com/golang-jwt/jwt/v5 v5.0.0
-	github.com/google/uuid v1.4.0 // indirect
+	github.com/google/uuid v1.4.0
 	github.com/gorilla/websocket v1.5.1 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/redis/go-redis/v9 v9.3.0 // indirect
+	github.com/tencentyun/tls-sig-api-v2-golang v1.3.0
 	go.opentelemetry.io/otel/sdk v1.20.0 // indirect
 	golang.org/x/net v0.18.0
 	golang.org/x/tools v0.6.0
+
 )
