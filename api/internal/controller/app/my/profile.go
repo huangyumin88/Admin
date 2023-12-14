@@ -4,12 +4,13 @@ import (
 	"api/api"
 	apiMy "api/api/app/my"
 	"api/internal/cache"
+	controllerupload "api/internal/controller"
 	daoUser "api/internal/dao/user"
 	"api/internal/service"
 	"api/internal/utils"
 	"api/internal/utils/idCard"
+	"api/internal/utils/upload"
 	"context"
-
 	"github.com/gogf/gf/v2/crypto/gmd5"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/util/gconv"
@@ -125,5 +126,17 @@ func (controllerThis *Profile) Update(ctx context.Context, req *apiMy.ProfileUpd
 	/**--------参数处理 结束--------**/
 
 	_, err = service.User().Update(ctx, filter, data)
+	return
+}
+
+// 获取签名（H5直传用）
+func (controllerThis *Profile) ProfileUploadSign(ctx context.Context, req *apiMy.ProfileUploadSignReq) (res *apiMy.ProfileUploadSignRes, err error) {
+	println("ProfileUploadSign")
+
+	signInfo, err := upload.NewUpload(ctx).Sign(controllerupload.CreateUploadOption(req.UploadType))
+	if err != nil {
+		return
+	}
+	utils.HttpWriteJson(ctx, signInfo, 0, ``)
 	return
 }
