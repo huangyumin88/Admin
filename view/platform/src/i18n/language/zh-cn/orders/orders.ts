@@ -7,6 +7,7 @@ export default {
 		client_status: '用户订单状态',
 		backend_status: '后台订单状态',
 		trade_files: '交易图片',
+		trade_remark: '交易备注',
 		failed_reason: '拒绝原因',
 		failed_files: '拒绝图片',
 		trade_amount: '交易金额',

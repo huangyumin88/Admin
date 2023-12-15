@@ -31,12 +31,13 @@ type OrdersColumns struct {
 	SalespersonId string // 业务员ID
 	ClientStatus  string // 用户订单状态：Pending - 交易中; Failed - 交易失败; Completed - 交易完成; Closed - 关闭;
 	BackendStatus string // 后台订单状态：Pending - 等待审核; Loading - 加载中;  Failed - 加载失败; Pledging - 质押中; Completed - 交易完成;
-	TradeFiles	  string // 交易图片
+	TradeFiles    string // 交易图片
+	TradeRemark   string // 交易备注
 	FailedReason  string // 拒绝原因
 	FailedFiles   string // 拒绝图片
 	TradeAmount   string // 交易金额（AUD）
 	PayableAmount string // 需要支付金额
-	CardCateId	  string // 主分类ID
+	CardCateId    string // 主分类ID
 	CardCateSubId string // 子分类ID
 	Device        string // 使用设备
 	Wallet        string // 结算货币
@@ -52,12 +53,13 @@ var ordersColumns = OrdersColumns{
 	SalespersonId: "salesperson_id",
 	ClientStatus:  "client_status",
 	BackendStatus: "backend_status",
-	TradeFiles:	   "trade_files",
+	TradeFiles:    "trade_files",
+	TradeRemark:   "trade_remark",
 	FailedReason:  "failed_reason",
 	FailedFiles:   "failed_files",
 	TradeAmount:   "trade_amount",
 	PayableAmount: "payable_amount",
-	CardCateId:	   "card_cate_id",
+	CardCateId:    "card_cate_id",
 	CardCateSubId: "card_cate_sub_id",
 	Device:        "device",
 	Wallet:        "wallet",

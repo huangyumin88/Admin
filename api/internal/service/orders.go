@@ -10,7 +10,7 @@ import (
 )
 
 type (
-	IOrders interface {
+	IOrdersOrdersActions interface {
 		// 新增
 		Create(ctx context.Context, data map[string]interface{}) (id int64, err error)
 		// 修改
@@ -18,7 +18,7 @@ type (
 		// 删除
 		Delete(ctx context.Context, filter map[string]interface{}) (row int64, err error)
 	}
-	IOrdersOrdersActions interface {
+	IOrders interface {
 		// 新增
 		Create(ctx context.Context, data map[string]interface{}) (id int64, err error)
 		// 修改

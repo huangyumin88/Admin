@@ -90,6 +90,7 @@ type OrdersInfo struct {
 	CardCateId    *uint       `json:"card_cate_id,omitempty"  dc:"分类ID"`
 	CardCateSubId *uint       `json:"card_cate_sub_id,omitempty" dc:"子分类ID"`
 	TradeFiles    *string     `json:"trade_files,omitempty" dc:"交易图片"`
+	TradeRemark   *string     `json:"trade_remark,omitempty" v:"" dc:"交易备注"`
 	Device        *string     `json:"device,omitempty" dc:"使用设备"`
 	Wallet        *string     `json:"wallet,omitempty" dc:"结算货币"`
 	UpdatedAt     *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
@@ -108,6 +109,7 @@ type OrdersCreateReq struct {
 	//FailedReason  *string  `json:"failed_reason,omitempty" v:"" dc:"拒绝原因"`
 	//FailedFiles   *string  `json:"failed_files,omitempty" v:"" dc:"拒绝图片"`
 	TradeFiles    *string  `json:"trade_files,omitempty" v:"" dc:"交易图片"`
+	TradeRemark   *string  `json:"trade_remark,omitempty" v:"" dc:"交易备注"`
 	TradeAmount   *float64 `json:"trade_amount,omitempty" v:"required|min:1" dc:"交易金额（AUD）"`
 	PayableAmount *uint    `json:"payable_amount,omitempty" v:"" dc:"需要支付金额"`
 	CardCateId    *uint    `json:"card_cate_id,omitempty" v:"required|min:1" dc:"分类ID"`
