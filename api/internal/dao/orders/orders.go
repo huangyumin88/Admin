@@ -184,6 +184,10 @@ func (daoThis *ordersDao) ParseField(field []string, fieldWithParam map[string]i
 		tableThis := daoThis.ParseDbTable(ctx)
 		for _, v := range field {
 			switch v {
+			case `client_status_name`:
+				*afterField = append(*afterField, v)
+			case `backend_status_name`:
+				*afterField = append(*afterField, v)
 			/* case `xxxx`:
 			m = m.Handler(daoThis.ParseJoin(Xxxx.ParseDbTable(ctx), joinTableArr))
 			*afterField = append(*afterField, v) */
@@ -226,6 +230,31 @@ func (daoThis *ordersDao) HookSelect(afterField *[]string, afterFieldWithParam m
 			for _, record := range result {
 				for _, v := range *afterField {
 					switch v {
+					case `client_status_name`:
+						//fmt.Println("client_status_name", record[Orders.Columns().ClientStatus])
+						if record[Orders.Columns().ClientStatus].String() == "Pending" {
+							record[v] = gvar.New("交易中")
+						} else if record[Orders.Columns().ClientStatus].String() == "Failed" {
+							record[v] = gvar.New("交易失败")
+						} else if record[Orders.Columns().ClientStatus].String() == "Completed" {
+							record[v] = gvar.New("交易完成")
+						} else {
+							record[v] = gvar.New("关闭")
+						}
+					case `backend_status_name`:
+
+						if record[Orders.Columns().BackendStatus].String() == "Pending" {
+							record[v] = gvar.New("等待审核")
+						} else if record[Orders.Columns().BackendStatus].String() == "Loading" {
+							record[v] = gvar.New("加载中")
+						} else if record[Orders.Columns().BackendStatus].String() == "Failed" {
+							record[v] = gvar.New("加载失败")
+						} else if record[Orders.Columns().BackendStatus].String() == "Pledging" {
+							record[v] = gvar.New("质押中")
+						} else {
+							record[v] = gvar.New("交易完成")
+						}
+
 					default:
 						record[v] = gvar.New(nil)
 					}
@@ -261,6 +290,10 @@ func (daoThis *ordersDao) ParseFilter(filter map[string]interface{}, joinTableAr
 				}
 			case `id`, `idArr`:
 				m = m.Where(tableThis+`.`+daoThis.PrimaryKey(), v)
+			//case `client_status_name`:
+			//
+			//case `backend_status_name`:
+
 			default:
 				if daoThis.ColumnArrG().Contains(k) {
 					m = m.Where(tableThis+`.`+k, v)
