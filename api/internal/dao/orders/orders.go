@@ -6,9 +6,10 @@ package dao
 
 import (
 	"api/internal/dao/orders/internal"
+	userAdmin "api/internal/dao/platform"
+	userDao "api/internal/dao/user"
 	"context"
 	"database/sql"
-
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/database/gdb"
@@ -186,6 +187,14 @@ func (daoThis *ordersDao) ParseField(field []string, fieldWithParam map[string]i
 			/* case `xxxx`:
 			m = m.Handler(daoThis.ParseJoin(Xxxx.ParseDbTable(ctx), joinTableArr))
 			*afterField = append(*afterField, v) */
+			case `salesperson_name`:
+				m = m.Fields(userAdmin.Admin.Table() + `.` + userAdmin.Admin.Columns().Nickname + ` AS ` + v)
+				m = daoThis.ParseJoin(userAdmin.Admin.Table(), joinTableArr)(m)
+
+			case `user_name`:
+				m = m.Fields(userDao.User.Table() + `.` + userDao.User.Columns().Nickname + ` AS ` + v)
+				m = daoThis.ParseJoin(userDao.User.Table(), joinTableArr)(m)
+
 			case `id`:
 				m = m.Fields(tableThis + `.` + daoThis.PrimaryKey() + ` AS ` + v)
 			default:
@@ -318,9 +327,13 @@ func (daoThis *ordersDao) ParseJoin(joinCode string, joinTableArr *[]string) gdb
 		tableThis := daoThis.ParseDbTable(ctx)
 		*joinTableArr = append(*joinTableArr, joinCode)
 		switch joinCode {
-		/* case Xxxx.ParseDbTable(ctx):
-		m = m.LeftJoin(joinCode, joinCode+`.`+Xxxx.Columns().XxxxId+` = `+tableThis+`.`+daoThis.PrimaryKey())
-		// m = m.LeftJoin(Xxxx.ParseDbTable(ctx)+` AS `+joinCode, joinCode+`.`+Xxxx.Columns().XxxxId+` = `+tableThis+`.`+daoThis.PrimaryKey()) */
+
+		case userAdmin.Admin.ParseDbTable(ctx):
+			m = m.LeftJoin(joinCode, joinCode+`.`+userAdmin.Admin.PrimaryKey()+` = `+tableThis+`.`+daoThis.Columns().SalespersonId)
+
+		case userDao.User.ParseDbTable(ctx):
+			m = m.LeftJoin(joinCode, joinCode+`.`+userDao.User.PrimaryKey()+` = `+tableThis+`.`+daoThis.Columns().UserId)
+
 		default:
 			m = m.LeftJoin(joinCode, joinCode+`.`+daoThis.PrimaryKey()+` = `+tableThis+`.`+daoThis.PrimaryKey())
 		}
