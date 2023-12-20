@@ -19,13 +19,13 @@
     <div class="TUIChat-main">
       <div class="TUIChat-safe-tips">
         <span>
-          {{ $t('TUIChat.安全提示') }}
+          {{ 'TUIChat.安全提示' }}
         </span>
-        <a @click="openLink(Link.complaint)">{{ $t('TUIChat.点此投诉') }}</a>
+        <a @click="openLink(Link.complaint)">{{ 'TUIChat.点此投诉' }}</a>
       </div>
       <ul class="TUI-message-list" @click="dialogID = ''" ref="messageEle" id="messageEle">
         <p class="message-more" @click="getHistoryMessageList" v-if="!isCompleted">
-          {{ $t('TUIChat.查看更多') }}
+          {{ 'TUIChat.查看更多' }}
         </p>
         <li v-for="(item, index) in messages" :key="index" :id="item?.ID" ref="messageAimID">
           <MessageTimestamp :currTime="item?.time" :prevTime="index > 0 ? (messages[index-1]?.time) : 0"></MessageTimestamp>
@@ -111,7 +111,7 @@
         :replyOrReference="reference"
         :isMute="isMute"
         :muteText="muteText"
-        :placeholder="$t('TUIChat.请输入消息')"
+        :placeholder="'TUIChat.请输入消息'"
         @sendMessage="reportMessageSend"
         @resetReplyOrReference="resetReplyOrReference"
         @onTyping="handleTyping"
@@ -119,11 +119,11 @@
     </div>
     <div v-show="showResend" class="mask" @click="showResend = false">
       <div class="mask-main">
-        <header>{{ $t('TUIChat.确认重发该消息？') }}</header>
+        <header>{{ 'TUIChat.确认重发该消息？' }}</header>
         <footer>
-          <p @click="showResend = false">{{ $t('TUIChat.取消') }}</p>
+          <p @click="showResend = false">{{ 'TUIChat.取消' }}</p>
           <i></i>
-          <p @click="submit">{{ $t('TUIChat.确定') }}</p>
+          <p @click="submit">{{ 'TUIChat.确定' }}</p>
         </footer>
       </div>
     </div>
@@ -170,8 +170,8 @@ import { useStore } from 'vuex';
 import constant from '../constant';
 import { handleErrorPrompts } from '../utils';
 import Link from '../../../utils/link';
-import { Message } from './interface';
-import { Conversation } from '../TUIConversation/interface';
+import type {  Message } from './interface';
+import type { Conversation } from '../TUIConversation/interface';
 
 import MessageInput from './message-input';
 
@@ -203,7 +203,8 @@ const TUIChat: any = defineComponent({
     const GroupServer = TUIServer?.TUICore?.TUIServer?.TUIGroup;
     const ProfileServer = TUIServer?.TUICore?.TUIServer?.TUIProfile;
     const VuexStore = (TUIServer.TUICore.isOfficial && useStore && useStore()) || {};
-    const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+    // const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+    // const { t, tm } = useI18n()
     const data = reactive({
       messageList: [] as Message[],
       conversation: {} as Conversation,
@@ -736,9 +737,9 @@ const TUIChat: any = defineComponent({
         case true:
           data.needToBottom = true;
           if (data?.conversation?.unreadCount && data?.conversation?.unreadCount > 0) {
-            data.toBottomTipCont = `${data?.conversation?.unreadCount} ${t('TUIChat.条新消息')}`;
+            data.toBottomTipCont = `${data?.conversation?.unreadCount} ${'TUIChat.条新消息'}`;
           } else {
-            data.toBottomTipCont = t('TUIChat.回到最新位置');
+            data.toBottomTipCont = 'TUIChat.回到最新位置';
           }
           break;
         case false:

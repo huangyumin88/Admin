@@ -2,15 +2,15 @@
   <div class="TUI-search" :class="[env.isH5 ? 'TUI-search-H5' : '']" ref="dialog">
     <header @click="toggleOptionalShow">
       <i class="plus"></i>
-      <h1 v-if="env.isH5">{{ $t('TUISearch.发起会话') }}</h1>
+      <h1 v-if="env.isH5">{{ 'TUISearch.发起会话' }}</h1>
       <ul v-show="optionalShow">
         <li>
           <i class="icon icon-c2c" v-if="env.isH5"></i>
-          <h1 @click="showOpen('isC2C')">{{ $t('TUISearch.发起单聊') }}</h1>
+          <h1 @click="showOpen('isC2C')">{{ 'TUISearch.发起单聊' }}</h1>
         </li>
         <li>
           <i class="icon icon-group"></i>
-          <h1 @click="showOpen('isGroup')">{{ $t('TUISearch.发起群聊') }}</h1>
+          <h1 @click="showOpen('isGroup')">{{ 'TUISearch.发起群聊' }}</h1>
         </li>
       </ul>
     </header>
@@ -57,7 +57,8 @@ const TUISearch = defineComponent({
 
   setup(props) {
     const TUIServer: any = TUISearch?.TUIServer;
-    const { t } = TUIServer.TUICore.config.i18n.useI18n();
+    // const { t } = TUIServer.TUICore.config.i18n.useI18n();
+    // const { t, tm } = useI18n()
     const data = reactive({
       open: false,
       searchUserID: '',
@@ -137,7 +138,7 @@ const TUISearch = defineComponent({
         toggleOpen();
       } else {
         if (!CreateGroup.TUIServer) {
-          const message = t('TUISearch.创建群聊，请注册 TUIGroup 模块');
+          const message = 'TUISearch.创建群聊，请注册 TUIGroup 模块';
           handleErrorPrompts(message, data.env);
         }
         initGroupOptions();
@@ -159,7 +160,7 @@ const TUISearch = defineComponent({
       }
       try {
         const imResponse = await GroupServer.createGroup(options);
-        const message = t('TUISearch.创建成功');
+        const message = 'TUISearch.创建成功';
         handleSuccessPrompts(message, data.env);
         (window as any)?.TUIKitTUICore?.isOfficial && VuexStore?.commit && VuexStore?.commit('handleTask', 3);
         toggleOpen();
@@ -191,11 +192,11 @@ const TUISearch = defineComponent({
       switch (type) {
         case 'isC2C':
           data.createConversationType = constant.typeC2C;
-          data.showTitle = t('TUISearch.发起单聊');
+          data.showTitle = 'TUISearch.发起单聊';
           return data.showTitle;
         case 'isGroup':
           data.createConversationType = constant.typeGroup;
-          data.showTitle = t('TUISearch.发起群聊');
+          data.showTitle = 'TUISearch.发起群聊';
           return data.showTitle;
       }
     };
@@ -210,7 +211,7 @@ const TUISearch = defineComponent({
       try {
         const imResponse: any = await TUIServer.getUserProfile([val]);
         if (!imResponse.data.length) {
-          handleErrorPrompts(t('TUISearch.该用户不存在'), data.env);
+          handleErrorPrompts('TUISearch.该用户不存在', data.env);
           data.searchUserList = [...data.allUserList];
           return;
         }
@@ -218,7 +219,7 @@ const TUISearch = defineComponent({
         const searchAllResult = data.allUserList.filter((item: any) => item.userID === imResponse.data[0].userID);
         data.allUserList = searchAllResult.length ? data.allUserList : [...data.allUserList, ...data.searchUserList];
       } catch (error) {
-        handleErrorPrompts(t('TUISearch.该用户不存在'), data.env);
+        handleErrorPrompts('TUISearch.该用户不存在', data.env);
         data.searchUserList = [...data.allUserList];
         return;
       }

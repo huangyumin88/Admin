@@ -2,7 +2,7 @@ import { formatTime } from '../../../utils/date';
 import { decodeText } from './decodeText';
 import TIM from '../../../../TUICore/tim';
 import constant from '../../constant';
-import { Message } from '../interface';
+import type { Message } from '../interface';
 
 // Handling avatars
 export function handleAvatar(item: any) {
@@ -29,7 +29,8 @@ export function handleAvatar(item: any) {
 
 // Handling names
 export function handleName(item: any) {
-  const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+  // const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+  // const { t, tm } = useI18n()
   let name = '';
   switch (item.type) {
     case TIM.TYPES.CONV_C2C:
@@ -39,18 +40,19 @@ export function handleName(item: any) {
       name = item.groupProfile.name || item?.groupProfile?.groupID || '';
       break;
     case TIM.TYPES.CONV_SYSTEM:
-      name = t('系统通知');
+      name = '系统通知';
       break;
   }
   return name;
 }
 // Handle whether there is someone@
 export function handleAt(item: any) {
-  const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+  // const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+  // const { t, tm } = useI18n()
   const List: any = [
-    `[${t('TUIConversation.有人@我')}]`,
-    `[${t('TUIConversation.@所有人')}]`,
-    `[${t('TUIConversation.@所有人')}][${t('TUIConversation.有人@我')}]`,
+    `[${'TUIConversation.有人@我'}]`,
+    `[${'TUIConversation.@所有人'}]`,
+    `[${'TUIConversation.@所有人'}][${'TUIConversation.有人@我'}]`,
   ];
   let showAtType = '';
   for (let index = 0; index < item.groupAtInfoList.length; index++) {
@@ -104,7 +106,8 @@ export function handleReferenceForShow(message: any) {
 
 // Internal display of processing message box
 export function handleShowLastMessage(item: any) {
-  const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+  // const { t } = (window as any).TUIKitTUICore.config.
+  // const { t, tm } = useI18n()
   const { lastMessage } = item;
   const conversation = item;
   let showNick = '';
@@ -113,12 +116,12 @@ export function handleShowLastMessage(item: any) {
   const showUnreadCount =
     conversation.unreadCount > 0 &&
     conversation.messageRemindType === TIM.TYPES.MSG_REMIND_ACPT_NOT_NOTE
-      ? `[${conversation.unreadCount > 99 ? "99+" : conversation.unreadCount}${t('TUIConversation.条')}] `
+      ? `[${conversation.unreadCount > 99 ? "99+" : conversation.unreadCount}${'TUIConversation.条'}] `
       : "";
   // Determine the lastmessage sender of the group. Namecard / Nick / userid is displayed by priority
   if (conversation.type === TIM.TYPES.CONV_GROUP) {
     if (lastMessage.fromAccount === conversation.groupProfile.selfInfo.userID) {
-      showNick = t('TUIConversation.我');
+      showNick = 'TUIConversation.我';
     } else {
       showNick = lastMessage.nameCard || lastMessage.nick || lastMessage.fromAccount;
     }
@@ -138,7 +141,7 @@ export function handleShowLastMessage(item: any) {
   }
 
   if (lastMessage.isRevoked) {
-    lastMessagePayload = t('TUIChat.撤回了一条消息');
+    lastMessagePayload = 'TUIChat.撤回了一条消息';
   }
   if (conversation.type === TIM.TYPES.CONV_GROUP && lastMessage.type === TIM.TYPES.MSG_GRP_TIP) {
     return lastMessagePayload;
@@ -165,21 +168,21 @@ export function handleTipMessageShowContext(message: any) {
   if (message?.type === TIM?.TYPES?.MSG_GRP_TIP) {
     switch (message.payload.operationType) {
       case TIM.TYPES.GRP_TIP_MBR_JOIN:
-        options.text = `${userName} ${t('message.tip.加入群组')}`;
+        options.text = `${userName} ${'message.tip.加入群组'}`;
         break;
       case TIM.TYPES.GRP_TIP_MBR_QUIT:
-        options.text = `${t('message.tip.群成员')}：${userName} ${t('message.tip.退出群组')}`;
+        options.text = `${'message.tip.群成员'}：${userName} ${'message.tip.退出群组'}`;
         break;
       case TIM.TYPES.GRP_TIP_MBR_KICKED_OUT:
-        options.text = `${t('message.tip.群成员')}：${userName} ${t('message.tip.被')}${message.payload.operatorID}${t(
+        options.text = `${'message.tip.群成员'}：${userName} ${'message.tip.被'}${message.payload.operatorID}${
           'message.tip.踢出群组'
-        )}`;
+        }`;
         break;
       case TIM.TYPES.GRP_TIP_MBR_SET_ADMIN:
-        options.text = `${t('message.tip.群成员')}：${userName} ${t('message.tip.成为管理员')}`;
+        options.text = `${'message.tip.群成员'}：${userName} ${'message.tip.成为管理员'}`;
         break;
       case TIM.TYPES.GRP_TIP_MBR_CANCELED_ADMIN:
-        options.text = `${t('message.tip.群成员')}：${userName} ${t('message.tip.被撤销管理员')}`;
+        options.text = `${'message.tip.群成员'}：${userName} ${'message.tip.被撤销管理员'}`;
         break;
       case TIM.TYPES.GRP_TIP_GRP_PROFILE_UPDATED:
         // options.text =  `${userName} 修改群组资料`;
@@ -188,19 +191,19 @@ export function handleTipMessageShowContext(message: any) {
       case TIM.TYPES.GRP_TIP_MBR_PROFILE_UPDATED:
         for (const member of message.payload.memberList) {
           if (member.muteTime > 0) {
-            options.text = `${t('message.tip.群成员')}：${member.userID}${t('message.tip.被禁言')}`;
+            options.text = `${'message.tip.群成员'}：${member.userID}${'message.tip.被禁言'}`;
           } else {
-            options.text = `${t('message.tip.群成员')}：${member.userID}${t('message.tip.被取消禁言')}`;
+            options.text = `${'message.tip.群成员'}：${member.userID}${'message.tip.被取消禁言'}`;
           }
         }
         break;
       default:
-        options.text = `[${t('message.tip.群提示消息')}]`;
+        options.text = `[${'message.tip.群提示消息'}]`;
         break;
     }
   } else if (JSONToObject(message?.payload?.data)?.businessID === "group_create") {
     const data = JSONToObject(message?.payload?.data);
-    options.text = `"${data?.opUser}" ` + t(data?.content);
+    options.text = `"${data?.opUser}" ` + data?.content;
   } else {
     options.text = extractCallingInfoFromMessage(message);
   }
@@ -208,20 +211,21 @@ export function handleTipMessageShowContext(message: any) {
 }
 
 function handleTipGrpUpdated(message: any) {
-  const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+  // const { t } = (window as any).TUIKitTUICore.config.
+  // const { t, tm } = useI18n()
   const { payload } = message;
   const { newGroupProfile } = payload;
   const { operatorID } = payload;
   let text = "";
   if ("muteAllMembers" in newGroupProfile) {
     if (newGroupProfile["muteAllMembers"]) {
-      text = `${t("message.tip.管理员")} ${operatorID} ${t(
+      text = `${"message.tip.管理员"} ${operatorID} ${
         "message.tip.开启全员禁言"
-      )}`;
+      }`;
       } else {
-      text = `${t("message.tip.管理员")} ${operatorID} ${t(
+      text = `${"message.tip.管理员"} ${operatorID} ${
         "message.tip.取消全员禁言"
-      )}`;
+      }`;
       }
   } else if ("ownerID" in newGroupProfile) {
     text = `${newGroupProfile["ownerID"]} ${t("message.tip.成为新的群主")}`;
@@ -369,42 +373,42 @@ export function extractCallingInfoFromMessage(message: any) {
   switch (callingMessage.actionType) {
     case 1: {
       if (objectData.call_end >= 0 && !callingMessage.groupID) {
-        return `${t('message.custom.通话时长')}：${formatTime(objectData.call_end)}`;
+        return `${'message.custom.通话时长'}：${formatTime(objectData.call_end)}`;
       }
       if (callingMessage.groupID && callingMessage.timeout > 0) {
-        return `${inviter}${t('message.custom.发起通话')}`;
+        return `${inviter}${'message.custom.发起通话'}`;
       }
       if (callingMessage.groupID) {
-        return `${t('message.custom.结束群聊')}`;
+        return `${'message.custom.结束群聊'}`;
       }
       if (objectData.data && objectData.data.cmd === 'switchToAudio') {
-        return `${t('message.custom.切换语音通话')}`;
+        return `${'message.custom.切换语音通话'}`;
       }
       if (objectData.data && objectData.data.cmd === 'switchToVideo') {
-        return `${t('message.custom.切换视频通话')}`;
+        return `${'message.custom.切换视频通话'}`;
       }
-      return `${t('message.custom.发起通话')}`;
+      return `${'message.custom.发起通话'}`;
     }
     case 2:
-      return `${callingMessage.groupID ? inviter : ''}${t('message.custom.取消通话')}`;
+      return `${callingMessage.groupID ? inviter : ''}${'message.custom.取消通话'}`;
     case 3:
       if (objectData.data && objectData.data.cmd === 'switchToAudio') {
-        return `${t('message.custom.切换语音通话')}`;
+        return `${'message.custom.切换语音通话'}`;
       }
       if (objectData.data && objectData.data.cmd === 'switchToVideo') {
-        return `${t('message.custom.切换视频通话')}`;
+        return `${'message.custom.切换视频通话'}`;
       }
-      return `${callingMessage.groupID ? inviteeList : ''}${t('message.custom.已接听')}`;
+      return `${callingMessage.groupID ? inviteeList : ''}${'message.custom.已接听'}`;
     case 4:
-      return `${callingMessage.groupID ? inviteeList : ''}${t('message.custom.拒绝通话')}`;
+      return `${callingMessage.groupID ? inviteeList : ''}${'message.custom.拒绝通话'}`;
     case 5:
       if (objectData.data && objectData.data.cmd === 'switchToAudio') {
-        return `${t('message.custom.切换语音通话')}`;
+        return `${'message.custom.切换语音通话'}`;
       }
       if (objectData.data && objectData.data.cmd === 'switchToVideo') {
-        return `${t('message.custom.切换视频通话')}`;
+        return `${'message.custom.切换视频通话'}`;
       }
-      return `${callingMessage.groupID ? inviteeList : ''}${t('message.custom.无应答')}`;
+      return `${callingMessage.groupID ? inviteeList : ''}${'message.custom.无应答'}`;
     default:
       return '';
   }
@@ -412,7 +416,8 @@ export function extractCallingInfoFromMessage(message: any) {
 
 // Parsing and handling custom message display
 export function handleCustomMessageShowContext(item: any) {
-  const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+  // const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+  // const { t, tm } = useI18n()
   const payloadObj = JSONToObject(item?.payload?.data);
   if (payloadObj?.businessID === constant.typeEvaluate) {
     if (!(payloadObj?.score > 0)) {
@@ -422,49 +427,50 @@ export function handleCustomMessageShowContext(item: any) {
   }
   return {
     message: item,
-    custom: extractCallingInfoFromMessage(item) || `[${t('message.custom.自定义消息')}]`,
+    custom: extractCallingInfoFromMessage(item) || `[${'message.custom.自定义消息'}]`,
   };
 }
 
 // Parsing and handling system message display
 export function translateGroupSystemNotice(message: any) {
-  const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+  // const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+  // const { t, tm } = useI18n()
   const groupName = message.payload.groupProfile.name || message.payload.groupProfile.groupID;
   switch (message.payload.operationType) {
     case 1:
-      return `${message.payload.operatorID} ${t('message.tip.申请加入群组')}：${groupName}`;
+      return `${message.payload.operatorID} ${'message.tip.申请加入群组'}：${groupName}`;
     case 2:
-      return `${t('message.tip.成功加入群组')}：${groupName}`;
+      return `${'message.tip.成功加入群组'}：${groupName}`;
     case 3:
-      return `${t('message.tip.申请加入群组')}：${groupName} ${t('message.tip.被拒绝')}`;
+      return `${'message.tip.申请加入群组'}：${groupName} ${'message.tip.被拒绝'}`;
     case 4:
-      return `${t('message.tip.你被管理员')}${message.payload.operatorID} ${t('message.tip.踢出群组')}：${groupName}`;
+      return `${'message.tip.你被管理员'}${message.payload.operatorID} ${'message.tip.踢出群组'}：${groupName}`;
     case 5:
-      return `${t('message.tip.群')}：${groupName} ${t('message.tip.被')} ${message.payload.operatorID} ${t(
+      return `${'message.tip.群'}：${groupName} ${'message.tip.被'} ${message.payload.operatorID} ${
         'message.tip.解散'
-      )}`;
+      }`;
     case 6:
-      return `${message.payload.operatorID} ${t('message.tip.创建群')}：${groupName}`;
+      return `${message.payload.operatorID} ${'message.tip.创建群'}：${groupName}`;
     case 7:
-      return `${message.payload.operatorID} ${t('message.tip.邀请你加群')}：${groupName}`;
+      return `${message.payload.operatorID} ${'message.tip.邀请你加群'}：${groupName}`;
     case 8:
-      return `${t('message.tip.你退出群组')}：${groupName}`;
+      return `${'message.tip.你退出群组'}：${groupName}`;
     case 9:
-      return `${t('message.tip.你被')}${message.payload.operatorID} ${t('message.tip.设置为群')}：${groupName} ${t(
+      return `${'message.tip.你被'}${message.payload.operatorID} ${'message.tip.设置为群'}：${groupName} ${
         'message.tip.的管理员'
-      )}`;
+      }`;
     case 10:
-      return `${t('message.tip.你被')}${message.payload.operatorID} ${t('message.tip.撤销群')}：${groupName} ${t(
+      return `${'message.tip.你被'}${message.payload.operatorID} ${'message.tip.撤销群'}：${groupName} ${
         'message.tip.的管理员身份'
-      )}`;
+      }`;
     case 12:
-      return `${message.payload.operatorID} ${t('message.tip.邀请你加群')}：${groupName}`;
+      return `${message.payload.operatorID} ${'message.tip.邀请你加群'}：${groupName}`;
     case 13:
-      return `${message.payload.operatorID} ${t('message.tip.同意加群')}：${groupName}`;
+      return `${message.payload.operatorID} ${'message.tip.同意加群'}：${groupName}`;
     case 14:
-      return `${message.payload.operatorID} ${t('message.tip.拒接加群')}：${groupName}`;
+      return `${message.payload.operatorID} ${'message.tip.拒接加群'}：${groupName}`;
     case 255:
-      return `${t('message.tip.自定义群系统通知')}: ${message.payload.userDefinedField}`;
+      return `${'message.tip.自定义群系统通知'}: ${message.payload.userDefinedField}`;
   }
 }
 

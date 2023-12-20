@@ -2,14 +2,13 @@ import { createApp } from "vue"
 import App from "./App.vue"
 
 import "./assets/css/main.css"
-
+// import locales from './locales';
 import i18n from './i18n'
 import router from './router'
 import { createPinia } from 'pinia'
 
 import { TUIComponents, TUICore, genTestUserSig } from "./TUIKit";
-
-import { TUICallKit } from '@tencentcloud/call-uikit-vue';
+// import { TUINotification } from './TUIKit/TUIPlugin';
 
 const SDKAppID = 1600014653; // Your SDKAppID
 const secretKey = 'cb21e11dbc877362238d4e27bffeee7c3a02da4c8d86b4f0f1e2591fd5c583b2'; //Your secretKey
@@ -20,8 +19,7 @@ const TUIKit = TUICore.init({
 });
 
 TUIKit.use(TUIComponents);
-
-TUIKit.use(TUICallKit);
+// TUIKit.use(TUINotification);
 
 TUIKit.login({
     userID: userID,
@@ -47,6 +45,8 @@ for (const [key, component] of Object.entries(epIconList)) {
     //app.component('Ep' + key, component)
     app.component('AutoiconEp' + key, component)    //兼容图标插件unplugin-icons，如插件以后支持动态加载<component :is="图标标识变量"/>，不用修改代码
 }
+
+// export { SDKAppID, secretKey };
 /*-------- 动态加载图标 结束 --------*/
 
 /*-------- 错误处理 开始 --------*/

@@ -34,7 +34,7 @@
 import { defineComponent, reactive, watchEffect, toRefs, watch, ref } from 'vue';
 import { onClickOutside } from '@vueuse/core';
 import { caculateTimeago } from '../../../utils';
-import { Message } from '../../interface';
+import type { Message } from '../../interface';
 import TIM from '../../../../../TUICore/tim';
 import RepliesItem from './replies-item.vue';
 import { JSONToObject } from '../../utils/utils';

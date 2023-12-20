@@ -65,7 +65,7 @@
             <label>{{ $t(`TUIChat.manage.群ID`) }}</label>
             <div class="groupID">
               <span>{{ conversation.groupProfile.groupID }}</span>
-              <i class="icon icon-msg-copy" @click="handleGroupIDCopy" :title="$t('TUIChat.复制')"></i>
+              <i class="icon icon-msg-copy" @click="handleGroupIDCopy" :title="'TUIChat.复制'"></i>
             </div>
           </li>
           <li>
@@ -259,7 +259,8 @@ const manage = defineComponent({
   setup(props: any, ctx: any) {
     const types: any = manage.TUIServer.TUICore.TIM.TYPES;
     const { GroupServer } = manage;
-    const { t } = manage.TUIServer.TUICore.config.i18n.useI18n();
+    // const { t } = manage.TUIServer.TUICore.config.i18n.useI18n();
+    // const { t, tm } = useI18n()
     const data: any = reactive({
       conversation: {},
       userInfo: {
@@ -574,7 +575,7 @@ const manage = defineComponent({
               });
             }
           } catch (error) {
-            const message = t('TUIChat.manage.该用户不存在');
+            const message = 'TUIChat.manage.该用户不存在';
             handleErrorPrompts(message, props);
           }
           break;
@@ -582,7 +583,7 @@ const manage = defineComponent({
           try {
             imResponse = await GroupServer.getGroupMemberProfile(options);
             if (imResponse.data.memberList.length === 0) {
-              const message = t('TUIChat.manage.该用户不在群组内');
+              const message = 'TUIChat.manage.该用户不在群组内';
               return handleErrorPrompts(message, props);
             }
             data.transferList = data.transferList.filter(
@@ -590,7 +591,7 @@ const manage = defineComponent({
             );
             data.transferList = [...data.transferList, ...imResponse?.data?.memberList];
           } catch (error) {
-            const message = t('TUIChat.manage.该用户不存在');
+            const message = 'TUIChat.manage.该用户不存在';
             handleErrorPrompts(message, props);
           }
           break;
@@ -677,7 +678,7 @@ const manage = defineComponent({
 
     const toggleShow = () => {
       if (!GroupServer) {
-        const message = t('TUIChat.manage.请先注册 TUIGroup 模块');
+        const message = 'TUIChat.manage.请先注册 TUIGroup 模块';
         return handleErrorPrompts(message, props);
       }
       data.show = !data.show;

@@ -10,7 +10,7 @@
         <i v-if="isH5" class="icon icon-back" @click="toggleShow"></i>
       </div>
       <div class="header-title">
-        <span>{{ $t('TUIChat.消息详情') }}</span>
+        <span>{{ 'TUIChat.消息详情' }}</span>
       </div>
       <div class="header-close">
         <i v-if="!isH5" class="icon icon-close" @click="toggleShow"></i>
@@ -65,7 +65,7 @@
 import { defineComponent, reactive, watchEffect, toRefs, watch, ref } from 'vue';
 import { onClickOutside } from '@vueuse/core';
 import { caculateTimeago, handleErrorPrompts } from '../../../utils';
-import { Message, userListItem } from '../../interface';
+import type { Message, userListItem } from '../../interface';
 import {
   handleImageMessageShowContext,
   handleVideoMessageShowContext,
@@ -89,7 +89,8 @@ const ReadReceiptDialog = defineComponent({
     },
   },
   setup(props: any, ctx: any) {
-    const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+    // const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+    // const { t, tm } = useI18n()
     const data = reactive({
       message: {} as Message,
       isGroup: false,
@@ -101,7 +102,7 @@ const ReadReceiptDialog = defineComponent({
       },
       readReceiptList: [
         {
-          label: props.isH5 ? t('TUIChat.人已读') : t('TUIChat.已读'),
+          label: props.isH5 ? 'TUIChat.人已读' : 'TUIChat.已读',
           count: 0,
           userList: [] as userListItem[],
           isCompleted: true,
@@ -109,7 +110,7 @@ const ReadReceiptDialog = defineComponent({
           show: true,
         },
         {
-          label: props.isH5 ? t('TUIChat.人未读') : t('TUIChat.未读'),
+          label: props.isH5 ? 'TUIChat.人未读' : 'TUIChat.未读',
           count: 0,
           userList: [] as userListItem[],
           isCompleted: true,
@@ -117,7 +118,7 @@ const ReadReceiptDialog = defineComponent({
           show: true,
         },
         {
-          label: props.isH5 ? t('TUIChat.人关闭阅读状态') : t('TUIChat.关闭阅读状态'),
+          label: props.isH5 ? 'TUIChat.人关闭阅读状态' : 'TUIChat.关闭阅读状态',
           count: 0,
           userList: [] as userListItem[],
           isCompleted: true,
@@ -185,7 +186,7 @@ const ReadReceiptDialog = defineComponent({
           : readList;
       } catch (error) {
         if (error && (error as any)?.code === 10062) {
-          const message = t('TUIChat.您当前购买使用的套餐包暂未开通群消息已读回执功能');
+          const message = 'TUIChat.您当前购买使用的套餐包暂未开通群消息已读回执功能';
           handleErrorPrompts(message, data.env);
           console.warn(message);
         }
@@ -249,7 +250,7 @@ const ReadReceiptDialog = defineComponent({
       data.message = {};
       data.readReceiptList = [
         {
-          label: props.isH5 ? t('TUIChat.人已读') : t('TUIChat.已读'),
+          label: props.isH5 ? 'TUIChat.人已读' : 'TUIChat.已读',
           count: 0,
           userList: [] as userListItem[],
           isCompleted: true,
@@ -257,7 +258,7 @@ const ReadReceiptDialog = defineComponent({
           show: true,
         },
         {
-          label: props.isH5 ? t('TUIChat.人未读') : t('TUIChat.未读'),
+          label: props.isH5 ? 'TUIChat.人未读' : 'TUIChat.未读',
           count: 0,
           userList: [] as userListItem[],
           isCompleted: true,
@@ -265,7 +266,7 @@ const ReadReceiptDialog = defineComponent({
           show: true,
         },
         {
-          label: props.isH5 ? t('TUIChat.人关闭阅读状态') : t('TUIChat.关闭阅读状态'),
+          label: props.isH5 ? 'TUIChat.人关闭阅读状态' : 'TUIChat.关闭阅读状态',
           count: 0,
           userList: [] as userListItem[],
           isCompleted: true,
@@ -288,7 +289,7 @@ const ReadReceiptDialog = defineComponent({
           data.messageInfo.isImg = false;
           break;
         case ReadReceiptDialog.TUIServer.TUICore.TIM.TYPES.MSG_CUSTOM:
-          data.messageInfo.content = t('TUIChat.自定义');
+          data.messageInfo.content = 'TUIChat.自定义';
           data.messageInfo.isImg = false;
           break;
         case ReadReceiptDialog.TUIServer.TUICore.TIM.TYPES.MSG_IMAGE:
@@ -296,7 +297,7 @@ const ReadReceiptDialog = defineComponent({
           data.messageInfo.isImg = true;
           break;
         case ReadReceiptDialog.TUIServer.TUICore.TIM.TYPES.MSG_AUDIO:
-          data.messageInfo.content = t('TUIChat.语音');
+          data.messageInfo.content = 'TUIChat.语音';
           data.messageInfo.isImg = false;
           break;
         case ReadReceiptDialog.TUIServer.TUICore.TIM.TYPES.MSG_VIDEO:
@@ -304,7 +305,7 @@ const ReadReceiptDialog = defineComponent({
           data.messageInfo.isImg = true;
           break;
         case ReadReceiptDialog.TUIServer.TUICore.TIM.TYPES.MSG_FILE:
-          data.messageInfo.content = t('TUIChat.文件') + data.message?.payload?.fileName;
+          data.messageInfo.content = 'TUIChat.文件' + data.message?.payload?.fileName;
           data.messageInfo.isImg = false;
           break;
         case ReadReceiptDialog.TUIServer.TUICore.TIM.TYPES.MSG_FACE:

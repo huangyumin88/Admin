@@ -59,21 +59,22 @@ const ManageMember = defineComponent({
     });
 
     const handleRoleName = (item: any) => {
-      const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+      // const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+      // const { t, tm } = useI18n()
       let name = '';
       switch (item?.role) {
         case types.GRP_MBR_ROLE_ADMIN:
-          name = t('TUIChat.manage.管理员');
+          name = 'TUIChat.manage.管理员';
           break;
         case types.GRP_MBR_ROLE_OWNER:
-          name = t('TUIChat.manage.群主');
+          name = 'TUIChat.manage.群主';
           break;
       }
       if (name) {
         name = `(${name})`;
       }
       if (item.userID === data.self.userID) {
-        name += ` (${t('TUIChat.manage.我')})`;
+        name += ` (${'TUIChat.manage.我'})`;
       }
       return name;
     };

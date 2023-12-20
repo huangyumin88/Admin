@@ -1,8 +1,8 @@
 import TUIMessage from '../components/message/index';
 import Error from './error';
-
+// const { t, tm } = useI18n()
 export function caculateTimeago(dateTimeStamp: number) {
-  const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+  // const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
   const minute = 1000 * 60;
   const hour = minute * 60;
   const day = hour * 24;
@@ -19,15 +19,15 @@ export function caculateTimeago(dateTimeStamp: number) {
   const dayC = diffValue / day;
   const weekC = diffValue / week;
   if (weekC >= 1 && weekC <= 4) {
-    result = ` ${parseInt(`${weekC}`, 10)} ${t('time.周')}${t('time.前')}`;
+    result = ` ${parseInt(`${weekC}`, 10)} ${'time.周'}${'time.前'}`;
   } else if (dayC >= 1 && dayC <= 6) {
-    result = ` ${parseInt(`${dayC}`, 10)} ${t('time.天')}${t('time.前')}`;
+    result = ` ${parseInt(`${dayC}`, 10)} ${'time.天'}${'time.前'}`;
   } else if (hourC >= 1 && hourC <= 23) {
-    result = ` ${parseInt(`${hourC}`, 10)} ${t('time.小时')}${t('time.前')}`;
+    result = ` ${parseInt(`${hourC}`, 10)} ${'time.小时'}${'time.前'}`;
   } else if (minC >= 1 && minC <= 59) {
-    result = ` ${parseInt(`${minC}`, 10)} ${t('time.分钟')}${t('time.前')}`;
+    result = ` ${parseInt(`${minC}`, 10)} ${'time.分钟'}${'time.前'}`;
   } else if (diffValue >= 0 && diffValue <= minute) {
-    result = `${t('time.刚刚')}`;
+    result = `${'刚刚'}`;
   } else {
     const datetime = new Date();
     datetime.setTime(dateTimeStamp);
@@ -42,43 +42,44 @@ export function caculateTimeago(dateTimeStamp: number) {
 // 解析处理系统消息
 // Handle the system messages
 export function translateGroupSystemNotice(message: any) {
-  const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+  // const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+  const { t, tm } = useI18n()
   const groupName = message.payload.groupProfile.name || message.payload.groupProfile.groupID;
   switch (message.payload.operationType) {
     case 1:
-      return `${message.payload.operatorID} ${t('message.tip.申请加入群组')}：${groupName}`;
+      return `${message.payload.operatorID} ${'message.tip.申请加入群组'}：${groupName}`;
     case 2:
-      return `${t('message.tip.成功加入群组')}：${groupName}`;
+      return `${'message.tip.成功加入群组'}：${groupName}`;
     case 3:
-      return `${t('message.tip.申请加入群组')}：${groupName} ${t('message.tip.被拒绝')}`;
+      return `${'message.tip.申请加入群组'}：${groupName} ${'message.tip.被拒绝'}`;
     case 4:
-      return `${t('message.tip.你被管理员')}${message.payload.operatorID} ${t('message.tip.踢出群组')}：${groupName}`;
+      return `${'message.tip.你被管理员'}${message.payload.operatorID} ${'message.tip.踢出群组'}：${groupName}`;
     case 5:
-      return `${t('message.tip.群')}：${groupName} ${t('message.tip.被')} ${message.payload.operatorID} ${t(
+      return `${'message.tip.群'}：${groupName} ${'message.tip.被'} ${message.payload.operatorID} ${t(
         'message.tip.解散'
       )}`;
     case 6:
-      return `${message.payload.operatorID} ${t('message.tip.创建群')}：${groupName}`;
+      return `${message.payload.operatorID} ${'message.tip.创建群'}：${groupName}`;
     case 7:
-      return `${message.payload.operatorID} ${t('message.tip.邀请你加群')}：${groupName}`;
+      return `${message.payload.operatorID} ${'message.tip.邀请你加群'}：${groupName}`;
     case 8:
-      return `${t('message.tip.你退出群组')}：${groupName}`;
+      return `${'message.tip.你退出群组'}：${groupName}`;
     case 9:
-      return `${t('message.tip.你被')}${message.payload.operatorID} ${t('message.tip.设置为群')}：${groupName} ${t(
+      return `${'message.tip.你被'}${message.payload.operatorID} ${'message.tip.设置为群'}：${groupName} ${
         'message.tip.的管理员'
-      )}`;
+      }`;
     case 10:
-      return `${t('message.tip.你被')}${message.payload.operatorID} ${t('message.tip.撤销群')}：${groupName} ${t(
+      return `${'message.tip.你被'}${message.payload.operatorID} ${'message.tip.撤销群'}：${groupName} ${
         'message.tip.的管理员身份'
-      )}`;
+      }`;
     case 12:
-      return `${message.payload.operatorID} ${t('message.tip.邀请你加群')}：${groupName}`;
+      return `${message.payload.operatorID} ${'message.tip.邀请你加群'}：${groupName}`;
     case 13:
-      return `${message.payload.operatorID} ${t('message.tip.同意加群')}：${groupName}`;
+      return `${message.payload.operatorID} ${'message.tip.同意加群'}：${groupName}`;
     case 14:
-      return `${message.payload.operatorID} ${t('message.tip.拒接加群')}：${groupName}`;
+      return `${message.payload.operatorID} ${'message.tip.拒接加群'}：${groupName}`;
     case 255:
-      return `${t('message.tip.自定义群系统通知')}: ${message.payload.userDefinedField}`;
+      return `${'message.tip.自定义群系统通知'}: ${message.payload.userDefinedField}`;
   }
 }
 

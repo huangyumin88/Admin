@@ -1,4 +1,4 @@
-import { TUITheme, TUIi18n, TUIEnv, TUIDirective, TUINotification } from '../../TUIPlugin';
+import { TUITheme, TUIEnv, TUIDirective, TUINotification } from '../../TUIPlugin';
 
 import TIM from '../tim';
 import TIMUploadPlugin from 'tim-upload-plugin';
@@ -71,7 +71,7 @@ export default class TUICore extends ITUIServer {
     const { isH5 } = TUIEnv();
     (window as any).TUIKitTUICore = TUICore.instance;
     TUICore.instance.use(TUITheme);
-    TUICore.instance.use(TUIi18n);
+    // TUICore.instance.use(TUIi18n);
     return TUICore.instance;
   }
 

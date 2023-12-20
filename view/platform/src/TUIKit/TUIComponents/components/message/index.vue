@@ -8,7 +8,7 @@
 </template>
 <script lang="ts">
 import { useTimeoutFn } from '@vueuse/core';
-import { computed, CSSProperties, defineComponent, onMounted, ref, watch } from 'vue';
+import { computed, type CSSProperties, defineComponent, onMounted, ref, watch } from 'vue';
 export default defineComponent({
   name: 'TUIMessage',
   props: {

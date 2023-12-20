@@ -34,4 +34,4 @@ interface userListItem {
   userID: string;
 }
 
-export { Message, userListItem };
+export { type Message,type userListItem };

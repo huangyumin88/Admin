@@ -65,7 +65,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive, toRefs, watchEffect } from 'vue';
-import { Message } from '../../interface';
+import type { Message } from '../../interface';
 import {
   handleTextMessageShowContext,
   handleCustomMessageShowContext,

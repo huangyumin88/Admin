@@ -87,7 +87,7 @@
 <script lang="ts">
 import { onClickOutside, useElementBounding } from '@vueuse/core';
 import { defineComponent, nextTick, reactive, ref, toRefs, watch, watchEffect } from 'vue';
-import { Conversation } from '../../interface';
+import type { Conversation } from '../../interface';
 const ListItem: any = defineComponent({
   props: {
     conversation: {

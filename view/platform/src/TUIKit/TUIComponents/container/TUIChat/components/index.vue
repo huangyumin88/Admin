@@ -73,7 +73,7 @@ import {
   handleCustomMessageShowContext,
   isMessageTip,
 } from '../utils/utils';
-import { Message } from '@tencentcloud/chat';
+import type { Message } from '@tencentcloud/chat';
 import constant from '../../constant';
 
 const props = defineProps({

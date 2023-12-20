@@ -8,14 +8,14 @@
       <div class="call-main-content" ref="dialog">
         <div class="call-main-voice" @click="onClickCall(1)">
           <i class="icon icon-call-voice" v-if="isH5"></i>
-          {{ $t('TUIChat.语音通话') }}
+          {{ 'TUIChat.语音通话' }}
         </div>
         <div class="call-main-video" @click="onClickCall(2)">
           <i class="icon icon-call-video" v-if="isH5"></i>
-          {{ $t('TUIChat.视频通话') }}
+          {{ 'TUIChat.视频通话' }}
         </div>
         <footer>
-          <span v-if="isH5" class="close" @click.stop="showSelectDialog = false">{{ $t('TUIChat.取消') }}</span>
+          <span v-if="isH5" class="close" @click.stop="showSelectDialog = false">{{ 'TUIChat.取消' }}</span>
         </footer>
       </div>
     </div>
@@ -44,7 +44,7 @@
       :isHeaderShow="true"
       :isFooterShow="true"
       :background="true"
-      :title="$t('TUIChat.欢迎使用TUICallKit')"
+      :title="'TUIChat.欢迎使用TUICallKit'"
       @update:show="(e: boolean) => (showUnsupportDialog = e)"
     >
       <div>
@@ -53,9 +53,9 @@
             {{ errorContent }}
           </p>
           <p v-show="Object.keys(errorLink).length > 0">
-            {{ $t('TUIChat.请点击') }}
+            {{ 'TUIChat.请点击' }}
             <a @click="openLink(errorLink?.url)">{{ $t(`TUIChat.${errorLink?.label}`) }}</a>
-            {{ $t('TUIChat.进行体验') }}
+            {{ 'TUIChat.进行体验' }}
           </p>
         </div>
       </div>
@@ -66,7 +66,7 @@
 <script lang="ts">
 import { defineComponent, reactive, watchEffect, toRefs, ref, watch } from 'vue';
 import { onClickOutside } from '@vueuse/core';
-import { Conversation } from '../../../TUIConversation/interface';
+import type { Conversation } from '../../../TUIConversation/interface';
 import Dialog from '../../../../components/dialog';
 import Transfer from '../../../../components/transfer';
 import Link from '../../../../../utils/link/index';
@@ -96,7 +96,8 @@ const Call = defineComponent({
     Transfer,
   },
   setup(props: any, ctx: any) {
-    const { t } = Call.TUIServer.TUICore.config.i18n.useI18n();
+    // const { t } = Call.TUIServer.TUICore.config.i18n.useI18n();
+    // const { t, tm } = useI18n()
     const VuexStore = ((window as any)?.TUIKitTUICore?.isOfficial && useStore && useStore()) || {};
     const data = reactive({
       showSelectDialog: false,
@@ -214,7 +215,7 @@ const Call = defineComponent({
 
     const handleGroupDialog = (mediaType: number) => {
       data.showGroupUserDialog = true;
-      data.showTitle = mediaType === 1 ? t('TUIChat.发起群语音') : t('TUIChat.发起群视频');
+      data.showTitle = mediaType === 1 ? 'TUIChat.发起群语音' : 'TUIChat.发起群视频';
       const options: any = {
         groupID: data?.conversation?.groupProfile?.groupID,
         count: 100,
@@ -269,11 +270,11 @@ const Call = defineComponent({
     const handleUnsupportDialog = (error?: any) => {
       if (!error) {
         data.showUnsupportDialog = true;
-        data.errorContent = t('TUIChat.检测到您暂未集成TUICallKit，无法体验音视频通话功能');
+        data.errorContent = 'TUIChat.检测到您暂未集成TUICallKit，无法体验音视频通话功能';
         data.errorLink = Link.implement;
       } else if (error?.message?.indexOf('The package you purchased does not support this ability.') >= 0) {
         data.showUnsupportDialog = true;
-        data.errorContent = t('TUIChat.您当前购买使用的套餐包暂未开通此功能');
+        data.errorContent = 'TUIChat.您当前购买使用的套餐包暂未开通此功能';
         data.errorLink = Link.purchase;
       } else {
         data.errorContent = error?.message || error;

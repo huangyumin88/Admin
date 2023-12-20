@@ -13,5 +13,6 @@ module.exports = {
     '@typescript-eslint/no-var-requires': 0,
     'prefer-const': 0,
     'vue/multi-word-component-names': 0,
+    'vue/multi-word-component-names': 'warn',
   },
 };

@@ -1,4 +1,4 @@
-import { createVNode, render, ComponentPublicInstance, VNode } from 'vue';
+import { createVNode, render, type ComponentPublicInstance, type VNode } from 'vue';
 import MessageConstructor from './index.vue';
 
 const instances:any = [];

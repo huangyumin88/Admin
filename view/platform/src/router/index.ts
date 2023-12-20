@@ -96,6 +96,15 @@ const initRouteList = [
                 meta: { isAuth: true, keepAlive: true, componentName: '/platform/admin' }
             },
             {
+                path: '/platform/chats',
+                component: async () => {
+                    const component = await import('@/views/chats/Index.vue')
+                    component.default.name = '/platform/chats'
+                    return component
+                },
+                meta: { isAuth: true, keepAlive: true, componentName: '/platform/chats' }
+            },
+            {
                 path: '/platform/config',
                 component: async () => {
                     const component = await import('@/views/platform/config/Index.vue')

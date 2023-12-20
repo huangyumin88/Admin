@@ -53,7 +53,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, watch, reactive, toRefs, ref, watchEffect } from 'vue';
-import { Message } from '../interface';
+import type { Message } from '../interface';
 import TIM from '../../../../TUICore/tim';
 import { handleErrorPrompts } from '../../utils';
 import constant from '../../constant';

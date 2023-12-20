@@ -68,7 +68,7 @@
     @click="showRepliesDialog(message, true)"
   >
     <i class="icon icon-msg-replies"></i>
-    <span>{{ replies?.length + $t('TUIChat.条回复') }}</span>
+    <span>{{ replies?.length + 'TUIChat.条回复' }}</span>
   </label>
 </template>
 
@@ -123,7 +123,8 @@ const messageBubble = defineComponent({
     MessageEmojiReact,
   },
   setup(props: any, ctx: any) {
-    const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+    // const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+    // const { t, tm } = useI18n()
     const { TUIServer } = TUIChat;
     const data = reactive({
       env: TUIEnv(),
@@ -261,7 +262,7 @@ const messageBubble = defineComponent({
       ) {
         ctx.emit('jumpID', (data.referenceMessage as any).messageID);
       } else {
-        const message = t('TUIChat.无法定位到原消息');
+        const message = 'TUIChat.无法定位到原消息';
         handleErrorPrompts(message, props);
       }
     };
@@ -306,20 +307,20 @@ const messageBubble = defineComponent({
             message?.readReceiptInfo?.isPeerRead ||
             (message?.readReceiptInfo?.isPeerRead === undefined && message?.isPeerRead)
           ) {
-            return t('TUIChat.已读');
+            return 'TUIChat.已读';
           }
-          return t('TUIChat.未读');
+          return 'TUIChat.未读';
         case TUIServer.TUICore.TIM.TYPES.CONV_GROUP:
           if (message.readReceiptInfo.unreadCount === 0) {
-            return t('TUIChat.全部已读');
+            return 'TUIChat.全部已读';
           }
           if (
             message.readReceiptInfo.readCount === 0 ||
             (message.readReceiptInfo.unreadCount === undefined && message.readReceiptInfo.readCount === undefined)
           ) {
-            return t('TUIChat.未读');
+            return 'TUIChat.未读';
           }
-          return `${message.readReceiptInfo.readCount + t('TUIChat.人已读')}`;
+          return `${message.readReceiptInfo.readCount + 'TUIChat.人已读'}`;
         default:
           return '';
       }
@@ -342,7 +343,7 @@ const messageBubble = defineComponent({
           ctx.emit('showRepliesDialog', message, 'replies');
           return;
         } else {
-          const message = t('TUIChat.无法定位到原消息');
+          const message = 'TUIChat.无法定位到原消息';
           handleErrorPrompts(message, props);
         }
       }

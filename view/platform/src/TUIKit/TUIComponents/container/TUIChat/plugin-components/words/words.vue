@@ -5,7 +5,7 @@
         <div class="words-main-content" ref="dialog">
           <header>
             <aside>
-              <h1>{{$t('Words.常用语-快捷回复工具')}}</h1>
+              <h1>{{'Words.常用语-快捷回复工具'}}</h1>
             </aside>
             <span v-if="isH5" class="close" @click="toggleShow">关闭</span>
           </header>
@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, watchEffect, toRefs, watch, ref } from 'vue';
-import { useI18nLocale  } from '../../../../../TUIPlugin/TUIi18n';
+// import { useI18nLocale  } from '../../../../../TUIPlugin/TUIi18n';
 import { onClickOutside } from '@vueuse/core';
 
 const Words = defineComponent({
@@ -41,7 +41,8 @@ const Words = defineComponent({
     },
   },
   setup(props:any, ctx:any) {
-    const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+    // const { t } = (window as any).TUIKitTUICore.config.i18n.useI18n();
+    // const { t, tm } = useI18n()
     const list:any = [
       {
         value: '在吗？在吗？在吗？重要的话说三遍。',
@@ -75,16 +76,16 @@ const Words = defineComponent({
       list: [],
       show: false,
       isMute: false,
-      locale: useI18nLocale(),
+      // locale: useI18nLocale(),
     });
 
     const dialog:any = ref();
 
-    watch(() => data.locale, (newVal:any, oldVal:any) => {
-      data.list = list.map((item:any) => ({
-        value: t(`Words.${item.value}`),
-      }));
-    });
+    // watch(() => data.locale, (newVal:any, oldVal:any) => {
+    //   data.list = list.map((item:any) => ({
+    //     value: t(`Words.${item.value}`),
+    //   }));
+    // });
 
     watchEffect(() => {
       data.show = props.show;
