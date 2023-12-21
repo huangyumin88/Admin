@@ -31,6 +31,7 @@ type AdminColumns struct {
 	Password  string // 密码。md5保存
 	Salt      string // 加密盐
 	Nickname  string // 昵称
+	ImUserId  string // IMID
 	Avatar    string // 头像
 	IsStop    string // 停用：0否 1是
 	UpdatedAt string // 更新时间
@@ -45,6 +46,7 @@ var adminColumns = AdminColumns{
 	Password:  "password",
 	Salt:      "salt",
 	Nickname:  "nickname",
+	ImUserId:  "imUserId",
 	Avatar:    "avatar",
 	IsStop:    "isStop",
 	UpdatedAt: "updatedAt",

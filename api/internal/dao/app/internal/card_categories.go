@@ -30,6 +30,7 @@ type CardCategoriesColumns struct {
 	Avatar    string // 图片
 	AvatarUrl string // 转发图片地址
 	Name      string // card 名字
+	IMUsers   string // 负责客服
 	Sort      string // 排序值。从小到大排序，默认50，范围0-100
 	IsActive  string // 活动：0否 1是
 	IsStop    string // 停用：0否 1是
@@ -44,6 +45,7 @@ var cardCategoriesColumns = CardCategoriesColumns{
 	Avatar:    "avatar",
 	AvatarUrl: "avatar_url",
 	Name:      "name",
+	IMUsers:   "im_users",
 	Sort:      "sort",
 	IsActive:  "isActive",
 	IsStop:    "isStop",

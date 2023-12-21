@@ -41,6 +41,9 @@ type CardCategoriesListItem struct {
 	//Avatar    *string     `json:"avatar,omitempty" dc:"图片"`
 	AvatarUrl *string `json:"avatar_url,omitempty" dc:"转发图片地址"`
 	Name      *string `json:"name,omitempty" dc:"card 名字"`
+	//IMUsers   *string `json:"im_users,omitempty" dc:"负责客服"`
+	//IMUsers *string `json:"imUsers,omitempty" dc:"负责客服"`
+	IMUsersArr []string `json:"imUserArr,omitempty" dc:"负责客服数组"`
 	//Sort      *uint       `json:"sort,omitempty" dc:"排序值。从小到大排序，默认50，范围0-100"`
 	IsActive *int `json:"isActive,omitempty" dc:"活动：0否 1是"`
 	//IsStop    *uint       `json:"isStop,omitempty" dc:"停用：0否 1是"`

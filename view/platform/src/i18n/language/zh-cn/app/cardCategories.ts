@@ -3,6 +3,8 @@ export default {
 		sub_id: 'Card id',
 		avatar: '图片',
 		avatar_url: '转发图片地址',
+		im_users: '负责客服',
+		im_users_names: '负责客服',
 		name: 'card 名字',
 		sort: '排序值',
 		isActive: '活动',

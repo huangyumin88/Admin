@@ -6,6 +6,7 @@ import (
 	daoApp "api/internal/dao/app"
 	"context"
 	"fmt"
+	"github.com/gogf/gf/v2/container/gset"
 
 	"github.com/gogf/gf/v2/util/gconv"
 )
@@ -30,15 +31,15 @@ func (controllerThis *CardCategories) List(ctx context.Context, req *apiApp.Card
 	fmt.Println("page", page)
 
 	//columnsThis := daoApp.CardCategories.Columns()
-	//allowField := daoApp.CardCategories.ColumnArr()
-	//allowField = append(allowField, `id`, `label`)
-	//field := allowField
-	//if len(req.Field) > 0 {
-	//	field = gset.NewStrSetFrom(req.Field).Intersect(gset.NewStrSetFrom(allowField)).Slice()
-	//	if len(field) == 0 {
-	//		field = allowField
-	//	}
-	//}
+	allowField := daoApp.CardCategories.ColumnArr()
+	allowField = append(allowField, `id`, `imUserArr`)
+	field := allowField
+	if len(req.Field) > 0 {
+		field = gset.NewStrSetFrom(req.Field).Intersect(gset.NewStrSetFrom(allowField)).Slice()
+		if len(field) == 0 {
+			field = allowField
+		}
+	}
 	/**--------参数处理 结束--------**/
 
 	/**--------权限验证 开始--------**/
@@ -54,7 +55,7 @@ func (controllerThis *CardCategories) List(ctx context.Context, req *apiApp.Card
 	if err != nil {
 		return
 	}
-	list, err := daoHandlerThis.Order(order).JoinGroupByPrimaryKey().GetModel().Page(page, limit).All()
+	list, err := daoHandlerThis.Field(field).Order(order).JoinGroupByPrimaryKey().GetModel().Page(page, limit).All()
 	if err != nil {
 		return
 	}

@@ -6,15 +6,16 @@ package dao
 
 import (
 	"api/internal/dao/app/internal"
+	platformAdminDao "api/internal/dao/platform"
 	"context"
 	"database/sql"
-
 	"github.com/gogf/gf/v2/container/garray"
 	"github.com/gogf/gf/v2/container/gvar"
 	"github.com/gogf/gf/v2/database/gdb"
 	"github.com/gogf/gf/v2/frame/g"
 	"github.com/gogf/gf/v2/text/gstr"
 	"github.com/gogf/gf/v2/util/gconv"
+	"strings"
 )
 
 // internalCardCategoriesDao is internal type for wrapping internal DAO implements.
@@ -186,6 +187,11 @@ func (daoThis *cardCategoriesDao) ParseField(field []string, fieldWithParam map[
 			/* case `xxxx`:
 			m = m.Handler(daoThis.ParseJoin(Xxxx.ParseDbTable(ctx), joinTableArr))
 			*afterField = append(*afterField, v) */
+
+			case `imUserArr`:
+				*afterField = append(*afterField, v)
+			case `im_users_names`:
+				*afterField = append(*afterField, v)
 			case `label`:
 				m = m.Fields(tableThis + `.` + daoThis.Columns().Name + ` AS ` + v)
 			case `id`:
@@ -219,6 +225,27 @@ func (daoThis *cardCategoriesDao) HookSelect(afterField *[]string, afterFieldWit
 			for _, record := range result {
 				for _, v := range *afterField {
 					switch v {
+					case `imUserArr`:
+						if len(record[CardCategories.Columns().IMUsers].String()) != 0 {
+							idArr, _ := platformAdminDao.Admin.ParseDbCtx(ctx).Where(platformAdminDao.Admin.PrimaryKey(), record[CardCategories.Columns().IMUsers]).Array(platformAdminDao.Admin.Columns().ImUserId)
+							record[v] = gvar.New(idArr)
+						}
+					case `im_users_names`:
+						if len(record[CardCategories.Columns().IMUsers].String()) != 0 {
+
+							idArr, _ := platformAdminDao.Admin.ParseDbCtx(ctx).Where(platformAdminDao.Admin.PrimaryKey(), record[CardCategories.Columns().IMUsers]).Array(platformAdminDao.Admin.Columns().Account)
+							// 创建一个空的字符串切片
+							var strArr []string
+
+							// 遍历 idArr，并将每个 Value 转换为 string
+							for _, val := range idArr {
+								strArr = append(strArr, val.String()) // 假设 Value 类型有一个 String 方法返回字符串表示
+							}
+							idStr := strings.Join(strArr, " ")
+							record[v] = gvar.New(idStr)
+						} else {
+							record[v] = gvar.New(nil)
+						}
 					default:
 						record[v] = gvar.New(nil)
 					}

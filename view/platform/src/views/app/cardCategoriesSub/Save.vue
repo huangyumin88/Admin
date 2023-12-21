@@ -17,10 +17,10 @@ const saveForm = reactive({
 		cate_id: [
 			{ type: 'integer', min: 1, trigger: 'change', message: t('validation.select') },
 		],
-		name: [
-			{ type: 'string', required: true, max: 255, trigger: 'blur', message: t('validation.max.string', { max: 255 }) },
-			{ pattern: /^[\p{L}\p{M}\p{N}_-]+$/u, trigger: 'blur', message: t('validation.alpha_dash') },
-		],
+		// name: [
+		// 	{ type: 'string', required: true, max: 255, trigger: 'blur', message: t('validation.max.string', { max: 255 }) },
+		// 	{ pattern: /^[\p{L}\p{M}\p{N}_-]+$/u, trigger: 'blur', message: t('validation.alpha_dash') },
+		// ],
 		rate: [
 			{ type: 'integer', trigger: 'change', message: t('validation.input') },
 		],
@@ -91,7 +91,7 @@ const saveDrawer = reactive({
 		<ElScrollbar>
 			<ElForm :ref="(el: any) => { saveForm.ref = el }" :model="saveForm.data" :rules="saveForm.rules" label-width="auto" :status-icon="true" :scroll-to-error="true">
 				<ElFormItem :label="t('app.cardCategoriesSub.name.cate_id')" prop="cate_id">
-					<MySelect v-model="saveForm.data.cate_id" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/app/cate/list' }" />
+					<MySelect v-model="saveForm.data.cate_id" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/app/cardCategories/list' }" :style="{width:'300px'}" />
 				</ElFormItem>
 				<ElFormItem :label="t('app.cardCategoriesSub.name.name')" prop="name">
 					<ElInput v-model="saveForm.data.name" :placeholder="t('app.cardCategoriesSub.name.name')" minlength="1" maxlength="255" :show-word-limit="true" :clearable="true" />

@@ -48,12 +48,12 @@ const queryForm = reactive({
 		<ElFormItem prop="id">
 			<ElInputNumber v-model="queryCommon.data.id" :placeholder="t('common.name.id')" :min="1" :controls="false" />
 		</ElFormItem>
-		<ElFormItem prop="sub_id">
-			<ElInput v-model="queryCommon.data.sub_id" :placeholder="t('app.cardCategories.name.sub_id')" minlength="1" maxlength="30" :clearable="true" />
-		</ElFormItem>
-		<ElFormItem prop="avatar_url">
-			<ElInput v-model="queryCommon.data.avatar_url" :placeholder="t('app.cardCategories.name.avatar_url')" minlength="1" maxlength="255" :clearable="true" />
-		</ElFormItem>
+<!--		<ElFormItem prop="sub_id">-->
+<!--			<ElInput v-model="queryCommon.data.sub_id" :placeholder="t('app.cardCategories.name.sub_id')" minlength="1" maxlength="30" :clearable="true" />-->
+<!--		</ElFormItem>-->
+<!--		<ElFormItem prop="avatar_url">-->
+<!--			<ElInput v-model="queryCommon.data.avatar_url" :placeholder="t('app.cardCategories.name.avatar_url')" minlength="1" maxlength="255" :clearable="true" />-->
+<!--		</ElFormItem>-->
 		<ElFormItem prop="name">
 			<ElInput v-model="queryCommon.data.name" :placeholder="t('app.cardCategories.name.name')" minlength="1" maxlength="255" :clearable="true" />
 		</ElFormItem>

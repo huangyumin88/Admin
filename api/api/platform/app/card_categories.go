@@ -36,17 +36,19 @@ type CardCategoriesListRes struct {
 }
 
 type CardCategoriesListItem struct {
-	Id        *uint       `json:"id,omitempty" dc:"ID"`
-	Label     *string     `json:"label,omitempty" dc:"标签。常用于前端组件"`
-	SubId     *string     `json:"sub_id,omitempty" dc:"Card id"`
-	Avatar    *string     `json:"avatar,omitempty" dc:"图片"`
-	AvatarUrl *string     `json:"avatar_url,omitempty" dc:"转发图片地址"`
-	Name      *string     `json:"name,omitempty" dc:"card 名字"`
-	Sort      *uint       `json:"sort,omitempty" dc:"排序值。从小到大排序，默认50，范围0-100"`
-	IsActive  *int        `json:"isActive,omitempty" dc:"活动：0否 1是"`
-	IsStop    *uint       `json:"isStop,omitempty" dc:"停用：0否 1是"`
-	UpdatedAt *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
-	CreatedAt *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
+	Id           *uint       `json:"id,omitempty" dc:"ID"`
+	Label        *string     `json:"label,omitempty" dc:"标签。常用于前端组件"`
+	SubId        *string     `json:"sub_id,omitempty" dc:"Card id"`
+	Avatar       *string     `json:"avatar,omitempty" dc:"图片"`
+	AvatarUrl    *string     `json:"avatar_url,omitempty" dc:"转发图片地址"`
+	Name         *string     `json:"name,omitempty" dc:"card 名字"`
+	IMUsers      *string     `json:"im_users,omitempty" dc:"负责客服"`
+	IMUsersNames *string     `json:"im_users_names,omitempty" dc:"负责客服"`
+	Sort         *uint       `json:"sort,omitempty" dc:"排序值。从小到大排序，默认50，范围0-100"`
+	IsActive     *int        `json:"isActive,omitempty" dc:"活动：0否 1是"`
+	IsStop       *uint       `json:"isStop,omitempty" dc:"停用：0否 1是"`
+	UpdatedAt    *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
+	CreatedAt    *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
 }
 
 /*--------列表 结束--------*/
@@ -63,17 +65,19 @@ type CardCategoriesInfoRes struct {
 }
 
 type CardCategoriesInfo struct {
-	Id        *uint       `json:"id,omitempty" dc:"ID"`
-	Label     *string     `json:"label,omitempty" dc:"标签。常用于前端组件"`
-	SubId     *string     `json:"sub_id,omitempty" dc:"Card id"`
-	Avatar    *string     `json:"avatar,omitempty" dc:"图片"`
-	AvatarUrl *string     `json:"avatar_url,omitempty" dc:"转发图片地址"`
-	Name      *string     `json:"name,omitempty" dc:"card 名字"`
-	Sort      *uint       `json:"sort,omitempty" dc:"排序值。从小到大排序，默认50，范围0-100"`
-	IsActive  *int        `json:"isActive,omitempty" dc:"活动：0否 1是"`
-	IsStop    *uint       `json:"isStop,omitempty" dc:"停用：0否 1是"`
-	UpdatedAt *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
-	CreatedAt *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
+	Id           *uint       `json:"id,omitempty" dc:"ID"`
+	Label        *string     `json:"label,omitempty" dc:"标签。常用于前端组件"`
+	SubId        *string     `json:"sub_id,omitempty" dc:"Card id"`
+	Avatar       *string     `json:"avatar,omitempty" dc:"图片"`
+	AvatarUrl    *string     `json:"avatar_url,omitempty" dc:"转发图片地址"`
+	Name         *string     `json:"name,omitempty" dc:"card 名字"`
+	IMUsers      *string     `json:"im_users,omitempty" dc:"负责客服"`
+	IMUsersNames *string     `json:"im_users_names,omitempty" dc:"负责客服"`
+	Sort         *uint       `json:"sort,omitempty" dc:"排序值。从小到大排序，默认50，范围0-100"`
+	IsActive     *int        `json:"isActive,omitempty" dc:"活动：0否 1是"`
+	IsStop       *uint       `json:"isStop,omitempty" dc:"停用：0否 1是"`
+	UpdatedAt    *gtime.Time `json:"updatedAt,omitempty" dc:"更新时间"`
+	CreatedAt    *gtime.Time `json:"createdAt,omitempty" dc:"创建时间"`
 }
 
 /*--------详情 结束--------*/
@@ -84,7 +88,8 @@ type CardCategoriesCreateReq struct {
 	SubId     *string `json:"sub_id,omitempty" v:"max-length:30" dc:"Card id"`
 	Avatar    *string `json:"avatar,omitempty" v:"max-length:255|url" dc:"图片"`
 	AvatarUrl *string `json:"avatar_url,omitempty" v:"max-length:255|url" dc:"转发图片地址"`
-	Name      *string `json:"name,omitempty" v:"required|max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"card 名字"`
+	Name      *string `json:"name,omitempty" v:"max-length:255" dc:"card 名字"`
+	IMUsers   *string `json:"im_users,omitempty" dc:"负责客服"`
 	Sort      *uint   `json:"sort,omitempty" v:"between:0,100" dc:"排序值。从小到大排序，默认50，范围0-100"`
 	IsActive  *int    `json:"isActive,omitempty" v:"in:0,1" dc:"活动：0否 1是"`
 	IsStop    *uint   `json:"isStop,omitempty" v:"in:0,1" dc:"停用：0否 1是"`
@@ -97,9 +102,10 @@ type CardCategoriesUpdateReq struct {
 	g.Meta    `path:"/cardCategories/update" method:"post" tags:"平台后台/分类" sm:"更新"`
 	IdArr     []uint  `json:"idArr,omitempty" v:"required|distinct|foreach|min:1" dc:"ID数组"`
 	SubId     *string `json:"sub_id,omitempty" v:"max-length:30" dc:"Card id"`
+	IMUsers   *string `json:"im_users,omitempty" dc:"负责客服"`
 	Avatar    *string `json:"avatar,omitempty" v:"max-length:255|url" dc:"图片"`
 	AvatarUrl *string `json:"avatar_url,omitempty" v:"max-length:255|url" dc:"转发图片地址"`
-	Name      *string `json:"name,omitempty" v:"max-length:255|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"card 名字"`
+	Name      *string `json:"name,omitempty" v:"max-length:255" dc:"card 名字"`
 	Sort      *uint   `json:"sort,omitempty" v:"between:0,100" dc:"排序值。从小到大排序，默认50，范围0-100"`
 	IsActive  *int    `json:"isActive,omitempty" v:"in:0,1" dc:"活动：0否 1是"`
 	IsStop    *uint   `json:"isStop,omitempty" v:"in:0,1" dc:"停用：0否 1是"`

@@ -25,10 +25,10 @@ const saveForm = reactive({
 			{ type: 'string', max: 255, trigger: 'blur', message: t('validation.max.string', { max: 255 }) },
 			{ type: 'url', trigger: 'change', message: t('validation.url') },
 		],
-		name: [
-			{ type: 'string', required: true, max: 255, trigger: 'blur', message: t('validation.max.string', { max: 255 }) },
-			{ pattern: /^[\p{L}\p{M}\p{N}_-]+$/u, trigger: 'blur', message: t('validation.alpha_dash') },
-		],
+		// name: [
+		// 	{ type: 'string', required: true, max: 255, trigger: 'blur', message: t('validation.max.string', { max: 255 }) },
+		// 	{ pattern: /^[\p{L}\p{M}\p{N}_-]+$/u, trigger: 'blur', message: t('validation.alpha_dash') },
+		// ],
 		sort: [
 			{ type: 'integer', min: 0, max: 100, trigger: 'change', message: t('validation.between.number', { min: 0, max: 100 }) },
 		],
@@ -46,7 +46,10 @@ const saveForm = reactive({
 			}
 			saveForm.loading = true
 			const param = removeEmptyOfObj(saveForm.data, false)
+      // console.log(saveForm.data.im_users)
+      saveForm.data.im_users = saveForm.data.im_users.toString();
 			try {
+
 				if (param?.idArr?.length > 0) {
 					await request(t('config.VITE_HTTP_API_PREFIX') + '/app/cardCategories/update', param, true)
 				} else {
@@ -94,6 +97,9 @@ const saveDrawer = reactive({
 				<ElFormItem :label="t('app.cardCategories.name.avatar')" prop="avatar">
 					<MyUpload v-model="saveForm.data.avatar" accept="image/*" />
 				</ElFormItem>
+        <ElFormItem :label="t('app.cardCategories.name.im_users')" prop="im_users">
+          <MySelect v-model="saveForm.data.im_users" :api="{ code: t('config.VITE_HTTP_API_PREFIX') + '/platform/admin/list', param:{filter: { roleId: 2 } } } " :style="{width:'300px'}" />
+        </ElFormItem>
 				<ElFormItem :label="t('app.cardCategories.name.avatar_url')" prop="avatar_url">
 					<ElInput v-model="saveForm.data.avatar_url" :placeholder="t('app.cardCategories.name.avatar_url')" minlength="1" maxlength="255" :show-word-limit="true" :clearable="true" />
 				</ElFormItem>

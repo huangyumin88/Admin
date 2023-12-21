@@ -31,7 +31,7 @@ func (controllerThis *CardCategories) List(ctx context.Context, req *apiApp.Card
 
 	columnsThis := daoApp.CardCategories.Columns()
 	allowField := daoApp.CardCategories.ColumnArr()
-	allowField = append(allowField, `id`, `label`)
+	allowField = append(allowField, `id`, `label`, `im_users_names`)
 	field := allowField
 	if len(req.Field) > 0 {
 		field = gset.NewStrSetFrom(req.Field).Intersect(gset.NewStrSetFrom(allowField)).Slice()
@@ -70,7 +70,7 @@ func (controllerThis *CardCategories) List(ctx context.Context, req *apiApp.Card
 func (controllerThis *CardCategories) Info(ctx context.Context, req *apiApp.CardCategoriesInfoReq) (res *apiApp.CardCategoriesInfoRes, err error) {
 	/**--------参数处理 开始--------**/
 	allowField := daoApp.CardCategories.ColumnArr()
-	allowField = append(allowField, `id`)
+	allowField = append(allowField, `id`, `im_users_names`)
 	field := allowField
 	if len(req.Field) > 0 {
 		field = gset.NewStrSetFrom(req.Field).Intersect(gset.NewStrSetFrom(allowField)).Slice()
@@ -134,6 +134,8 @@ func (controllerThis *CardCategories) Update(ctx context.Context, req *apiApp.Ca
 	}
 	filter := map[string]interface{}{`id`: req.IdArr}
 	/**--------参数处理 结束--------**/
+
+	//fmt.Println("im_users", data["im_users"])
 
 	/**--------权限验证 开始--------**/
 	_, err = service.AuthAction().CheckAuth(ctx, `appCardCategoriesUpdate`)
