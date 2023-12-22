@@ -35,7 +35,7 @@ func (controllerThis *Orders) List(ctx context.Context, req *apiOrders.OrdersLis
 
 	//columnsThis := daoOrders.Orders.Columns()
 	allowField := daoOrders.Orders.ColumnArr()
-	allowField = append(allowField, `id`)
+	allowField = append(allowField, `id`, `cate`, `sub_cate`)
 	field := allowField
 	if len(req.Field) > 0 {
 		field = gset.NewStrSetFrom(req.Field).Intersect(gset.NewStrSetFrom(allowField)).Slice()
@@ -72,7 +72,7 @@ func (controllerThis *Orders) List(ctx context.Context, req *apiOrders.OrdersLis
 func (controllerThis *Orders) Info(ctx context.Context, req *apiOrders.OrdersInfoReq) (res *apiOrders.OrdersInfoRes, err error) {
 	/**--------参数处理 开始--------**/
 	allowField := daoOrders.Orders.ColumnArr()
-	allowField = append(allowField, `id`)
+	allowField = append(allowField, `id`, `cate`, `sub_cate`)
 	field := allowField
 	if len(req.Field) > 0 {
 		field = gset.NewStrSetFrom(req.Field).Intersect(gset.NewStrSetFrom(allowField)).Slice()

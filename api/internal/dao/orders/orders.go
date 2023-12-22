@@ -5,6 +5,7 @@
 package dao
 
 import (
+	cardDao "api/internal/dao/app"
 	"api/internal/dao/orders/internal"
 	userAdmin "api/internal/dao/platform"
 	userDao "api/internal/dao/user"
@@ -184,6 +185,10 @@ func (daoThis *ordersDao) ParseField(field []string, fieldWithParam map[string]i
 		tableThis := daoThis.ParseDbTable(ctx)
 		for _, v := range field {
 			switch v {
+			case `cate`:
+				*afterField = append(*afterField, v)
+			case `sub_cate`:
+				*afterField = append(*afterField, v)
 			case `client_status_name`:
 				*afterField = append(*afterField, v)
 			case `backend_status_name`:
@@ -230,6 +235,16 @@ func (daoThis *ordersDao) HookSelect(afterField *[]string, afterFieldWithParam m
 			for _, record := range result {
 				for _, v := range *afterField {
 					switch v {
+					case `cate`:
+						if record[Orders.Columns().CardCateId].Int() > 0 {
+							cateInfo, _ := cardDao.CardCategories.ParseDbCtx(ctx).Where(cardDao.CardCategories.PrimaryKey(), record[daoThis.Columns().CardCateId]).One()
+							record[v] = gvar.New(cateInfo)
+						}
+					case `sub_cate`:
+						if record[Orders.Columns().CardCateSubId].Int() > 0 {
+							cateSubInfo, _ := cardDao.CardCategoriesSub.ParseDbCtx(ctx).Where(cardDao.CardCategoriesSub.PrimaryKey(), record[daoThis.Columns().CardCateSubId]).One()
+							record[v] = gvar.New(cateSubInfo)
+						}
 					case `client_status_name`:
 						//fmt.Println("client_status_name", record[Orders.Columns().ClientStatus])
 						if record[Orders.Columns().ClientStatus].String() == "Pending" {

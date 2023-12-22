@@ -1,5 +1,5 @@
 import { TUINotification } from '../../../TUIPlugin';
-import Message from '../../../TUICore/tim/index';
+import type Message from '../../../TUICore/tim/index';
 import IComponentServer from '../IComponentServer';
 import { isTypingMessage, JSONToObject } from './utils/utils';
 

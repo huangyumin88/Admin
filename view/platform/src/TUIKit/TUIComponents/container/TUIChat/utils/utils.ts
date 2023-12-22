@@ -228,13 +228,13 @@ function handleTipGrpUpdated(message: any) {
       }`;
       }
   } else if ("ownerID" in newGroupProfile) {
-    text = `${newGroupProfile["ownerID"]} ${t("message.tip.成为新的群主")}`;
+    text = `${newGroupProfile["ownerID"]} ${"message.tip.成为新的群主"}`;
   } else if ("groupName" in newGroupProfile) {
-    text = `${operatorID} ${t("message.tip.修改群名为")} ${
+    text = `${operatorID} ${"message.tip.修改群名为"} ${
       newGroupProfile["groupName"]
     }`;
   } else if ("notification" in newGroupProfile) {
-    text = `${operatorID} ${t("message.tip.发布新公告")}`;
+    text = `${operatorID} ${"message.tip.发布新公告"}`;
   }
   return text;
 }
