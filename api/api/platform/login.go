@@ -19,4 +19,10 @@ type LoginLoginReq struct {
 	Password  string `json:"password" v:"required|size:32" dc:"密码。加密后发送，公式：md5(md5(md5(密码)+静态加密盐)+动态加密盐)"`
 }
 
+type LoginLoginServiceReq struct {
+	g.Meta    `path:"/login/service" method:"post" tags:"平台后台/登录" sm:"客服登录"`
+	LoginName string `json:"loginName" v:"required|max-length:30|regex:^[\\p{L}\\p{M}\\p{N}_-]+$" dc:"账号/手机"`
+	Password  string `json:"password" v:"required|size:32" dc:"密码。加密后发送，公式：md5(md5(md5(密码)+静态加密盐)+动态加密盐)"`
+}
+
 /*--------登录 结束--------*/
