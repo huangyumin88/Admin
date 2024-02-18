@@ -6,6 +6,7 @@ package logic
 
 import (
 	_ "api/internal/logic/auth"
+	_ "api/internal/logic/image"
 	_ "api/internal/logic/platform"
 	_ "api/internal/logic/user"
 )

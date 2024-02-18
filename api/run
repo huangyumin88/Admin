@@ -1,0 +1,1 @@
+./main myGen -sceneCode=platform -dbGroup=default -dbTable=ai_image -removePrefix=ai_ -moduleDir=image -commonName=图片 -isList=yes -isCount=yes -isInfo=yes -isCreate=yes -isUpdate=yes -isDelete=yes -isApi=yes -isAuthAction=no -isView=yes -isCover=yes

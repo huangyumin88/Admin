@@ -10,14 +10,6 @@ import (
 )
 
 type (
-	IAuthScene interface {
-		// 新增
-		Create(ctx context.Context, data map[string]interface{}) (id int64, err error)
-		// 修改
-		Update(ctx context.Context, filter map[string]interface{}, data map[string]interface{}) (row int64, err error)
-		// 删除
-		Delete(ctx context.Context, filter map[string]interface{}) (row int64, err error)
-	}
 	IAuthAction interface {
 		// 新增
 		Create(ctx context.Context, data map[string]interface{}) (id int64, err error)
@@ -44,6 +36,14 @@ type (
 		// 删除
 		Delete(ctx context.Context, filter map[string]interface{}) (row int64, err error)
 	}
+	IAuthScene interface {
+		// 新增
+		Create(ctx context.Context, data map[string]interface{}) (id int64, err error)
+		// 修改
+		Update(ctx context.Context, filter map[string]interface{}, data map[string]interface{}) (row int64, err error)
+		// 删除
+		Delete(ctx context.Context, filter map[string]interface{}) (row int64, err error)
+	}
 )
 
 var (
@@ -52,6 +52,17 @@ var (
 	localAuthRole   IAuthRole
 	localAuthScene  IAuthScene
 )
+
+func AuthScene() IAuthScene {
+	if localAuthScene == nil {
+		panic("implement not found for interface IAuthScene, forgot register?")
+	}
+	return localAuthScene
+}
+
+func RegisterAuthScene(i IAuthScene) {
+	localAuthScene = i
+}
 
 func AuthAction() IAuthAction {
 	if localAuthAction == nil {
@@ -84,15 +95,4 @@ func AuthRole() IAuthRole {
 
 func RegisterAuthRole(i IAuthRole) {
 	localAuthRole = i
-}
-
-func AuthScene() IAuthScene {
-	if localAuthScene == nil {
-		panic("implement not found for interface IAuthScene, forgot register?")
-	}
-	return localAuthScene
-}
-
-func RegisterAuthScene(i IAuthScene) {
-	localAuthScene = i
 }

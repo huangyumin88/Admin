@@ -4,6 +4,7 @@ import (
 	"api/internal/controller"
 	controllerCurrent "api/internal/controller/platform"
 	controllerAuth "api/internal/controller/platform/auth"
+	controllerImage "api/internal/controller/platform/image"
 	controllerMy "api/internal/controller/platform/my"
 	controllerPlatform "api/internal/controller/platform/platform"
 	controllerUser "api/internal/controller/platform/user"
@@ -52,6 +53,10 @@ func InitRouterPlatform(s *ghttp.Server) {
 
 			group.Group(`/user`, func(group *ghttp.RouterGroup) {
 				group.Bind(controllerUser.NewUser())
+			})
+
+			group.Group(`/image`, func(group *ghttp.RouterGroup) {
+				group.Bind(controllerImage.NewImage())
 			})
 
 			/*--------后端路由自动代码生成锚点（不允许修改和删除，否则将不能自动生成路由）--------*/

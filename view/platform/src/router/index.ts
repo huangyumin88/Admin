@@ -122,6 +122,24 @@ const initRouteList = [
                 },
                 meta: { isAuth: true, keepAlive: true, componentName: '/user/user' }
             },
+            {
+                path: '/review/image',
+                component: async () => {
+                    const component = await import('@/views/review/image/Index.vue')
+                    component.default.name = '/review/image'
+                    return component
+                },
+                meta: { isAuth: true, keepAlive: true, componentName: '/review/image' }
+            },
+            {
+                path: '/image/image',
+                component: async () => {
+                    const component = await import('@/views/image/image/Index.vue')
+                    component.default.name = '/image/image'
+                    return component
+                },
+                meta: { isAuth: true, keepAlive: true, componentName: '/image/image' }
+            },
             /*--------前端路由自动代码生成锚点（不允许修改和删除，否则将不能自动生成路由）--------*/
             {
                 path: '/profile',

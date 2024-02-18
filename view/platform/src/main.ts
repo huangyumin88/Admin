@@ -1,24 +1,26 @@
-import { createApp } from "vue"
-import App from "./App.vue"
+import { createApp } from "vue";
+import App from "./App.vue";
 
-import "./assets/css/main.css"
+import "./assets/css/main.css";
 
-import i18n from './i18n'
-import router from './router'
-import { createPinia } from 'pinia'
+import i18n from "./i18n";
+import router from "./router";
+import { createPinia } from "pinia";
 
-const app = createApp(App)
-app.use(i18n)
-app.use(router)
-app.use(createPinia())
-app.mount('#app')
+const app = createApp(App);
+app.use(i18n);
+app.use(router);
+app.use(createPinia());
+
+app.mount("#app");
 
 /*-------- 动态加载图标 开始 --------*/
 //app.component('autoiconEpLollipop', autoiconEpLollipop)
-import * as epIconList from '@element-plus/icons-vue'
-for (let [key, component] of Object.entries(epIconList)) {
-    //app.component('Ep' + key, component)
-    app.component('AutoiconEp' + key, component)    //兼容图标插件unplugin-icons，如插件以后支持动态加载<component :is="图标标识变量"/>，不用修改代码
+import * as epIconList from "@element-plus/icons-vue";
+
+for (const [key, component] of Object.entries(epIconList)) {
+  //app.component('Ep' + key, component)
+  app.component("AutoiconEp" + key, component); //兼容图标插件unplugin-icons，如插件以后支持动态加载<component :is="图标标识变量"/>，不用修改代码
 }
 /*-------- 动态加载图标 结束 --------*/
 

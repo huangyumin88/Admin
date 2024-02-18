@@ -3,19 +3,23 @@
 gfcli:
   build:
     packSrc: "manifest,resource" # 需要打包资源目录
+    arch: "amd64"
+    system: "linux"
+    version: "v1.0.0"
+    output: "./bin"
     # output: "../" #默认文件名main，也可写成../xxxx指定文件名
   gen:
     dao:
-      - link: "mysql:root:123456@tcp(0.0.0.0:3306)/dev_admin"
+      - link: "mysql:ai_news:PHBrs6rpRwMC7Hz7@tcp(124.220.48.159:3306)/ai_news"
         group: "default"
-        removePrefix: "auth_"
-        daoPath: "dao/auth"
-        doPath: "model/do/auth"
-        entityPath: "model/entity/auth"
-        tables: "auth_test"
+        removePrefix: "ai_"
+        daoPath: "dao/image"
+        doPath: "model/do/image"
+        entityPath: "model/entity/image"
+        tables: "ai_image"
         tplDaoIndexPath: "resource/gen/gen_dao_template_dao.txt"
         tplDaoInternalPath: "resource/gen/gen_dao_template_dao_internal.txt"
         overwriteDao: true
     pbentity:
-      - link: "mysql:root:123456@tcp(0.0.0.0:3306)/dev_admin"
+      - link: "mysql:ai_news:PHBrs6rpRwMC7Hz7@tcp(124.220.48.159:3306)/ai_news"
         tables: "auth_test"
